@@ -28,12 +28,28 @@ This document defines the `--gc-` semantic vocabulary, frozen by operator
 approval of F-001 on 2026-08-03. Names and tier boundaries are fixed; exact
 values remain tunable through v1.0.
 
+> **Boundary prose is clarifiable; names and tier membership are not.** The
+> 2026-08-03 freeze locks the 83 token names and the tier each belongs to.
+> Clarifying what a token means — refining its boundary definition, as
+> Amendment 3 does for `--gc-text-muted` below — does not require a version
+> bump. Renaming a token, moving it between tiers, adding one, or removing one
+> does.
+
+> **Standing contrast rule (property of the contract, set by Amendment 3).**
+> Every semantic foreground token placed on every semantic surface token meets
+> WCAG AA contrast (4.5:1) at the framework's default body and caption sizes,
+> in every theme, with no size qualification. This is a property of the token
+> contract from here: a future theme inherits it rather than rediscovering it.
+> `--gc-text-disabled` is outside this rule because WCAG 1.4.3 exempts inactive
+> controls; `--gc-text-inverse` is outside it on non-inverted surfaces because
+> the token is defined for inverted surfaces only.
+
 ## 1. Tier Contract
 
 | Tier | Holds | May reference | Consumer status |
 |------|-------|---------------|-----------------|
 | Primitive | Literal colour, dimension, type, motion, shape, and effect values | Nothing | Internal; framework rules never read it |
-| Semantic | Roles shared by all themes and components | Primitive tokens only | Public freeze candidate; themes may override it |
+| Semantic | Roles shared by all themes and components | Primitive tokens only | Frozen 2026-08-03; themes may override values only |
 | Component | Defaults and shared state recipes for a component | Semantic tokens only | Public where a component exposes it |
 
 The dependency direction is primitive to semantic to component. A theme
@@ -69,7 +85,7 @@ presumes a hue, game mechanic, or one theme's technique.
 |-------|---------------------|
 | `--gc-text-primary` | Highest-emphasis ordinary text; not text placed on an accent fill. |
 | `--gc-text-secondary` | Supporting readable text; not placeholder or disabled text. |
-| `--gc-text-muted` | Low-emphasis metadata and hints; not an inaccessible decorative tint. |
+| `--gc-text-muted` | Low-emphasis metadata and hints; not an inaccessible decoration. Meets 4.5:1 against every surface at default sizes. Differentiates from `--gc-text-secondary` by weight, size, and spacing (which the framework controls), not by lightness alone — the 4.5:1 rule compresses the muted–secondary lightness gap, so a consumer must not rely on colour value to distinguish them. |
 | `--gc-text-inverse` | Text on a generally inverted surface; not specifically text on accent. |
 | `--gc-text-disabled` | Text for unavailable controls; not muted but available content. |
 | `--gc-border-default` | Ordinary component boundary; not a focus or selected indicator. |
