@@ -35,14 +35,41 @@ values remain tunable through v1.0.
 > bump. Renaming a token, moving it between tiers, adding one, or removing one
 > does.
 
-> **Standing contrast rule (property of the contract, set by Amendment 3).**
-> Every semantic foreground token placed on every semantic surface token meets
-> WCAG AA contrast (4.5:1) at the framework's default body and caption sizes,
-> in every theme, with no size qualification. This is a property of the token
-> contract from here: a future theme inherits it rather than rediscovering it.
-> `--gc-text-disabled` is outside this rule because WCAG 1.4.3 exempts inactive
-> controls; `--gc-text-inverse` is outside it on non-inverted surfaces because
-> the token is defined for inverted surfaces only.
+> **Standing contrast rule (property of the contract, set by Amendment 3;
+> scope corrected 2026-08-03 after review).** Every **designed** foreground and
+> background pairing meets its WCAG threshold in every theme, at the
+> framework's default body and caption sizes, with no size qualification. The
+> rule is defined over the enumerated pairings in the table below, **not** over
+> the Cartesian product of foreground and surface tokens. Several tokens are
+> pair-specific by their own boundary definition, so the product contains
+> combinations no theme can or should satisfy: `--gc-on-accent` is defined for
+> the accent fill and is near-white in modern, which would measure roughly 1:1
+> against `--gc-surface-base`. A future theme inherits this rule rather than
+> rediscovering it.
+
+#### Designed pairings and thresholds
+
+| Foreground | Valid backgrounds | Threshold |
+|------------|-------------------|-----------|
+| `--gc-text-primary`, `--gc-text-secondary`, `--gc-text-muted` | `--gc-surface-canvas`, `--gc-surface-base`, `--gc-surface-raised`, `--gc-surface-sunken`, `--gc-surface-interactive`, `--gc-surface-overlay` | 4.5:1 |
+| `--gc-on-accent` | `--gc-accent`, and `--gc-control-fill-selected` because that recipe derives from the accent | 4.5:1 |
+| `--gc-on-status-success` | `--gc-status-success` | 4.5:1 |
+| `--gc-on-status-warning` | `--gc-status-warning` | 4.5:1 |
+| `--gc-on-status-danger` | `--gc-status-danger` | 4.5:1 |
+| `--gc-on-status-info` | `--gc-status-info` | 4.5:1 |
+| `--gc-border-default`, `--gc-border-strong`, `--gc-divider`, `--gc-focus-ring` | The surface each is drawn against | 3:1 (WCAG 1.4.11, non-text) |
+
+Outside the rule, and why:
+
+- `--gc-text-disabled` on any surface. WCAG 1.4.3 exempts inactive controls.
+- `--gc-text-inverse` is pairing-restricted and currently unused. Its boundary
+  defines it for inverted surfaces, and no theme declares one yet. **The first
+  component that uses it establishes the pairing, and that pairing joins this
+  table and must meet 4.5:1.** It is not a standing exemption.
+
+Any combination absent from this table is undesigned. A component that creates
+one has introduced a pairing, not found a loophole: add the row and meet the
+threshold, or use a token designed for that background.
 
 ## 1. Tier Contract
 
@@ -189,6 +216,8 @@ by those recipes; they do not enumerate state values.
 
 ## 4. Freeze Decision
 
-Finding F-001 in [the foundations review](foundations-review-2026-08-02.md)
-asks the operator to approve this vocabulary as frozen. Until that question is
-answered yes, downstream documents must call this a freeze candidate.
+Finding F-001 in [the foundations review](foundations-review-2026-08-02.md) was
+approved on 2026-08-03. This vocabulary is frozen: the 83 names and their tier
+membership are API, and renaming, moving, adding, or removing one is a major
+version. Values remain tunable through v1.0, and boundary prose remains
+clarifiable.
