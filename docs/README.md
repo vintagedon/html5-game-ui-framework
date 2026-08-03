@@ -3,8 +3,8 @@
 title: "Documentation"
 description: "Project documentation, standards, and reference materials"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-07-25"
-version: "1.3"
+date: "2026-08-03"
+version: "1.4"
 status: "Active"
 tags:
   - type: directory-readme
@@ -17,7 +17,10 @@ related_documents:
 
 # Documentation
 
-Project documentation. The project charter holds frozen scope, architecture, and acceptance criteria. The `documentation-standards/` subdirectory contains the template library and guidelines that govern all documentation in the repository.
+Project documentation. The project charter holds frozen scope, architecture,
+and acceptance criteria. The token and cascade references describe the Phase 1
+contract, and the foundations review holds the operator decision surface. The
+`documentation-standards/` subdirectory governs repository documentation.
 
 ---
 
@@ -39,7 +42,10 @@ docs/
 │   ├── script-header-shell.md
 │   ├── script-header-powershell.md
 │   └── README.md
+├── cascade-and-overrides.md         # Layer precedence and consumer override contract
+├── foundations-review-2026-08-02.md  # F-001 through F-006 operator questions
 ├── project-charter.md              # Frozen scope, architecture, acceptance criteria
+├── token-reference.md              # Semantic freeze candidate and tier boundaries
 └── README.md                       # This file
 ```
 
@@ -49,9 +55,10 @@ docs/
 
 | File | Description | Status |
 |------|-------------|--------|
+| [cascade-and-overrides.md](cascade-and-overrides.md) | Cascade order, zero-specificity defaults, and important-layer reversal | Active |
+| [foundations-review-2026-08-02.md](foundations-review-2026-08-02.md) | Closed approval questions for Phase 1 foundations and the spike | Under Review |
 | [project-charter.md](project-charter.md) | Frozen scope, architecture, roadmap, and acceptance criteria | Active |
-
-The staged manifest for the repository's initial commit is written by the initialization unit and lands here once that commit exists.
+| [token-reference.md](token-reference.md) | Three-tier contract and semantic freeze candidate | Under Review |
 
 ---
 
