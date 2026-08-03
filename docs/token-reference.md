@@ -161,8 +161,10 @@ presumes a hue, game mechanic, or one theme's technique.
 ## 3. State Recipes
 
 The component tier declares one OKLCH recipe each for hover, active, disabled,
-and selected fills. Themes supply only the semantic base tokens used by those
-recipes; they do not enumerate state values.
+and selected fills: `--gc-control-fill-hover`,
+`--gc-control-fill-active`, `--gc-control-fill-disabled`, and
+`--gc-control-fill-selected`. Themes supply only the semantic base tokens used
+by those recipes; they do not enumerate state values.
 
 ## 4. Freeze Decision
 

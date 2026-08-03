@@ -1,0 +1,89 @@
+@layer core {
+  :where(.gc-panel) {
+    padding: var(--gc-space-5);
+    border: var(--gc-border-width) solid var(--gc-panel-border);
+    border-radius: var(--gc-radius-panel);
+    background-color: var(--gc-panel-fill);
+    color: var(--gc-panel-text);
+    box-shadow: var(--gc-elevation-mid);
+  }
+
+  :where(.gc-button, .gc-input) {
+    min-block-size: 2.75rem;
+    border: var(--gc-border-width) solid var(--gc-border-default);
+    border-radius: var(--gc-radius-control);
+    transition:
+      background-color var(--gc-motion-base) var(--gc-easing-standard),
+      border-color var(--gc-motion-base) var(--gc-easing-standard),
+      color var(--gc-motion-base) var(--gc-easing-standard),
+      transform var(--gc-motion-fast) var(--gc-easing-standard);
+  }
+
+  :where(.gc-button) {
+    padding: var(--gc-space-3) var(--gc-space-4);
+    background-color: var(--gc-button-fill);
+    color: var(--gc-button-text);
+    cursor: pointer;
+    font-size: var(--gc-type-label-size);
+    font-weight: var(--gc-type-label-weight);
+    letter-spacing: var(--gc-type-label-tracking);
+    text-transform: var(--gc-type-label-transform);
+    box-shadow: var(--gc-elevation-low);
+  }
+
+  :where(.gc-input) {
+    inline-size: 100%;
+    padding: var(--gc-space-3) var(--gc-space-4);
+    border-color: var(--gc-input-border);
+    background-color: var(--gc-input-fill);
+    color: var(--gc-input-text);
+  }
+
+  :where(.gc-input::placeholder) {
+    color: var(--gc-input-placeholder);
+  }
+
+  :where(.gc-button:hover:not(:disabled), .gc-input:hover:not(:disabled)) {
+    background-color: var(--gc-control-fill-hover);
+  }
+
+  :where(.gc-button:active:not(:disabled)) {
+    background-color: var(--gc-control-fill-active);
+    transform: translateY(var(--gc-space-1));
+  }
+
+  :where(.gc-button[aria-selected="true"]) {
+    background-color: var(--gc-control-fill-selected);
+    color: var(--gc-button-selected-text);
+  }
+
+  :where(.gc-button:disabled, .gc-input:disabled) {
+    background-color: var(--gc-control-fill-disabled);
+    color: var(--gc-text-disabled);
+    cursor: not-allowed;
+    opacity: var(--gc-disabled-opacity);
+  }
+
+  :where(.gc-button:focus-visible, .gc-input:focus-visible) {
+    outline: var(--gc-border-medium) solid var(--gc-focus-ring);
+    outline-offset: var(--gc-focus-offset);
+  }
+
+  :where(.gc-meter) {
+    position: relative;
+    overflow: hidden;
+    block-size: 1rem;
+    border: var(--gc-border-width) solid var(--gc-border-default);
+    border-radius: var(--gc-radius-round);
+    background-color: var(--gc-meter-track);
+    box-shadow: var(--gc-elevation-low);
+  }
+
+  :where(.gc-meter__fill) {
+    block-size: 100%;
+    inline-size: var(--gc-meter-value, 50%);
+    border-radius: inherit;
+    background-color: var(--gc-meter-fill);
+    transition: inline-size var(--gc-motion-slow) var(--gc-easing-standard);
+  }
+}

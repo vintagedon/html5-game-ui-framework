@@ -8,7 +8,7 @@
     --gc-surface-base: var(--gc-palette-modern-00);
     --gc-surface-raised: var(--gc-palette-modern-00);
     --gc-surface-sunken: var(--gc-palette-modern-20);
-    --gc-surface-interactive: var(--gc-palette-modern-10);
+    --gc-surface-interactive: var(--gc-palette-modern-00);
     --gc-surface-overlay: var(--gc-palette-modern-00);
     --gc-surface-texture: var(--gc-image-none);
     --gc-surface-backdrop-filter: var(--gc-filter-none);

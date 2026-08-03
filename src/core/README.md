@@ -28,7 +28,8 @@ escalation.
 
 ```text
 core/
-├── base.css      # Reset, document defaults, and specificity probe
+├── base.css          # Reset, document defaults, and specificity probe
+├── components.css    # Phase 1 proof specimens and state bindings
 └── README.md     # This file
 ```
 
@@ -39,6 +40,7 @@ core/
 | File | Description | Status |
 |------|-------------|--------|
 | [base.css](base.css) | Layered base rules and Phase 1 core defaults | Active |
+| [components.css](components.css) | Button, panel, input, and meter proof styles | Active |
 
 ---
 
