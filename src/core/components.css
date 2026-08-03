@@ -100,7 +100,7 @@
     transform: translateY(var(--gc-space-1));
   }
 
-  :where(.gc-button[aria-selected="true"]) {
+  :where(.gc-button[aria-pressed="true"]) {
     background-color: var(--gc-control-fill-selected);
     color: var(--gc-button-selected-text);
   }
