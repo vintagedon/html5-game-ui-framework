@@ -1,0 +1,39 @@
+{
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "agentic",
+    "backdrop",
+    "cspell",
+    "ehthumbs",
+    "frontmatter",
+    "Gitea",
+    "gitignore",
+    "kilocode",
+    "markdownlint",
+    "OKLCH",
+    "Playwright",
+    "renderer",
+    "roguelite",
+    "runbook",
+    "runbooks",
+    "themeable",
+    "tsconfig",
+    "VintageDon",
+    "worklog",
+    "worklogs"
+  ],
+  "ignorePaths": [
+    "**/.git/**",
+    "**/.venv/**",
+    "**/build/**",
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/playwright-report/**",
+    "**/reference-files-assets/**",
+    "**/reference-files-games/**",
+    "**/reference-files-ui/**",
+    "**/test-results/**"
+  ]
+}

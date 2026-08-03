@@ -1,0 +1,268 @@
+# ============================================================================
+# .gitignore for html5-game-ui-framework
+# ============================================================================
+# Public repository. The "PUBLIC REPO ONLY" block below is active, and the
+# three reference-files-* trees are excluded at directory level because they
+# hold licensed third-party art this project may not redistribute.
+#
+# Adapted from the estate's Python/data-science template, so sections below
+# cover toolchains this repository does not use. They are inert and are left
+# in place deliberately; see the worklog for the narrowing question.
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# SECRETS & CREDENTIALS
+# ----------------------------------------------------------------------------
+.env
+.env.*
+*.pem
+*.key
+secrets/
+credentials/
+config.local.*
+*.secrets
+
+# ----------------------------------------------------------------------------
+# WORKFLOW
+# ----------------------------------------------------------------------------
+*-pending.md
+recycle-bin/
+
+# --- PUBLIC REPO ONLY (active: this repository is public) ---
+staging/
+internal-files/
+spec/
+
+# Licensed third-party reference art. Harvest-only, never redistributed (see AGENTS.md)
+reference-files-games/
+reference-files-ui/
+reference-files-assets/
+
+# ----------------------------------------------------------------------------
+# IDE & EDITOR
+# ----------------------------------------------------------------------------
+.vscode/
+.idea/
+# Kilo Agent Manager session worktrees and state. Never public.
+.kilo/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.spyderproject
+.spyproject
+
+# ----------------------------------------------------------------------------
+# PYTHON
+# ----------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+.venv/
+ENV/
+env/
+.conda/
+conda-env/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+
+# Testing
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# ----------------------------------------------------------------------------
+# JUPYTER / NOTEBOOKS
+# ----------------------------------------------------------------------------
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+profile_default/
+ipython_config.py
+*.ipynb_meta
+
+# ----------------------------------------------------------------------------
+# DATA SCIENCE / ML / AI
+# ----------------------------------------------------------------------------
+# Model files (large binaries)
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.joblib
+*.model
+*.pt
+*.pth
+*.onnx
+*.pb
+*.tflite
+*.safetensors
+*.gguf
+*.bin
+
+# Checkpoints
+checkpoints/
+*.ckpt
+*.ckpt.*
+
+# Datasets (keep structure, exclude data)
+data/raw/
+data/processed/
+data/interim/
+data/external/
+*.csv
+*.parquet
+*.feather
+*.arrow
+*.tsv
+!data/.gitkeep
+
+# FITS and astronomical data
+*.fits
+*.fits.gz
+*.fit
+*.fz
+
+# Large archives
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.7z
+*.rar
+
+# MLflow / experiment tracking
+mlruns/
+mlartifacts/
+wandb/
+outputs/
+runs/
+
+# TensorBoard
+logs/
+tensorboard/
+
+# Hugging Face
+.cache/
+transformers_cache/
+
+# DVC
+.dvc/cache/
+.dvc/tmp/
+*.dvc.lock
+
+# ----------------------------------------------------------------------------
+# VECTOR DATABASES / EMBEDDINGS
+# ----------------------------------------------------------------------------
+*.faiss
+*.index
+chroma/
+chromadb/
+lancedb/
+qdrant_storage/
+weaviate_data/
+milvus_data/
+
+# ----------------------------------------------------------------------------
+# BUILD & DOCUMENTATION
+# ----------------------------------------------------------------------------
+docs/_build/
+*.log
+*.tmp
+*.temp
+
+# ----------------------------------------------------------------------------
+# OS GENERATED
+# ----------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ----------------------------------------------------------------------------
+# DOCKER
+# ----------------------------------------------------------------------------
+docker-compose.override.yml
+.docker/
+
+# ----------------------------------------------------------------------------
+# NODE / PLAYWRIGHT
+# ----------------------------------------------------------------------------
+node_modules/
+# package-lock.json is TRACKED: Playwright golden-image regression needs a
+# reproducible dependency tree. Do not ignore it once package.json lands.
+yarn.lock
+
+# Playwright run output. Approved goldens are tracked; run artifacts are not.
+test-results/
+playwright-report/
+
+# ----------------------------------------------------------------------------
+# ANSIBLE
+# ----------------------------------------------------------------------------
+*.retry
+ansible/inventory/hosts.local
+
+# ----------------------------------------------------------------------------
+# TERRAFORM (if used)
+# ----------------------------------------------------------------------------
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+
+# ----------------------------------------------------------------------------
+# MISC
+# ----------------------------------------------------------------------------
+*.bak
+*.backup
+tmp/
+temp/
+local/
+.local/
+*.local
