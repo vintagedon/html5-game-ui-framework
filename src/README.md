@@ -33,8 +33,25 @@ src/
 ├── themes/       # Removable semantic-token theme files
 ├── tokens/       # Primitive, semantic, and component token tiers
 ├── gc.css        # Public entry and single cascade layer order
+├── gc.js         # Public ESM entry; injects shared SVG defs (e.g. filter refs)
 └── README.md     # This file
 ```
+
+## 2. Consumption
+
+A consuming page loads the CSS entry and imports the ESM entry. The CSS carries
+all tokens, layers, and component defaults; the ESM injects the shared SVG
+`<defs>` that some surface techniques reference by bare fragment (currently
+`#gc-edge-distress`, the fantasy weathered-edge filter). Without the ESM import
+those references resolve to nothing in a document that did not also copy the
+defs inline, so the two files together are the complete consumption story:
+
+```html
+<link rel="stylesheet" href="./src/gc.css">
+<script type="module" src="./src/gc.js"></script>
+```
+
+No build step, no bundler, no external network request.
 
 ---
 

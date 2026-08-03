@@ -123,7 +123,8 @@ html5-game-ui-framework/
 │   ├── modules/               # Reserved consumer-driven module boundary
 │   ├── themes/                # Modern, arcade, sci-fi, and fantasy
 │   ├── tokens/                # Primitive, semantic, and component tiers
-│   └── gc.css                 # Public entry and cascade layer order
+│   ├── gc.css                 # Public entry and cascade layer order
+│   └── gc.js                  # Public ESM entry; injects shared SVG defs
 ├── staging/                   # Pre-commit staging area (gitignored)
 ├── .gitignore
 ├── .markdownlint.json         # Markdown lint configuration (tracked; project config)
@@ -156,9 +157,11 @@ python3 -m http.server 8000
 ```
 
 Open `http://127.0.0.1:8000/reference/`. A consuming page loads `src/gc.css`
-and switches themes by setting `data-gc-theme` on `<html>`. The semantic
-vocabulary remains a freeze candidate until F-001 is answered. Node and
-Playwright become development dependencies when the Phase 2 harness lands.
+and imports `src/gc.js` (the ESM entry injects shared SVG defs referenced by
+surface techniques such as the fantasy weathered-edge filter), and switches
+themes by setting `data-gc-theme` on `<html>`. The semantic vocabulary remains
+a freeze candidate until F-001 is answered. Node and Playwright become
+development dependencies when the Phase 2 harness lands.
 
 ---
 
