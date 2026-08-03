@@ -63,6 +63,7 @@ Evidence: `src/tokens/semantic.css` declares the vocabulary,
 | `--gc-accent` | Primary emphasis and action colour; not a named hue or status. |
 | `--gc-on-accent` | Legible foreground on accent; not general inverse text. |
 | `--gc-focus-ring` | Keyboard focus indicator colour; not hover or selected colour. |
+| `--gc-focus-width` | Keyboard focus indicator stroke width; not a generic border width. |
 | `--gc-focus-offset` | Space between focus ring and target; not layout spacing. |
 | `--gc-status-success` | Positive completion or healthy state; not resource gain. |
 | `--gc-on-status-success` | Foreground on success fill; not success-adjacent text. |

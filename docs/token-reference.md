@@ -75,6 +75,7 @@ presumes a hue, game mechanic, or one theme's technique.
 | `--gc-accent` | Primary emphasis and action colour; not a named hue or status. |
 | `--gc-on-accent` | Legible foreground placed on the accent; not general inverse text. |
 | `--gc-focus-ring` | Keyboard focus indicator colour; not hover or selected colour. |
+| `--gc-focus-width` | Keyboard focus indicator stroke width; not a generic border width. |
 | `--gc-focus-offset` | Space between a focus ring and its target; not layout spacing. |
 
 ### Status

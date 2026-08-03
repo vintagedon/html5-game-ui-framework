@@ -28,6 +28,7 @@
     --gc-accent: var(--gc-palette-fantasy-accent);
     --gc-on-accent: var(--gc-palette-fantasy-accent-on);
     --gc-focus-ring: var(--gc-palette-fantasy-accent);
+    --gc-focus-width: var(--gc-border-medium);
     --gc-focus-offset: var(--gc-size-1);
 
     --gc-status-success: var(--gc-palette-positive);

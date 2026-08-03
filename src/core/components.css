@@ -113,7 +113,7 @@
   }
 
   :where(.gc-button:focus-visible, .gc-input:focus-visible) {
-    outline: var(--gc-border-medium) solid var(--gc-focus-ring);
+    outline: var(--gc-focus-width) solid var(--gc-focus-ring);
     outline-offset: var(--gc-focus-offset);
   }
 
