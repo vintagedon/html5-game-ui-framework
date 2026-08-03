@@ -28,7 +28,9 @@ can scan explicit boundaries.
 
 ```text
 src/
+├── core/         # Domain-neutral primitives and base behavior
 ├── tokens/       # Primitive, semantic, and component token tiers
+├── gc.css        # Public entry and single cascade layer order
 └── README.md     # This file
 ```
 
@@ -38,6 +40,7 @@ src/
 
 | Directory | Description |
 |-----------|-------------|
+| [core/](core/README.md) | Domain-neutral framework defaults and primitives |
 | [tokens/](tokens/README.md) | Three-tier token contract and state recipes |
 
 ---
