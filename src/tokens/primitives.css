@@ -12,7 +12,7 @@
     --gc-palette-modern-70: oklch(34% 0.035 255);
     --gc-palette-modern-85: oklch(22% 0.03 255);
     --gc-palette-modern-95: oklch(14% 0.025 255);
-    --gc-palette-modern-accent: oklch(62% 0.19 255);
+    --gc-palette-modern-accent: oklch(42% 0.19 255);
     --gc-palette-modern-accent-on: oklch(99% 0.004 255);
 
     --gc-palette-arcade-00: oklch(96% 0.04 105);
@@ -47,7 +47,7 @@
     --gc-palette-positive-on: oklch(13% 0.025 150);
     --gc-palette-caution: oklch(79% 0.15 88);
     --gc-palette-caution-on: oklch(17% 0.035 72);
-    --gc-palette-critical: oklch(62% 0.22 27);
+    --gc-palette-critical: oklch(50% 0.22 27);
     --gc-palette-critical-on: oklch(98% 0.008 27);
     --gc-palette-notice: oklch(68% 0.15 235);
     --gc-palette-notice-on: oklch(98% 0.008 235);

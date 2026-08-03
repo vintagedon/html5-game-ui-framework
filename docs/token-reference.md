@@ -1,11 +1,11 @@
 <!--
 ---
 title: "Semantic Token Reference"
-description: "Freeze-candidate vocabulary and tier boundaries for framework tokens"
+description: "Frozen vocabulary and tier boundaries for framework tokens"
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-08-03"
-version: "1.0"
-status: "Under Review"
+version: "1.1"
+status: "Frozen"
 tags:
   - type: reference
   - domain: foundations
@@ -19,10 +19,14 @@ related_documents:
 
 # Semantic Token Reference
 
-This document is the freeze candidate for the `--gc-` semantic vocabulary.
-It remains **Under Review** until the operator approves finding F-001 in the
-foundations review. That approval freezes names and boundaries; exact values
-remain tunable through v1.0.
+> **Frozen 2026-08-03** by operator approval of F-001 in
+> [Foundations Review 2026-08-02](foundations-review-2026-08-02.md). The 83
+> semantic token names in this document are API. Renaming one is a major
+> version. Values remain tunable to v1.0; names and tier boundaries do not.
+
+This document defines the `--gc-` semantic vocabulary, frozen by operator
+approval of F-001 on 2026-08-03. Names and tier boundaries are fixed; exact
+values remain tunable through v1.0.
 
 ## 1. Tier Contract
 

@@ -4,8 +4,8 @@ title: "Foundations Review 2026-08-02"
 description: "Closed approval questions for the token contract, state recipes, source boundary, compatibility floor, and zero-raster spike"
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-08-03"
-version: "1.0"
-status: "Under Review"
+version: "1.1"
+status: "Approved"
 tags:
   - type: report
   - domain: foundations
@@ -267,45 +267,90 @@ contradiction was confirmed.
 | F-006 | The sci-fi frost now actually renders. A1.6 made `--gc-surface-raised` translucent (`color-mix` at 0.72 alpha) under sci-fi with an `@supports` opaque fallback, so `backdrop-filter` composites real backdrop pixels. Measured interior backdrop bleed-through 0 → 40 over a high-contrast pattern, with text contrast held at 14.16:1. Compatibility question stands; no new feature was introduced outside the floor. |
 | F-007 (new) | See below. |
 
-### F-007: Theme token-value contrast defects (surfaced by the A1.5 accessibility audit)
+### F-007: Theme token-value contrast defects (resolved by Amendment 2; two new pairs surfaced)
 
-Statement: A1.5 mandated a measured accessibility audit (axe-core). The audit
-resolved the targeted `aria-allowed-attr` violation (aria-pressed is valid on
-a button; aria-selected was not) and additionally revealed pre-existing
-color-contrast failures in two theme token-value pairs. These are not
-attribute defects and are out of Amendment 1's scope to fix, because the
-amendment forbids altering the four theme token values; they are surfaced here
-for operator decision.
+**Resolution (Amendment 2, 2026-08-03).** The operator chose **adjust**.
+Amendment 2 darkened two primitive palette values: `--gc-palette-modern-accent`
+62% → 42% L, and `--gc-palette-critical` 62% → 50% L (chroma and hue
+unchanged). No semantic token was added, renamed, or removed; the 83-token
+vocabulary and tier boundaries are unchanged. The two named pairs now measure:
 
-Evidence (measured via axe-core on the reference page):
+| Pair | Themes | Before | After |
+|------|--------|--------|-------|
+| `--gc-on-accent` / `--gc-accent` | modern | 3.60:1 | **8.24:1** |
+| `--gc-on-accent` / `--gc-control-fill-selected` | modern | 2.74:1 | **5.33:1** |
+| `--gc-on-status-danger` / `--gc-status-danger` | all four | 3.82:1 | **6.02:1** |
 
-| Theme | Element | Ratio | Threshold |
-|-------|---------|-------|-----------|
-| modern | pressed toggle button + accent swatch (`--gc-accent` / `--gc-on-accent`) | 2.73:1 / 3.60:1 | 4.5:1 |
-| modern, arcade, sci-fi, fantasy | `--gc-status-danger` / `--gc-on-status-danger` swatch label | 3.79:1 | 4.5:1 |
+axe-core color-contrast on the reference page reports **0 violations across all
+four themes** (was 4). The measurement method and the full pair matrix are
+recorded in the worklog's Amendment 2 section. A mutation test (revert
+`--gc-palette-critical` to its original value, re-run axe) re-surfaced the
+danger failure at 3.79:1 and was restored.
 
-Root cause: the modern accent at its current lightness and the status-danger
-fill at its current lightness are too light for their near-white on-colours at
-small text sizes. This is a token-value concern, not a vocabulary concern, and
-it overlaps F-004 (state recipes) and F-001 (token values remain tunable).
+The accent darkened rather than the on-colour so that every foreground placed on
+the accent passes unambiguously (darkening the on-colour leaves the separate
+near-white `--gc-text-inverse` token failing on accent at 3.60:1). The binding
+constraint was the derived selected fill (`accent 82% / surface-base 18%`,
+lightened toward white); L=42 was chosen over the also-passing L=44 to give the
+selected pair 5.33:1 rather than 4.97:1, since a pair near the threshold is a
+defect waiting for a later value nudge. Before/after captures of modern's accent
+surfaces are attached to the worklog.
 
-Question: choose **adjust the affected theme/palette values to meet 4.5:1**,
-**accept as a known Phase 1 issue for the Phase 2 harness accessibility gate to
-enforce**, or **defer to a dedicated contrast-tuning spec**.
+**New findings surfaced (not adjusted).** While the palette was open, the
+comprehensive pair matrix measured every semantic fg/bg pair and surfaced two
+further pairs below 4.5:1 that the original audit did not name. Per the
+amendment these are recorded for operator decision, not silently adjusted:
+
+| Pair | Themes | Ratio | Note |
+|------|--------|-------|------|
+| `--gc-on-status-info` / `--gc-status-info` | all four | 2.62:1 | Worse than the danger pair the operator just approved fixing. Same class of defect. |
+| `--gc-text-muted` on surfaces | modern 2.88–3.15, fantasy 3.70 (arcade/scifi pass) | < 4.5:1 | Intentionally low-emphasis metadata; whether it must meet 4.5:1 depends on whether secondary metadata is treated as content or decorative. |
+
+Pairs that the matrix flags but are **not defects**: `--gc-text-disabled` (WCAG
+1.4.3 inactive-component exception — disabled controls are exempt), and
+`--gc-text-inverse` on `--gc-surface-sunken` / `--gc-status-danger` (non-designed
+pairings; the designed on-colour tokens pass).
+
+Question (carried for the two new findings): choose **adjust**,
+**accept**, or **defer** for the `on-status-info` and `text-muted` pairs.
 
 ## Review Summary
 
-| Finding | Operator decision |
-|---------|-------------------|
-| F-001 semantic vocabulary | Yes / No |
-| F-002 zero-raster position | Yes / No |
-| F-003 no Gate 1.5 semantic addition | Yes / No |
-| F-004 state recipes | Accept / Reopen |
-| F-005 source boundary | Yes / No |
-| F-006 compatibility floor | Accept / Out of bounds |
-| F-007 theme token-value contrast (Amendment 1) | Adjust / Accept / Defer |
+Operator decisions recorded 2026-08-03. The vocabulary is frozen as of this
+date; `docs/token-reference.md` carries the same status. Phase 2 is unblocked.
+
+| Finding | Operator decision | Consequence |
+|---------|-------------------|-------------|
+| F-001 semantic vocabulary | **Approved, frozen** | The 83-token vocabulary is API. Renaming a semantic token is a major version from here. Spec-02 binds scenarios to these names and does not renegotiate them. |
+| F-002 zero-raster position | **Holds** | The charter's central technical position is confirmed against the theme that decides it. No charter change. |
+| F-003 no Gate 1.5 semantic addition | **Approved** | The vocabulary was sufficient for four themes without a forced addition, which is the evidence F-001 rests on. |
+| F-004 state recipes | **Accepted** | Hover, active, disabled, and selected stay derived through `color-mix()` in OKLCH. Themes populate base tokens only. |
+| F-005 source boundary | **Approved** | `src/tokens/`, `src/core/`, `src/modules/`, `src/themes/` are the framework scan boundary. `reference/` is a review harness and is excluded, so page chrome never inflates a size metric. Spec-02 Gate 2.6 resolves against this list. |
+| F-006 compatibility floor | **Accepted with the prefixed pair** | Standard and `-webkit-` mask and backdrop declarations count as one compatibility unit. The unrendered Safari 16.4 prefixed backdrop path stays a known gap: the failure mode is a missing visual enhancement over a readable opaque surface, not lost content or interaction. Verify whenever a Safari host is convenient. |
+| F-007 theme token-value contrast | **Adjust (done, Amendment 2)** | The named pairs (modern accent, danger) now pass at 8.24 / 5.33 / 6.02. axe-core reports 0 violations across all four themes. Two further failing pairs surfaced during the comprehensive measurement (`on-status-info` 2.62; `text-muted` in modern/fantasy) and are carried below for decision. |
+
+**Why F-007 was not accepted as a known issue.** The modern accent pair at
+2.73:1 misses the 3:1 threshold for UI components, not only the 4.5:1 text
+threshold, so it is not a marginal miss. The charter freezes vocabulary and
+leaves values tunable to v1.0, so the fix is in bounds and cheap today and
+expensive later. And spec-02 builds a metrics block whose whole property is
+that its numbers are true at build time or visibly false; an accessibility
+failure count that ships with a standing accepted exception is a number
+everyone learns to skip. This is the first figure that block will ever report.
+
+**Carried from Amendment 2 (open).** The comprehensive contrast measurement
+surfaced two further failing pairs that the original audit did not name and
+Amendment 2 did not adjust (its scope was the two named pairs). They remain
+open for operator decision before or inside Phase 2:
+
+| Carried pair | Themes | Ratio | Decision pending |
+|--------------|--------|-------|------------------|
+| `--gc-on-status-info` / `--gc-status-info` | all four | 2.62:1 | Adjust / accept / defer |
+| `--gc-text-muted` on surfaces | modern, fantasy | 2.88–3.70 | Adjust / accept / defer |
 
 Confirmed charter contradictions: None. F-006 records a prefixed-property
 compatibility caveat for operator judgment without changing the charter.
 Amendment 1 (F-007) surfaced theme token-value contrast defects for operator
-decision without changing the charter.
+decision; Amendment 2 resolved the named pairs by adjusting primitive values,
+which the charter permits (values tunable to v1.0), and surfaced two further
+pairs without changing the charter.
