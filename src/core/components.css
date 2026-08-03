@@ -7,6 +7,7 @@
     background-image: var(--gc-surface-texture);
     color: var(--gc-panel-text);
     box-shadow: var(--gc-elevation-mid);
+    -webkit-backdrop-filter: var(--gc-surface-backdrop-filter);
     backdrop-filter: var(--gc-surface-backdrop-filter);
     clip-path: var(--gc-surface-shape);
     filter: var(--gc-surface-edge-filter);
@@ -35,6 +36,10 @@
     block-size: 5rem;
     background: var(--gc-ornament-color);
     content: "";
+    -webkit-mask-image: var(--gc-ornament-mask);
+    -webkit-mask-position: left top;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
     mask-image: var(--gc-ornament-mask);
     mask-position: left top;
     mask-repeat: no-repeat;

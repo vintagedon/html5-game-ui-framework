@@ -29,6 +29,7 @@ can scan explicit boundaries.
 ```text
 src/
 ├── core/         # Domain-neutral primitives and base behavior
+├── modules/      # Reserved module boundary; empty until consumer pressure
 ├── themes/       # Removable semantic-token theme files
 ├── tokens/       # Primitive, semantic, and component token tiers
 ├── gc.css        # Public entry and single cascade layer order
@@ -42,6 +43,7 @@ src/
 | Directory | Description |
 |-----------|-------------|
 | [core/](core/README.md) | Domain-neutral framework defaults and primitives |
+| [modules/](modules/README.md) | Game-pattern source and dependency scan boundary |
 | [themes/](themes/README.md) | Root-attribute themes that override semantic roles only |
 | [tokens/](tokens/README.md) | Three-tier token contract and state recipes |
 

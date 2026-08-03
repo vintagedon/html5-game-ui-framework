@@ -12,7 +12,7 @@
     --gc-surface-edge-filter: var(--gc-filter-none);
     --gc-ornament-color: var(--gc-palette-modern-accent);
     --gc-ornament-mask: var(--gc-image-none);
-    --gc-ornament-opacity: var(--gc-alpha-disabled);
+    --gc-ornament-opacity: var(--gc-alpha-hidden);
 
     --gc-text-primary: var(--gc-palette-modern-95);
     --gc-text-secondary: var(--gc-palette-modern-70);

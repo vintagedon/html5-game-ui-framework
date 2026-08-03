@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en" data-gc-theme="modern">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Phase 1 foundations and zero-raster review surface for html5-game-ui-framework">
+    <title>Game UI Foundations Review</title>
+    <link rel="stylesheet" href="../src/gc.css">
+    <link rel="stylesheet" href="reference.css">
+    <script type="module" src="reference.js"></script>
+  </head>
+  <body>
+    <svg width="0" height="0" aria-hidden="true" focusable="false">
+      <defs>
+        <filter id="gc-edge-distress" x="-3%" y="-3%" width="106%" height="106%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.012 0.055" numOctaves="2" seed="29" result="edge-noise"></feTurbulence>
+          <feDisplacementMap in="SourceGraphic" in2="edge-noise" scale="2.5" xChannelSelector="R" yChannelSelector="B"></feDisplacementMap>
+        </filter>
+      </defs>
+    </svg>
+
+    <main class="reference-shell">
+      <header class="reference-header">
+        <p class="phase-notice">
+          Phase 1 hand-authored review surface. Phase 2 replaces this page with
+          the scenario-registry-driven harness, runner, goldens, and computed metrics.
+        </p>
+        <h1 class="reference-title">Game UI Foundations</h1>
+        <p class="reference-lede">
+          One token contract, four unrelated visual registers, and a dark-fantasy
+          panel built without runtime image files. This page is an approval surface,
+          not the final component registry.
+        </p>
+        <nav class="theme-toolbar" aria-label="Theme selection">
+          <button class="gc-button" type="button" data-theme-choice="modern">Modern</button>
+          <button class="gc-button" type="button" data-theme-choice="arcade">Arcade</button>
+          <button class="gc-button" type="button" data-theme-choice="sci-fi">Sci-fi</button>
+          <button class="gc-button" type="button" data-theme-choice="fantasy">Fantasy</button>
+          <span class="theme-status" aria-live="polite">Theme: <strong data-theme-status>modern</strong></span>
+        </nav>
+      </header>
+
+      <section class="reference-section" aria-labelledby="primitive-heading">
+        <h2 class="section-heading" id="primitive-heading">Primitive palette scales</h2>
+        <p class="section-copy">Internal literals are visible here for contract review; framework components never consume them directly.</p>
+        <div class="token-grid">
+          <div class="token-swatch" style="--reference-swatch: var(--gc-palette-modern-00); --reference-on-swatch: var(--gc-palette-modern-95)"><code class="token-name">modern-00</code></div>
+          <div class="token-swatch" style="--reference-swatch: var(--gc-palette-modern-70); --reference-on-swatch: var(--gc-palette-modern-00)"><code class="token-name">modern-70</code></div>
+          <div class="token-swatch" style="--reference-swatch: var(--gc-palette-arcade-accent); --reference-on-swatch: var(--gc-palette-arcade-accent-on)"><code class="token-name">arcade-accent</code></div>
+          <div class="token-swatch" style="--reference-swatch: var(--gc-palette-scifi-accent); --reference-on-swatch: var(--gc-palette-scifi-accent-on)"><code class="token-name">scifi-accent</code></div>
+          <div class="token-swatch" style="--reference-swatch: var(--gc-palette-fantasy-15); --reference-on-swatch: var(--gc-palette-fantasy-92)"><code class="token-name">fantasy-15</code></div>
+          <div class="token-swatch" style="--reference-swatch: var(--gc-palette-fantasy-75); --reference-on-swatch: var(--gc-palette-fantasy-00)"><code class="token-name">fantasy-75</code></div>
+        </div>
+      </section>
+
+      <section class="reference-section" aria-labelledby="semantic-heading">
+        <h2 class="section-heading" id="semantic-heading">Semantic roles</h2>
+        <p class="section-copy">These swatches change in place when the root theme attribute changes.</p>
+        <div class="token-grid">
+          <div class="token-swatch" style="--reference-swatch: var(--gc-surface-canvas)"><code class="token-name">--gc-surface-canvas</code></div>
+          <div class="token-swatch" style="--reference-swatch: var(--gc-surface-raised)"><code class="token-name">--gc-surface-raised</code></div>
+          <div class="token-swatch" style="--reference-swatch: var(--gc-accent); --reference-on-swatch: var(--gc-on-accent)"><code class="token-name">--gc-accent</code></div>
+          <div class="token-swatch" style="--reference-swatch: var(--gc-status-success); --reference-on-swatch: var(--gc-on-status-success)"><code class="token-name">--gc-status-success</code></div>
+          <div class="token-swatch" style="--reference-swatch: var(--gc-status-warning); --reference-on-swatch: var(--gc-on-status-warning)"><code class="token-name">--gc-status-warning</code></div>
+          <div class="token-swatch" style="--reference-swatch: var(--gc-status-danger); --reference-on-swatch: var(--gc-on-status-danger)"><code class="token-name">--gc-status-danger</code></div>
+        </div>
+      </section>
+
+      <section class="reference-section" aria-labelledby="proof-heading">
+        <h2 class="section-heading" id="proof-heading">Proof specimens</h2>
+        <p class="section-copy">Hover, press, select, and disabled fills derive from the same four OKLCH recipes under every theme.</p>
+        <div class="proof-grid">
+          <article class="gc-panel proof-card">
+            <h3>Button states</h3>
+            <div class="proof-row">
+              <button class="gc-button" type="button">Resting</button>
+              <button class="gc-button" type="button" aria-selected="true">Selected</button>
+              <button class="gc-button" type="button" disabled>Disabled</button>
+            </div>
+          </article>
+          <article class="gc-panel proof-card">
+            <h3>Text input</h3>
+            <label class="token-label" for="callsign">Callsign</label>
+            <input class="gc-input" id="callsign" name="callsign" placeholder="Enter callsign">
+            <input class="gc-input" aria-label="Disabled input" value="Unavailable" disabled>
+          </article>
+          <article class="gc-panel proof-card">
+            <h3>Meter</h3>
+            <div class="meter-label"><span>Charge</span><span>72%</span></div>
+            <div class="gc-meter" role="meter" aria-label="Charge" aria-valuemin="0" aria-valuemax="100" aria-valuenow="72">
+              <div class="gc-meter__fill"></div>
+            </div>
+          </article>
+          <article class="gc-panel proof-card">
+            <h3>Panel levels</h3>
+            <p class="section-copy">Raised content, structural border, themed depth, type roles, and generated surface technique share unchanged markup.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="reference-section" aria-labelledby="spike-section-heading">
+        <h2 class="section-heading" id="spike-section-heading">Dark-fantasy zero-raster spike</h2>
+        <p class="section-copy">Select Fantasy above. The same element remains in the DOM under every theme; fantasy binds the procedural techniques.</p>
+        <article class="gc-panel gc-spike">
+          <span class="gc-spike__ornament" aria-hidden="true"></span>
+          <h3 class="spike-heading">The Ashen Compact</h3>
+          <p class="spike-copy">A weathered charter surface produced from text assets: procedural noise, vector scrollwork, inset light, and displaced geometry.</p>
+          <ul class="spike-evidence">
+            <li>Texture: SVG <code>feTurbulence</code></li>
+            <li>Filigree: SVG data-URI mask</li>
+            <li>Embossing: layered inset shadows</li>
+            <li>Edge: <code>feDisplacementMap</code> plus polygon</li>
+          </ul>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

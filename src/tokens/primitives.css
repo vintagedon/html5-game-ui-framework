@@ -57,6 +57,7 @@
     --gc-alpha-overlay: oklch(12% 0.02 255 / 88%);
     --gc-alpha-scrim: oklch(8% 0.02 255 / 72%);
     --gc-alpha-disabled: 0.48;
+    --gc-alpha-hidden: 0;
     --gc-alpha-soft: 0.72;
     --gc-alpha-full: 1;
     --gc-border-thin: 1px;
