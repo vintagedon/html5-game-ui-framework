@@ -10,3 +10,6 @@
 @import "./core/base.css";
 @import "./core/components.css";
 @import "./themes/modern.css";
+@import "./themes/arcade.css";
+@import "./themes/scifi.css";
+@import "./themes/fantasy.css";

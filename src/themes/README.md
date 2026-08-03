@@ -29,7 +29,10 @@ interactive state variants.
 
 ```text
 themes/
+├── arcade.css    # Square geometry, hard depth, stepped motion
+├── fantasy.css   # Weathered geometry, carved depth, editorial type
 ├── modern.css    # Explicit modern theme; semantic defaults also provide fallback
+├── scifi.css     # Chamfered readouts, scanlines, glow, and frosted surfaces
 └── README.md     # This file
 ```
 
@@ -39,7 +42,10 @@ themes/
 
 | File | Description | Status |
 |------|-------------|--------|
+| [arcade.css](arcade.css) | Square geometry, hard offset depth, uppercase tracked type, and stepped motion | Active |
+| [fantasy.css](fantasy.css) | Weathered geometry, carved depth, generated wash, and editorial type | Active |
 | [modern.css](modern.css) | Flat surfaces, soft depth, smooth motion, and normal-case type | Active |
+| [scifi.css](scifi.css) | Chamfered geometry, generated scanlines and sweep, glow, and frosted surfaces | Active |
 
 ---
 

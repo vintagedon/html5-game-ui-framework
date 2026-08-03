@@ -4,8 +4,13 @@
     border: var(--gc-border-width) solid var(--gc-panel-border);
     border-radius: var(--gc-radius-panel);
     background-color: var(--gc-panel-fill);
+    background-image: var(--gc-surface-texture);
     color: var(--gc-panel-text);
     box-shadow: var(--gc-elevation-mid);
+    backdrop-filter: var(--gc-surface-backdrop-filter);
+    clip-path: var(--gc-surface-shape);
+    filter: var(--gc-surface-edge-filter);
+    image-rendering: var(--gc-image-rendering);
   }
 
   :where(.gc-button, .gc-input) {
