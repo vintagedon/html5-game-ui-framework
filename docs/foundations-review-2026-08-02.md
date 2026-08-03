@@ -27,7 +27,10 @@ an operator answer.
 ## F-001: Semantic Vocabulary Freeze Candidate
 
 Statement: One hue-neutral and domain-neutral semantic vocabulary populated all
-four themes without a Gate 1.5 addition.
+four themes without a Gate 1.5 addition. Amendment 1 added one token
+(`--gc-focus-width`, A1.4) so Core stops reading a primitive; the count is now
+83 and the addition is hue-neutral and domain-neutral. No other change to the
+vocabulary.
 
 Evidence: `src/tokens/semantic.css` declares the vocabulary,
 `docs/token-reference.md` defines the tier contract, and every file under
@@ -249,6 +252,47 @@ Safari 16.4 here.
 Question: Choose **accept the frozen floor as met with the prefixed
 compatibility pair** or **treat mask/backdrop technique as out of bounds**.
 
+## Amendment 1 (2026-08-03)
+
+Amendment 1 repaired six findings from independent review of the open pull
+request. Two of them change what F-002 and F-006 describe; one adds a semantic
+token to F-001; and the accessibility measurement mandated by A1.5 surfaced a
+new finding (F-007) that the original review surface did not carry. No charter
+contradiction was confirmed.
+
+| Finding | Amendment change |
+|---------|------------------|
+| F-001 | One new semantic token, `--gc-focus-width` (added by A1.4 so Core stops reading the `--gc-border-medium` primitive). Vocabulary count is 82 → 83; the table above now includes its boundary. Still hue-neutral and domain-neutral. Question stands. |
+| F-002 | The fantasy spike still renders the four effects with zero raster files. The edge-distress technique changed rendering path: the `feDisplacementMap` filter defs now ship from framework ESM source (`src/gc.js` injects them on import) rather than relying on markup copied from `reference/`. A consumer loading only published source now gets the effect. (Correction to the amendment's prediction: Chromium 145 degrades rather than disappears when the reference is unresolvable — the panel renders without the displacement. The fix is still required because the effect must render from published source.) Verdict question stands. |
+| F-006 | The sci-fi frost now actually renders. A1.6 made `--gc-surface-raised` translucent (`color-mix` at 0.72 alpha) under sci-fi with an `@supports` opaque fallback, so `backdrop-filter` composites real backdrop pixels. Measured interior backdrop bleed-through 0 → 40 over a high-contrast pattern, with text contrast held at 14.16:1. Compatibility question stands; no new feature was introduced outside the floor. |
+| F-007 (new) | See below. |
+
+### F-007: Theme token-value contrast defects (surfaced by the A1.5 accessibility audit)
+
+Statement: A1.5 mandated a measured accessibility audit (axe-core). The audit
+resolved the targeted `aria-allowed-attr` violation (aria-pressed is valid on
+a button; aria-selected was not) and additionally revealed pre-existing
+color-contrast failures in two theme token-value pairs. These are not
+attribute defects and are out of Amendment 1's scope to fix, because the
+amendment forbids altering the four theme token values; they are surfaced here
+for operator decision.
+
+Evidence (measured via axe-core on the reference page):
+
+| Theme | Element | Ratio | Threshold |
+|-------|---------|-------|-----------|
+| modern | pressed toggle button + accent swatch (`--gc-accent` / `--gc-on-accent`) | 2.73:1 / 3.60:1 | 4.5:1 |
+| modern, arcade, sci-fi, fantasy | `--gc-status-danger` / `--gc-on-status-danger` swatch label | 3.79:1 | 4.5:1 |
+
+Root cause: the modern accent at its current lightness and the status-danger
+fill at its current lightness are too light for their near-white on-colours at
+small text sizes. This is a token-value concern, not a vocabulary concern, and
+it overlaps F-004 (state recipes) and F-001 (token values remain tunable).
+
+Question: choose **adjust the affected theme/palette values to meet 4.5:1**,
+**accept as a known Phase 1 issue for the Phase 2 harness accessibility gate to
+enforce**, or **defer to a dedicated contrast-tuning spec**.
+
 ## Review Summary
 
 | Finding | Operator decision |
@@ -259,6 +303,9 @@ compatibility pair** or **treat mask/backdrop technique as out of bounds**.
 | F-004 state recipes | Accept / Reopen |
 | F-005 source boundary | Yes / No |
 | F-006 compatibility floor | Accept / Out of bounds |
+| F-007 theme token-value contrast (Amendment 1) | Adjust / Accept / Defer |
 
 Confirmed charter contradictions: None. F-006 records a prefixed-property
 compatibility caveat for operator judgment without changing the charter.
+Amendment 1 (F-007) surfaced theme token-value contrast defects for operator
+decision without changing the charter.
