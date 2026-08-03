@@ -13,6 +13,36 @@
     image-rendering: var(--gc-image-rendering);
   }
 
+  :where(.gc-spike) {
+    position: relative;
+    isolation: isolate;
+    min-block-size: 24rem;
+    padding: calc(var(--gc-space-8) + var(--gc-space-6)) var(--gc-space-6) var(--gc-space-6);
+    border-color: var(--gc-border-strong);
+    box-shadow:
+      inset 0 0 0 var(--gc-space-1) color-mix(in oklch, var(--gc-border-strong) 55%, transparent),
+      inset 0 var(--gc-space-2) var(--gc-space-3) color-mix(in oklch, var(--gc-text-primary) 18%, transparent),
+      inset 0 calc(var(--gc-space-2) * -1) var(--gc-space-4) color-mix(in oklch, var(--gc-surface-canvas) 72%, transparent),
+      var(--gc-elevation-high);
+  }
+
+  :where(.gc-spike__ornament) {
+    position: absolute;
+    z-index: var(--gc-z-raised);
+    inset-block-start: var(--gc-space-3);
+    inset-inline-start: var(--gc-space-3);
+    inline-size: 5rem;
+    block-size: 5rem;
+    background: var(--gc-ornament-color);
+    content: "";
+    mask-image: var(--gc-ornament-mask);
+    mask-position: left top;
+    mask-repeat: no-repeat;
+    mask-size: contain;
+    opacity: var(--gc-ornament-opacity);
+    pointer-events: none;
+  }
+
   :where(.gc-button, .gc-input) {
     min-block-size: 2.75rem;
     border: var(--gc-border-width) solid var(--gc-border-default);
@@ -42,10 +72,6 @@
     border-color: var(--gc-input-border);
     background-color: var(--gc-input-fill);
     color: var(--gc-input-text);
-  }
-
-  :where(.gc-input::placeholder) {
-    color: var(--gc-input-placeholder);
   }
 
   :where(.gc-button:hover:not(:disabled), .gc-input:hover:not(:disabled)) {

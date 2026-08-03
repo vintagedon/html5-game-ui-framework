@@ -40,7 +40,7 @@ core/
 | File | Description | Status |
 |------|-------------|--------|
 | [base.css](base.css) | Layered base rules and Phase 1 core defaults | Active |
-| [components.css](components.css) | Button, panel, input, and meter proof styles | Active |
+| [components.css](components.css) | Button, panel, input, meter, and zero-raster spike proof styles | Active |
 
 ---
 

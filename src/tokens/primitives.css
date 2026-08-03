@@ -132,9 +132,12 @@
     --gc-image-fantasy-wash:
       radial-gradient(circle at 20% 15%, oklch(94% 0.045 85 / 8%), transparent 35%),
       repeating-linear-gradient(102deg, transparent 0 0.4rem, oklch(13% 0.025 40 / 5%) 0.45rem 0.5rem);
+    --gc-image-fantasy-parchment: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cfilter id='grain' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.035' numOctaves='4' seed='17' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' fill='%23c4a66b' opacity='.2' filter='url(%23grain)'/%3E%3C/svg%3E");
+    --gc-image-fantasy-ornament: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='black' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 88C8 44 44 8 88 8M8 66C8 34 34 8 66 8M17 49c18 0 32-14 32-32M47 13c0 20 16 36 36 36'/%3E%3Cpath d='M24 72c0-15 12-27 27-27M72 24c-15 0-27 12-27 27'/%3E%3C/g%3E%3Ccircle cx='9' cy='87' r='7' fill='black'/%3E%3Cpath d='M58 18c8-8 18-8 25-5-2 8-8 15-20 17zM18 58c-8 8-8 18-5 25 8-2 15-8 17-20z' fill='black'/%3E%3C/svg%3E");
     --gc-image-scifi-ornament: conic-gradient(from 45deg, transparent 0 12.5%, currentColor 12.5% 18.75%, transparent 18.75% 31.25%, currentColor 31.25% 37.5%, transparent 37.5%);
     --gc-filter-none: none;
     --gc-filter-frost: blur(0.75rem) saturate(125%);
+    --gc-filter-weathered-edge: url("#gc-edge-distress");
     --gc-shape-rect: none;
     --gc-shape-chamfer: polygon(0.75rem 0, calc(100% - 0.75rem) 0, 100% 0.75rem, 100% calc(100% - 0.75rem), calc(100% - 0.75rem) 100%, 0.75rem 100%, 0 calc(100% - 0.75rem), 0 0.75rem);
     --gc-shape-weathered: polygon(0.5% 2%, 7% 0.5%, 15% 1.5%, 24% 0, 36% 1.2%, 48% 0.4%, 61% 1.4%, 73% 0.2%, 86% 1.6%, 99.5% 0.5%, 99% 12%, 100% 25%, 99.2% 39%, 100% 53%, 99% 68%, 99.7% 82%, 98.8% 99%, 86% 98.4%, 73% 100%, 61% 98.8%, 49% 99.6%, 37% 98.7%, 24% 100%, 12% 98.5%, 0.5% 99.2%, 1.2% 86%, 0 72%, 0.8% 57%, 0 43%, 1% 28%);

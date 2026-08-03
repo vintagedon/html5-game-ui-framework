@@ -6,12 +6,12 @@
     --gc-surface-sunken: var(--gc-palette-fantasy-92);
     --gc-surface-interactive: var(--gc-palette-fantasy-75);
     --gc-surface-overlay: var(--gc-palette-fantasy-75);
-    --gc-surface-texture: var(--gc-image-fantasy-wash);
+    --gc-surface-texture: var(--gc-image-fantasy-parchment), var(--gc-image-fantasy-wash);
     --gc-surface-backdrop-filter: var(--gc-filter-none);
     --gc-surface-shape: var(--gc-shape-weathered);
-    --gc-surface-edge-filter: var(--gc-filter-none);
+    --gc-surface-edge-filter: var(--gc-filter-weathered-edge);
     --gc-ornament-color: var(--gc-palette-fantasy-accent);
-    --gc-ornament-mask: var(--gc-image-none);
+    --gc-ornament-mask: var(--gc-image-fantasy-ornament);
     --gc-ornament-opacity: var(--gc-alpha-full);
 
     --gc-text-primary: var(--gc-palette-fantasy-00);
