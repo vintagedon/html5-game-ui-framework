@@ -24,6 +24,22 @@ escalation.
 
 ---
 
+## 1. Provisional proof specimens
+
+`components.css` publishes `.gc-panel`, `.gc-button`, `.gc-input`, and
+`.gc-meter`. **They are provisional and unregistered.** They exist only to
+prove that the token contract and OKLCH state derivation render under the four
+themes, not as a stable component API a consumer should bind to.
+
+Per `AGENTS.md`, a component without a registered scenario is incomplete
+regardless of whether it renders. The foundations spec
+(`2026-08-02-h5gameui-spec-01`) forbade building the scenario registry, so
+these four specimens ship unregistered by design, not by oversight. The
+provisional qualifier is lifted when Phase 2 lands the registry-driven
+harness: spec-02 Gate 2.2 registers these four as the first scenarios.
+
+---
+
 ## 1. Contents
 
 ```text
