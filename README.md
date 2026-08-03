@@ -3,8 +3,8 @@
 title: "html5-game-ui-framework"
 description: "A renderer-agnostic browser game UI framework whose reference application is also its conformance surface"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-02"
-version: "0.3"
+date: "2026-08-03"
+version: "0.4"
 status: "Active"
 tags:
   - type: project-root
@@ -61,6 +61,10 @@ The rule covers what the framework and its themes ship to a running game. Reposi
 
 **The documentation is the test suite.** Every component declares its dependency level, required tokens, theme and viewport coverage, initial state, scripted interactions, and named capture checkpoints. The reference application renders from that declaration, and Playwright reads the same declaration to drive the interactions and compare captures against approved goldens. A module that reaches for another module renders as a visible failure on the page rather than only as a red test run. The metrics header is computed from the repository, so the headline claims are either true at build time or visibly false.
 
+Phase 1 uses a clearly labelled hand-authored reference surface to review the
+foundations contract and fantasy spike. The registry-driven application,
+runner, goldens, and computed metrics replace it in Phase 2.
+
 **Requirements come from artifacts that exist.** The predecessor framework contributes thirteen shipped component families, several commercial template packs contribute requirement lists and technique, and real games supply the integration pressure. Nothing enters the core because it seemed like a good idea.
 
 ---
@@ -70,11 +74,11 @@ The rule covers what the framework and its themes ship to a running game. Reposi
 | Area | Status | Description |
 |------|--------|-------------|
 | Charter | ✅ Complete | Scope, architecture, and acceptance criteria approved at v1.5 |
-| Repository hydration | 🔄 In Progress | Standards, agent scaffolding, and the documentation pass landed; git initialization pending |
-| Foundations | ⬜ Planned | Token contract, cascade layers, theme mechanism, four themes (modern, arcade, sci-fi, fantasy) |
-| Zero-raster spike | ⬜ Planned | Dark fantasy theme rendered with no image files |
+| Repository hydration | ✅ Complete | Public baseline initialized on `main` |
+| Foundations | 🔄 Under Review | Token freeze candidate, cascade contract, state recipes, and four themes await operator findings |
+| Zero-raster spike | 🔄 Under Review | Four dark-fantasy techniques render with zero framework raster files; F-002 verdict pending |
 | Harness | ⬜ Planned | Scenario registry, reference application, Playwright runner, goldens, metrics |
-| Core primitives | ⬜ Planned | Added only under consumer pressure |
+| Core primitives | 🔄 Proof Set | Button, panel, input, and meter exist only to verify foundations |
 | Modules | ⬜ Planned | Composed from core; no module-to-module dependency |
 | First consumer | ⬜ Planned | Rogue Cellar integration, UI layer only |
 | Published demo | ⬜ Planned | One original game, after the framework is proven |
@@ -104,12 +108,22 @@ html5-game-ui-framework/
 ├── assets/                    # Repository logo and documentation imagery
 ├── docs/                      # Documentation
 │   ├── documentation-standards/  # Template library and guidelines
-│   └── project-charter.md     # Frozen scope and architecture
+│   ├── cascade-and-overrides.md   # Layer and specificity contract
+│   ├── foundations-review-2026-08-02.md  # Operator approval questions
+│   ├── project-charter.md     # Frozen scope and architecture
+│   └── token-reference.md     # Semantic freeze candidate
 ├── internal-files/            # Ideation and source materials (gitignored)
+├── reference/                 # Temporary Phase 1 hand-authored review page
 ├── recycle-bin/               # Agent trash can (gitignored)
 ├── reference-files-assets/    # Third-party art packs (gitignored, never redistributed)
 ├── reference-files-games/     # Third-party game templates (gitignored)
 ├── reference-files-ui/        # Third-party UI packs (gitignored)
+├── src/                       # Framework and theme publication source
+│   ├── core/                  # Domain-neutral proof primitives
+│   ├── modules/               # Reserved consumer-driven module boundary
+│   ├── themes/                # Modern, arcade, sci-fi, and fantasy
+│   ├── tokens/                # Primitive, semantic, and component tiers
+│   └── gc.css                 # Public entry and cascade layer order
 ├── staging/                   # Pre-commit staging area (gitignored)
 ├── .gitignore
 ├── .markdownlint.json         # Markdown lint configuration (tracked; project config)
@@ -132,18 +146,19 @@ The three `reference-files-*` directories hold licensed third-party packs used a
 
 ## Getting Started
 
-The framework has no build step and no external runtime dependency. Development tooling requires Node for the metrics generator and Playwright for the scenario runner.
+The framework has no build step and no external runtime dependency. Serve the
+repository over HTTP to inspect the Phase 1 reference surface:
 
-```bash
+```console
 git clone https://github.com/vintagedon/html5-game-ui-framework
 cd html5-game-ui-framework
-
-# Development tooling (once the harness lands)
-npm install
-npx playwright install chromium
+python3 -m http.server 8000
 ```
 
-The project is in the foundations phase. There is no consumable artifact yet.
+Open `http://127.0.0.1:8000/reference/`. A consuming page loads `src/gc.css`
+and switches themes by setting `data-gc-theme` on `<html>`. The semantic
+vocabulary remains a freeze candidate until F-001 is answered. Node and
+Playwright become development dependencies when the Phase 2 harness lands.
 
 ---
 
@@ -164,4 +179,4 @@ Third-party reference material held locally under `reference-files-*` is license
 
 ---
 
-Last Updated: August 2, 2026 | Status: Foundations
+Last Updated: August 3, 2026 | Status: Foundations Review
