@@ -16,7 +16,7 @@
 
     --gc-text-primary: var(--gc-palette-fantasy-00);
     --gc-text-secondary: var(--gc-palette-fantasy-15);
-    --gc-text-muted: var(--gc-palette-fantasy-35);
+    --gc-text-muted: var(--gc-palette-fantasy-25);
     --gc-text-inverse: var(--gc-palette-fantasy-92);
     --gc-text-disabled: var(--gc-palette-fantasy-55);
 
@@ -28,6 +28,7 @@
     --gc-accent: var(--gc-palette-fantasy-accent);
     --gc-on-accent: var(--gc-palette-fantasy-accent-on);
     --gc-focus-ring: var(--gc-palette-fantasy-accent);
+    --gc-focus-width: var(--gc-border-medium);
     --gc-focus-offset: var(--gc-size-1);
 
     --gc-status-success: var(--gc-palette-positive);

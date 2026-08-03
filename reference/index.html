@@ -7,18 +7,10 @@
     <title>Game UI Foundations Review</title>
     <link rel="stylesheet" href="../src/gc.css">
     <link rel="stylesheet" href="reference.css">
+    <script type="module" src="../src/gc.js"></script>
     <script type="module" src="reference.js"></script>
   </head>
   <body>
-    <svg width="0" height="0" aria-hidden="true" focusable="false">
-      <defs>
-        <filter id="gc-edge-distress" x="-3%" y="-3%" width="106%" height="106%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.012 0.055" numOctaves="2" seed="29" result="edge-noise"></feTurbulence>
-          <feDisplacementMap in="SourceGraphic" in2="edge-noise" scale="2.5" xChannelSelector="R" yChannelSelector="B"></feDisplacementMap>
-        </filter>
-      </defs>
-    </svg>
-
     <main class="reference-shell">
       <header class="reference-header">
         <p class="phase-notice">
@@ -74,7 +66,7 @@
             <h3>Button states</h3>
             <div class="proof-row">
               <button class="gc-button" type="button">Resting</button>
-              <button class="gc-button" type="button" aria-selected="true">Selected</button>
+              <button class="gc-button" type="button" aria-pressed="true">Selected</button>
               <button class="gc-button" type="button" disabled>Disabled</button>
             </div>
           </article>

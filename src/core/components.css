@@ -1,3 +1,15 @@
+/*
+ * Provisional proof specimens. `.gc-panel`, `.gc-button`, `.gc-input`, and
+ * `.gc-meter` exist to prove the token contract and OKLCH state derivation
+ * render under four themes. They are NOT a registered component API yet.
+ *
+ * Per AGENTS.md, a component without a registered scenario is incomplete.
+ * This spec (2026-08-02-h5gameui-spec-01) forbade building the scenario
+ * registry, so these four specimens ship unregistered and provisional. A
+ * consumer should not bind to them as stable API. Phase 2 lands the
+ * registry-driven harness; spec-02 Gate 2.2 registers these four as the
+ * first scenarios, which is what lifts the provisional qualifier.
+ */
 @layer core {
   :where(.gc-panel) {
     padding: var(--gc-space-5);
@@ -88,7 +100,7 @@
     transform: translateY(var(--gc-space-1));
   }
 
-  :where(.gc-button[aria-selected="true"]) {
+  :where(.gc-button[aria-pressed="true"]) {
     background-color: var(--gc-control-fill-selected);
     color: var(--gc-button-selected-text);
   }
@@ -101,7 +113,7 @@
   }
 
   :where(.gc-button:focus-visible, .gc-input:focus-visible) {
-    outline: var(--gc-border-medium) solid var(--gc-focus-ring);
+    outline: var(--gc-focus-width) solid var(--gc-focus-ring);
     outline-offset: var(--gc-focus-offset);
   }
 

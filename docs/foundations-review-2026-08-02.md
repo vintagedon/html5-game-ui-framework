@@ -4,8 +4,8 @@ title: "Foundations Review 2026-08-02"
 description: "Closed approval questions for the token contract, state recipes, source boundary, compatibility floor, and zero-raster spike"
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-08-03"
-version: "1.0"
-status: "Under Review"
+version: "1.1"
+status: "Approved"
 tags:
   - type: report
   - domain: foundations
@@ -27,7 +27,10 @@ an operator answer.
 ## F-001: Semantic Vocabulary Freeze Candidate
 
 Statement: One hue-neutral and domain-neutral semantic vocabulary populated all
-four themes without a Gate 1.5 addition.
+four themes without a Gate 1.5 addition. Amendment 1 added one token
+(`--gc-focus-width`, A1.4) so Core stops reading a primitive; the count is now
+83 and the addition is hue-neutral and domain-neutral. No other change to the
+vocabulary.
 
 Evidence: `src/tokens/semantic.css` declares the vocabulary,
 `docs/token-reference.md` defines the tier contract, and every file under
@@ -63,6 +66,7 @@ Evidence: `src/tokens/semantic.css` declares the vocabulary,
 | `--gc-accent` | Primary emphasis and action colour; not a named hue or status. |
 | `--gc-on-accent` | Legible foreground on accent; not general inverse text. |
 | `--gc-focus-ring` | Keyboard focus indicator colour; not hover or selected colour. |
+| `--gc-focus-width` | Keyboard focus indicator stroke width; not a generic border width. |
 | `--gc-focus-offset` | Space between focus ring and target; not layout spacing. |
 | `--gc-status-success` | Positive completion or healthy state; not resource gain. |
 | `--gc-on-status-success` | Foreground on success fill; not success-adjacent text. |
@@ -248,16 +252,93 @@ Safari 16.4 here.
 Question: Choose **accept the frozen floor as met with the prefixed
 compatibility pair** or **treat mask/backdrop technique as out of bounds**.
 
+## Amendment 1 (2026-08-03)
+
+Amendment 1 repaired six findings from independent review of the open pull
+request. Two of them change what F-002 and F-006 describe; one adds a semantic
+token to F-001; and the accessibility measurement mandated by A1.5 surfaced a
+new finding (F-007) that the original review surface did not carry. No charter
+contradiction was confirmed.
+
+| Finding | Amendment change |
+|---------|------------------|
+| F-001 | One new semantic token, `--gc-focus-width` (added by A1.4 so Core stops reading the `--gc-border-medium` primitive). Vocabulary count is 82 → 83; the table above now includes its boundary. Still hue-neutral and domain-neutral. Question stands. |
+| F-002 | The fantasy spike still renders the four effects with zero raster files. The edge-distress technique changed rendering path: the `feDisplacementMap` filter defs now ship from framework ESM source (`src/gc.js` injects them on import) rather than relying on markup copied from `reference/`. A consumer loading only published source now gets the effect. (Correction to the amendment's prediction: Chromium 145 degrades rather than disappears when the reference is unresolvable — the panel renders without the displacement. The fix is still required because the effect must render from published source.) Verdict question stands. |
+| F-006 | The sci-fi frost now actually renders. A1.6 made `--gc-surface-raised` translucent (`color-mix` at 0.72 alpha) under sci-fi with an `@supports` opaque fallback, so `backdrop-filter` composites real backdrop pixels. Measured interior backdrop bleed-through 0 → 40 over a high-contrast pattern, with text contrast held at 14.16:1. Compatibility question stands; no new feature was introduced outside the floor. |
+| F-007 (new) | See below. |
+
+### F-007: Theme token-value contrast defects (closed)
+
+**Resolution.** The operator chose **adjust**, then decided the class rather
+than the list: every semantic foreground/background pair meets 4.5:1 in every
+theme. Amendments 2 and 3 fixed all four failing pairs the comprehensive sweep
+found, by adjusting primitive palette values and two theme mappings. No semantic
+token was added, renamed, or removed; the 83-token vocabulary and tier
+boundaries are unchanged. Final ratios:
+
+| Pair | Themes | Before | After |
+|------|--------|--------|-------|
+| `--gc-on-accent` / `--gc-accent` | modern | 3.60:1 | **8.24:1** |
+| `--gc-on-accent` / `--gc-control-fill-selected` | modern | 2.74:1 | **5.33:1** |
+| `--gc-on-status-danger` / `--gc-status-danger` | all four | 3.82:1 | **6.02:1** |
+| `--gc-on-status-info` / `--gc-status-info` | all four | 2.62:1 | **6.17:1** |
+| `--gc-text-muted` on surfaces | modern / fantasy | 2.88–3.70 | **6.01–6.91** |
+
+axe-core color-contrast on the reference page reports **0 violations across all
+four themes.** The full pair matrix (every semantic fg/bg pair, all four themes,
+passes and the exempt/non-designed entries explained) is in the worklog's
+Amendment 2 and Amendment 3 sections. Mutation tests re-surfaced each failure on
+revert and were restored.
+
+**Standing rule, set by Amendment 3 and recorded in `docs/token-reference.md`
+as a property of the contract.** Every semantic foreground placed on every
+semantic surface meets WCAG AA (4.5:1) at the framework's default body and
+caption sizes, in every theme, with no size qualification. A future theme
+inherits it. `--gc-text-disabled` is outside the rule (WCAG 1.4.3 exempts
+inactive controls); `--gc-text-inverse` is outside it on non-inverted surfaces
+(its boundary restricts it to inverted surfaces).
+
+**Finding recorded, not acted on.** Enforcing 4.5:1 compresses the
+muted–secondary lightness gap (modern: secondary L=34, muted L=46, gap 12 vs 31
+before; fantasy: secondary L=82, muted L=70, gap 12 vs 24). The tiers stay
+ordered and non-overlapping, but the separation is now re-earned through weight,
+size, and spacing rather than lightness alone — the `--gc-text-muted` boundary
+says so. That the tiers are visually close after 4.5:1 is a vocabulary finding
+for Phase 3's consumer-pressure work, not a defect here.
+
+No pair is carried forward. This finding is closed.
+
 ## Review Summary
 
-| Finding | Operator decision |
-|---------|-------------------|
-| F-001 semantic vocabulary | Yes / No |
-| F-002 zero-raster position | Yes / No |
-| F-003 no Gate 1.5 semantic addition | Yes / No |
-| F-004 state recipes | Accept / Reopen |
-| F-005 source boundary | Yes / No |
-| F-006 compatibility floor | Accept / Out of bounds |
+Operator decisions recorded 2026-08-03. The vocabulary is frozen as of this
+date; `docs/token-reference.md` carries the same status. Phase 2 is unblocked.
+
+| Finding | Operator decision | Consequence |
+|---------|-------------------|-------------|
+| F-001 semantic vocabulary | **Approved, frozen** | The 83-token vocabulary is API. Renaming a semantic token is a major version from here. Spec-02 binds scenarios to these names and does not renegotiate them. |
+| F-002 zero-raster position | **Holds** | The charter's central technical position is confirmed against the theme that decides it. No charter change. |
+| F-003 no Gate 1.5 semantic addition | **Approved** | The vocabulary was sufficient for four themes without a forced addition, which is the evidence F-001 rests on. |
+| F-004 state recipes | **Accepted** | Hover, active, disabled, and selected stay derived through `color-mix()` in OKLCH. Themes populate base tokens only. |
+| F-005 source boundary | **Approved** | `src/tokens/`, `src/core/`, `src/modules/`, `src/themes/` are the framework scan boundary. `reference/` is a review harness and is excluded, so page chrome never inflates a size metric. Spec-02 Gate 2.6 resolves against this list. |
+| F-006 compatibility floor | **Accepted with the prefixed pair** | Standard and `-webkit-` mask and backdrop declarations count as one compatibility unit. The unrendered Safari 16.4 prefixed backdrop path stays a known gap: the failure mode is a missing visual enhancement over a readable opaque surface, not lost content or interaction. Verify whenever a Safari host is convenient. |
+| F-007 theme token-value contrast | **Closed (Amendments 2 + 3)** | All four failing pairs the comprehensive sweep found (modern accent, danger, info, muted) now pass at 8.24 / 5.33 / 6.02 / 6.17 / 6.01–6.91. axe-core reports 0 violations across all four themes. The standing 4.5:1 rule is recorded in `docs/token-reference.md` as a property of the contract. No pair is carried forward. |
+
+**Why F-007 was not accepted as a known issue.** The modern accent pair at
+2.73:1 misses the 3:1 threshold for UI components, not only the 4.5:1 text
+threshold, so it is not a marginal miss. The charter freezes vocabulary and
+leaves values tunable to v1.0, so the fix is in bounds and cheap today and
+expensive later. And spec-02 builds a metrics block whose whole property is
+that its numbers are true at build time or visibly false; an accessibility
+failure count that ships with a standing accepted exception is a number
+everyone learns to skip. This is the first figure that block will ever report.
+
+**The spec is closed.** Every finding above shows a resolution; no item is
+carried forward. Amendments 1, 2, and 3 are complete on the branch, unpushed,
+awaiting operator review and merge.
 
 Confirmed charter contradictions: None. F-006 records a prefixed-property
 compatibility caveat for operator judgment without changing the charter.
+Amendments 1–3 adjusted primitive palette values and theme mappings, which the
+charter permits (values tunable to v1.0), and recorded one standing rule
+(4.5:1 contrast) as a property of the token contract, without changing the
+charter or the frozen vocabulary.

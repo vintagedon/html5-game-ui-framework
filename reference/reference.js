@@ -20,7 +20,7 @@ function selectTheme(theme) {
 
   for (const choice of choices) {
     const selected = choice.dataset.themeChoice === theme;
-    choice.setAttribute("aria-selected", String(selected));
+    choice.setAttribute("aria-pressed", String(selected));
   }
 }
 

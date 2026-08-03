@@ -1,11 +1,11 @@
 <!--
 ---
 title: "Semantic Token Reference"
-description: "Freeze-candidate vocabulary and tier boundaries for framework tokens"
+description: "Frozen vocabulary and tier boundaries for framework tokens"
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-08-03"
-version: "1.0"
-status: "Under Review"
+version: "1.1"
+status: "Frozen"
 tags:
   - type: reference
   - domain: foundations
@@ -19,17 +19,64 @@ related_documents:
 
 # Semantic Token Reference
 
-This document is the freeze candidate for the `--gc-` semantic vocabulary.
-It remains **Under Review** until the operator approves finding F-001 in the
-foundations review. That approval freezes names and boundaries; exact values
-remain tunable through v1.0.
+> **Frozen 2026-08-03** by operator approval of F-001 in
+> [Foundations Review 2026-08-02](foundations-review-2026-08-02.md). The 83
+> semantic token names in this document are API. Renaming one is a major
+> version. Values remain tunable to v1.0; names and tier boundaries do not.
+
+This document defines the `--gc-` semantic vocabulary, frozen by operator
+approval of F-001 on 2026-08-03. Names and tier boundaries are fixed; exact
+values remain tunable through v1.0.
+
+> **Boundary prose is clarifiable; names and tier membership are not.** The
+> 2026-08-03 freeze locks the 83 token names and the tier each belongs to.
+> Clarifying what a token means — refining its boundary definition, as
+> Amendment 3 does for `--gc-text-muted` below — does not require a version
+> bump. Renaming a token, moving it between tiers, adding one, or removing one
+> does.
+
+> **Standing contrast rule (property of the contract, set by Amendment 3;
+> scope corrected 2026-08-03 after review).** Every **designed** foreground and
+> background pairing meets its WCAG threshold in every theme, at the
+> framework's default body and caption sizes, with no size qualification. The
+> rule is defined over the enumerated pairings in the table below, **not** over
+> the Cartesian product of foreground and surface tokens. Several tokens are
+> pair-specific by their own boundary definition, so the product contains
+> combinations no theme can or should satisfy: `--gc-on-accent` is defined for
+> the accent fill and is near-white in modern, which would measure roughly 1:1
+> against `--gc-surface-base`. A future theme inherits this rule rather than
+> rediscovering it.
+
+#### Designed pairings and thresholds
+
+| Foreground | Valid backgrounds | Threshold |
+|------------|-------------------|-----------|
+| `--gc-text-primary`, `--gc-text-secondary`, `--gc-text-muted` | `--gc-surface-canvas`, `--gc-surface-base`, `--gc-surface-raised`, `--gc-surface-sunken`, `--gc-surface-interactive`, `--gc-surface-overlay` | 4.5:1 |
+| `--gc-on-accent` | `--gc-accent`, and `--gc-control-fill-selected` because that recipe derives from the accent | 4.5:1 |
+| `--gc-on-status-success` | `--gc-status-success` | 4.5:1 |
+| `--gc-on-status-warning` | `--gc-status-warning` | 4.5:1 |
+| `--gc-on-status-danger` | `--gc-status-danger` | 4.5:1 |
+| `--gc-on-status-info` | `--gc-status-info` | 4.5:1 |
+| `--gc-border-default`, `--gc-border-strong`, `--gc-divider`, `--gc-focus-ring` | The surface each is drawn against | 3:1 (WCAG 1.4.11, non-text) |
+
+Outside the rule, and why:
+
+- `--gc-text-disabled` on any surface. WCAG 1.4.3 exempts inactive controls.
+- `--gc-text-inverse` is pairing-restricted and currently unused. Its boundary
+  defines it for inverted surfaces, and no theme declares one yet. **The first
+  component that uses it establishes the pairing, and that pairing joins this
+  table and must meet 4.5:1.** It is not a standing exemption.
+
+Any combination absent from this table is undesigned. A component that creates
+one has introduced a pairing, not found a loophole: add the row and meet the
+threshold, or use a token designed for that background.
 
 ## 1. Tier Contract
 
 | Tier | Holds | May reference | Consumer status |
 |------|-------|---------------|-----------------|
 | Primitive | Literal colour, dimension, type, motion, shape, and effect values | Nothing | Internal; framework rules never read it |
-| Semantic | Roles shared by all themes and components | Primitive tokens only | Public freeze candidate; themes may override it |
+| Semantic | Roles shared by all themes and components | Primitive tokens only | Frozen 2026-08-03; themes may override values only |
 | Component | Defaults and shared state recipes for a component | Semantic tokens only | Public where a component exposes it |
 
 The dependency direction is primitive to semantic to component. A theme
@@ -65,7 +112,7 @@ presumes a hue, game mechanic, or one theme's technique.
 |-------|---------------------|
 | `--gc-text-primary` | Highest-emphasis ordinary text; not text placed on an accent fill. |
 | `--gc-text-secondary` | Supporting readable text; not placeholder or disabled text. |
-| `--gc-text-muted` | Low-emphasis metadata and hints; not an inaccessible decorative tint. |
+| `--gc-text-muted` | Low-emphasis metadata and hints; not an inaccessible decoration. Meets 4.5:1 against every surface at default sizes. Differentiates from `--gc-text-secondary` by weight, size, and spacing (which the framework controls), not by lightness alone — the 4.5:1 rule compresses the muted–secondary lightness gap, so a consumer must not rely on colour value to distinguish them. |
 | `--gc-text-inverse` | Text on a generally inverted surface; not specifically text on accent. |
 | `--gc-text-disabled` | Text for unavailable controls; not muted but available content. |
 | `--gc-border-default` | Ordinary component boundary; not a focus or selected indicator. |
@@ -75,6 +122,7 @@ presumes a hue, game mechanic, or one theme's technique.
 | `--gc-accent` | Primary emphasis and action colour; not a named hue or status. |
 | `--gc-on-accent` | Legible foreground placed on the accent; not general inverse text. |
 | `--gc-focus-ring` | Keyboard focus indicator colour; not hover or selected colour. |
+| `--gc-focus-width` | Keyboard focus indicator stroke width; not a generic border width. |
 | `--gc-focus-offset` | Space between a focus ring and its target; not layout spacing. |
 
 ### Status
@@ -168,6 +216,8 @@ by those recipes; they do not enumerate state values.
 
 ## 4. Freeze Decision
 
-Finding F-001 in [the foundations review](foundations-review-2026-08-02.md)
-asks the operator to approve this vocabulary as frozen. Until that question is
-answered yes, downstream documents must call this a freeze candidate.
+Finding F-001 in [the foundations review](foundations-review-2026-08-02.md) was
+approved on 2026-08-03. This vocabulary is frozen: the 83 names and their tier
+membership are API, and renaming, moving, adding, or removing one is a major
+version. Values remain tunable through v1.0, and boundary prose remains
+clarifiable.

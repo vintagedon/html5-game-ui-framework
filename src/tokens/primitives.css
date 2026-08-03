@@ -9,10 +9,11 @@
     --gc-palette-modern-10: oklch(96% 0.008 255);
     --gc-palette-modern-20: oklch(91% 0.012 255);
     --gc-palette-modern-40: oklch(65% 0.025 255);
+    --gc-palette-modern-55: oklch(46% 0.025 255);
     --gc-palette-modern-70: oklch(34% 0.035 255);
     --gc-palette-modern-85: oklch(22% 0.03 255);
     --gc-palette-modern-95: oklch(14% 0.025 255);
-    --gc-palette-modern-accent: oklch(62% 0.19 255);
+    --gc-palette-modern-accent: oklch(42% 0.19 255);
     --gc-palette-modern-accent-on: oklch(99% 0.004 255);
 
     --gc-palette-arcade-00: oklch(96% 0.04 105);
@@ -35,6 +36,7 @@
 
     --gc-palette-fantasy-00: oklch(94% 0.045 85);
     --gc-palette-fantasy-15: oklch(82% 0.07 82);
+    --gc-palette-fantasy-25: oklch(70% 0.09 70);
     --gc-palette-fantasy-35: oklch(58% 0.09 70);
     --gc-palette-fantasy-55: oklch(39% 0.065 55);
     --gc-palette-fantasy-75: oklch(25% 0.045 45);
@@ -47,9 +49,9 @@
     --gc-palette-positive-on: oklch(13% 0.025 150);
     --gc-palette-caution: oklch(79% 0.15 88);
     --gc-palette-caution-on: oklch(17% 0.035 72);
-    --gc-palette-critical: oklch(62% 0.22 27);
+    --gc-palette-critical: oklch(50% 0.22 27);
     --gc-palette-critical-on: oklch(98% 0.008 27);
-    --gc-palette-notice: oklch(68% 0.15 235);
+    --gc-palette-notice: oklch(46% 0.15 235);
     --gc-palette-notice-on: oklch(98% 0.008 235);
 
     /* Transparency, geometry, and depth literals. */
