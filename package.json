@@ -1,0 +1,22 @@
+{
+  "name": "html5-game-ui-framework",
+  "version": "0.4.0",
+  "description": "A renderer-agnostic browser game UI framework with no runtime image assets",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "node harness/registry/validate.js",
+    "metrics": "node harness/metrics/metrics.js",
+    "build": "npm run validate && npm run metrics",
+    "test": "npm run build && playwright test",
+    "capture": "npm run build && GC_CAPTURE=1 playwright test"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.62.0",
+    "clean-css": "^5.3.3",
+    "pixelmatch": "^6.0.0",
+    "pngjs": "^7.0.0",
+    "terser": "^5.36.0"
+  }
+}
