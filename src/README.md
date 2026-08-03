@@ -1,0 +1,50 @@
+<!--
+---
+title: "Framework Source"
+description: "Consumable CSS and ESM source for the game UI framework"
+author: "VintageDon (https://github.com/vintagedon/)"
+date: "2026-08-03"
+version: "1.0"
+status: "Active"
+tags:
+  - type: directory-readme
+  - domain: foundations
+  - tech: [css, javascript]
+related_documents:
+  - "[Project Charter](../docs/project-charter.md)"
+  - "[Token Reference](../docs/token-reference.md)"
+---
+-->
+
+# Framework Source
+
+This directory contains the text-only source that a game consumes. Token,
+core, module, and theme paths remain separate so dependency and asset metrics
+can scan explicit boundaries.
+
+---
+
+## 1. Contents
+
+```text
+src/
+├── tokens/       # Primitive, semantic, and component token tiers
+└── README.md     # This file
+```
+
+---
+
+## 3. Subdirectories
+
+| Directory | Description |
+|-----------|-------------|
+| [tokens/](tokens/README.md) | Three-tier token contract and state recipes |
+
+---
+
+## 4. Related
+
+| Document | Relationship |
+|----------|--------------|
+| [Repository README](../README.md) | Repository orientation |
+| [Token Reference](../docs/token-reference.md) | Semantic vocabulary and boundaries |
