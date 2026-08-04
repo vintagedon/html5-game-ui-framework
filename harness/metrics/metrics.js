@@ -22,6 +22,7 @@ import CleanCSS from "clean-css";
 import { minify } from "terser";
 import { listScopeFiles, scopeSummary, RASTER_EXTS, REPO_ROOT } from "./scope.js";
 import { contrastGate } from "./contrast.js";
+import { EXEMPTIONS } from "./pairings.js";
 import { registry } from "../registry/scenarios.js";
 import { audit } from "../auditor/auditor.js";
 
@@ -80,6 +81,7 @@ const metrics = [
   { label: "Dependency violations", value: dep.violations.length, scope: "auditor over registry declarations" },
   { label: "Accessibility failures", value: contrast.violations.length, scope: "contrast gate: designed pairs below threshold (text 4.5:1 + non-text 3:1); undesigned-pairing membership is enforced at test time by the Playwright runner" },
   { label: "Contrast coverage (pair×theme)", value: contrast.standingChecks, scope: `designed pairs (${contrast.standingChecks / contrast.themeCount}) × themes (${contrast.themeCount}); a ratio is computed for every one` },
+  { label: "Contrast exemptions (declared)", value: EXEMPTIONS.length, scope: "enumerated in pairings.js; applied and counted by the runner: " + EXEMPTIONS.map((e) => `${e.token} (${e.reason})`).join("; ") },
 ];
 
 const out = {
