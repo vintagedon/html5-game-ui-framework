@@ -20,9 +20,9 @@
     --gc-text-inverse: var(--gc-palette-modern-00);
     --gc-text-disabled: var(--gc-palette-modern-40);
 
-    --gc-border-default: var(--gc-palette-modern-20);
-    --gc-border-strong: var(--gc-palette-modern-40);
-    --gc-divider: var(--gc-palette-modern-20);
+    --gc-border-default: var(--gc-palette-modern-44);
+    --gc-border-strong: var(--gc-palette-modern-60);
+    --gc-divider: var(--gc-palette-modern-44);
     --gc-border-width: var(--gc-border-thin);
 
     --gc-accent: var(--gc-palette-modern-accent);
