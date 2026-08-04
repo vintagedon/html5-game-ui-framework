@@ -27,6 +27,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { registry } from "../registry/scenarios.js";
 import { compareCapture } from "./compare.js";
+import { semanticDeclarations } from "../metrics/contrast.js";
+import { designedPairs, EXEMPT_FGS } from "../metrics/pairings.js";
 
 const CAPTURE = !!process.env.GC_CAPTURE;
 const BASE = process.env.GC_BASE_URL || "http://127.0.0.1:8123";
@@ -137,4 +139,154 @@ for (const c of cases) {
 test.afterAll(async () => {
   mkdirSync(CANDIDATES, { recursive: true });
   writeFileSync(join(CANDIDATES, "matrix.json"), JSON.stringify(manifest, null, 2) + "\n");
+});
+
+// ---------------------------------------------------------------------------
+// Membership check (Amendment 4, A4.3). The static source scan in contrast.js
+// only saw fg/bg tokens declared in the SAME innermost block, so inherited
+// backgrounds were invisible to it. This check runs in the browser, where
+// getComputedStyle + ancestor walk resolves inheritance. For every element
+// under every specimen, across every theme, it finds the nearest ancestor whose
+// matched selector declares a foreground/background token and records the
+// pairing. Every observed pairing must be a designed row (or an enumerated
+// exemption); an undesigned pairing fails the run and is named.
+// ---------------------------------------------------------------------------
+const SEM_DECL = semanticDeclarations();
+const DESIGNED_KEYS = new Set(designedPairs().map(([f, b]) => `${f}|${b}`));
+const EXEMPT = new Set(EXEMPT_FGS);
+
+// key `${fg}|${bg}` -> { fg, bg, themes: Set, scenarios: Set }
+const observed = new Map();
+const excludedDisabledByScenario = {};
+
+test("membership: every rendered fg/bg pairing is designed", async ({ page }) => {
+  for (const theme of registry.themes) {
+    await page.goto(PAGE, { waitUntil: "networkidle" });
+    await page.evaluate((t) => {
+      document.documentElement.dataset.gcTheme = t;
+    }, theme);
+    await page.waitForTimeout(160);
+
+    for (const s of registry.scenarios) {
+      const pairings = await page.evaluate(
+        ([id, decls]) => {
+          const root = document.querySelector(`[data-scenario="${id}"] .gc-specimen`);
+          if (!root) return [];
+          const colorDecls = decls.filter((d) => d.fc);
+          const borderDecls = decls.filter((d) => d.fb);
+          const bgDecls = decls.filter((d) => d.b);
+          // Cascade winner: every framework selector is :where()-wrapped (zero
+          // specificity), so among matching declarations the LAST in source order
+          // wins. Return that one, not the first.
+          const cascadeMatch = (el, list) => {
+            let winner = null;
+            for (const d of list) {
+              try {
+                if (el.matches(d.s)) winner = d;
+              } catch {
+                /* malformed selector from the extractor — skip, never throw */
+              }
+            }
+            return winner;
+          };
+          // colour and border both inherit; background paints. For each, the
+          // nearest ancestor (incl self) whose matched selector declares the
+          // token is the source.
+          const nearest = (el, list, key) => {
+            let n = el;
+            while (n && n.nodeType === 1) {
+              const d = cascadeMatch(n, list);
+              if (d && d[key]) return d[key];
+              n = n.parentElement;
+            }
+            return null;
+          };
+          const seen = new Set();
+          let excludedDisabled = 0;
+          // An element within an inactive control is WCAG-exempt (1.4.3 / 1.4.11)
+          // and excluded from membership: its border/fill pairings are intentional
+          // but carry no contrast obligation. Counted here so the exclusion is
+          // visible, not silent.
+          const isDisabledControl = (el) => {
+            let n = el;
+            while (n && n.nodeType === 1) {
+              if (n.matches('button[disabled], input[disabled], textarea[disabled], select[disabled], [aria-disabled="true"]')) return true;
+              n = n.parentElement;
+            }
+            return false;
+          };
+          // An element contributes a TEXT pairing if it renders text: direct
+          // text content, or (for form fields) a value/placeholder. Decorative
+          // bg-only elements (e.g. .gc-meter__fill, .gc-spike__ornament) are
+          // excluded; they are listed in the worklog's exclusion enumeration.
+          const rendersText = (el) => {
+            if ([...el.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim().length > 0)) return true;
+            if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+              return String(el.value || "").trim().length > 0 || String(el.placeholder || "").trim().length > 0;
+            }
+            return false;
+          };
+          for (const el of [root, ...root.querySelectorAll("*")]) {
+            if (isDisabledControl(el)) { excludedDisabled++; continue; }
+            const bg = nearest(el, bgDecls, "b"); // background paints; nearest painting ancestor
+            if (!bg) continue;
+            // text colour inherits — walk ancestors
+            if (rendersText(el)) {
+              const fc = nearest(el, colorDecls, "fc");
+              if (fc) seen.add(`${fc}|${bg}`);
+            }
+            // border colour does NOT inherit — only the element's own cascade-winning declaration
+            const ownBorder = cascadeMatch(el, borderDecls);
+            if (ownBorder && ownBorder.fb) seen.add(`${ownBorder.fb}|${bg}`);
+          }
+          return { pairings: [...seen], excludedDisabled };
+        },
+        [s.id, SEM_DECL],
+      );
+      const excludedDisabledTotal = (excludedDisabledByScenario[s.id] = (excludedDisabledByScenario[s.id] || 0) + (pairings.excludedDisabled || 0));
+      for (const key of pairings.pairings) {
+        if (!observed.has(key)) observed.set(key, { fg: key.split("|")[0], bg: key.split("|")[1], themes: new Set(), scenarios: new Set() });
+        const e = observed.get(key);
+        e.themes.add(theme);
+        e.scenarios.add(s.id);
+      }
+    }
+  }
+
+  // Report observed pairings (count is materially larger than the static seven).
+  const totalExcludedDisabled = Object.values(excludedDisabledByScenario).reduce((a, b) => a + b, 0);
+  const report = {
+    distinctPairings: observed.size,
+    designedKeys: DESIGNED_KEYS.size,
+    excluded: {
+      disabledControlElements: totalExcludedDisabled,
+      reason: "WCAG 1.4.3 / 1.4.11 inactive-control exemption; pairings on disabled controls carry no contrast obligation",
+      decorativeBgOnlyElements: [".gc-meter__fill", ".gc-spike__ornament"],
+      decorativeReason: "background token with no text and no own border; not a fg/bg pairing",
+    },
+    pairings: [...observed.values()].map((e) => ({
+      fg: e.fg,
+      bg: e.bg,
+      designed: DESIGNED_KEYS.has(`${e.fg}|${e.bg}`),
+      exempt: EXEMPT.has(e.fg),
+      themes: [...e.themes],
+      scenarios: [...e.scenarios],
+    })),
+  };
+  mkdirSync(join(ROOT, "runner"), { recursive: true });
+  writeFileSync(join(ROOT, "runner/membership.json"), JSON.stringify(report, null, 2) + "\n");
+  console.log(
+    `\nmembership: ${observed.size} distinct fg/bg pairings observed across ${registry.themes.length} themes (designed table: ${DESIGNED_KEYS.size}); ${totalExcludedDisabled} element(s) excluded as disabled-control (WCAG-exempt)`,
+  );
+
+  // Every observed pairing must resolve to a designed row (or an exempt fg).
+  const undesigned = [...observed.values()].filter(
+    (e) => !DESIGNED_KEYS.has(`${e.fg}|${e.bg}`) && !EXEMPT.has(e.fg),
+  );
+  if (undesigned.length) {
+    throw new Error(
+      `membership: ${undesigned.length} undesigned fg/bg pairing(s) observed in the rendered tree:\n  ` +
+        undesigned.map((e) => `${e.fg} on ${e.bg} (scenarios: ${[...e.scenarios].join(", ")})`).join("\n  "),
+    );
+  }
 });

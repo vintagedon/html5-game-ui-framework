@@ -241,11 +241,13 @@ yarn.lock
 test-results/
 playwright-report/
 
-# Harness build artifacts. Candidate goldens, the generated metrics block, and
-# the scratch consumption proof are produced by tooling, not hand-authored.
+# Harness build artifacts. Candidate goldens, the generated metrics block, the
+# runner membership report, and the scratch consumption proof are produced by
+# tooling, not hand-authored.
 # Approved goldens under harness/goldens/approved/ ARE tracked.
 harness/goldens/candidates/
 harness/metrics/metrics.json
+harness/runner/membership.json
 harness/scratch/
 
 # ----------------------------------------------------------------------------
