@@ -36,15 +36,20 @@ values remain tunable through v1.0.
 > does.
 
 > **Standing contrast rule (property of the contract, set by Amendment 3;
-> scope corrected 2026-08-03 after review).** Every **designed** foreground and
-> background pairing meets its WCAG threshold in every theme, at the
-> framework's default body and caption sizes, with no size qualification. The
+> scope corrected 2026-08-03 after review; enforced by Amendment 4).** Every
+> **designed** foreground and background pairing meets its WCAG threshold in
+> every theme, at the framework's default body and caption sizes, with no size
+> qualification: **4.5:1 for text and 3:1 for non-text UI** (WCAG 1.4.11). The
 > rule is defined over the enumerated pairings in the table below, **not** over
-> the Cartesian product of foreground and surface tokens. Several tokens are
-> pair-specific by their own boundary definition, so the product contains
-> combinations no theme can or should satisfy: `--gc-on-accent` is defined for
-> the accent fill and is near-white in modern, which would measure roughly 1:1
-> against `--gc-surface-base`. A future theme inherits this rule rather than
+> the Cartesian product of foreground and surface tokens, and it is **measured
+> by the build-time contrast gate** (`harness/metrics/contrast.js`, run via
+> `npm run metrics`) and the **runner membership check**
+> (`harness/runner/runner.spec.js`, which resolves inheritance in a browser).
+> Reported as a pass, not asserted as one. Several tokens are pair-specific by
+> their own boundary definition, so the product contains combinations no theme
+> can or should satisfy: `--gc-on-accent` is defined for the accent fill and is
+> near-white in modern, which would measure roughly 1:1 against
+> `--gc-surface-base`. A future theme inherits this rule rather than
 > rediscovering it.
 
 #### Designed pairings and thresholds
@@ -57,7 +62,7 @@ values remain tunable through v1.0.
 | `--gc-on-status-warning` | `--gc-status-warning` | 4.5:1 |
 | `--gc-on-status-danger` | `--gc-status-danger` | 4.5:1 |
 | `--gc-on-status-info` | `--gc-status-info` | 4.5:1 |
-| `--gc-border-default`, `--gc-border-strong`, `--gc-divider`, `--gc-focus-ring` | The surface each is drawn against | 3:1 (WCAG 1.4.11, non-text) |
+| `--gc-border-default`, `--gc-border-strong`, `--gc-divider`, `--gc-focus-ring` | The surface each is drawn against | 3:1 (WCAG 1.4.11, non-text) — measured by the contrast gate every build |
 
 Outside the rule, and why:
 
