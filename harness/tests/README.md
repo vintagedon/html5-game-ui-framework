@@ -4,7 +4,7 @@ title: "Harness Unit Tests"
 description: "Node unit tests for pure conformance-harness logic"
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-08-05"
-version: "1.2"
+version: "1.3"
 status: "Active"
 tags:
   - type: directory-readme
@@ -28,6 +28,7 @@ floor beneath the composed reference application and Playwright suite.
 
 ```text
 tests/
+├── amendment4-evidence.test.js  # Historical screenshot discrimination
 ├── color.test.js                # Published contrast fixtures and color resolution
 ├── compare.test.js              # Approval-manifest and PNG comparison state machine
 ├── membership-freshness.test.js # Current-run membership guard
@@ -45,6 +46,7 @@ tests/
 
 | File | Description | Status |
 |------|-------------|--------|
+| [amendment4-evidence.test.js](amendment4-evidence.test.js) | PNG hash and pixel-difference evidence checks | Active |
 | [color.test.js](color.test.js) | WCAG contrast and CSS color-resolution unit tests | Active |
 | [compare.test.js](compare.test.js) | Approval-manifest and PNG comparator unit tests | Active |
 | [membership-freshness.test.js](membership-freshness.test.js) | Current Playwright-run membership guard | Active |

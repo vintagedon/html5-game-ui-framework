@@ -27,6 +27,7 @@ config.local.*
 # ----------------------------------------------------------------------------
 *-pending.md
 recycle-bin/
+.worktrees/
 
 # --- PUBLIC REPO ONLY (active: this repository is public) ---
 staging/

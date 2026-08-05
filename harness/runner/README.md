@@ -4,7 +4,7 @@ title: "Playwright Runner"
 description: "Chromium-only Playwright configuration and the registry-driven conformance runner"
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-08-05"
-version: "1.3"
+version: "1.4"
 status: "Active"
 tags:
   - type: directory-readme
@@ -40,6 +40,9 @@ runner/
 ├── runner.spec.js        # Registry-driven capture and comparison
 ├── interactions.js       # Serializable toggle and meter state changes
 ├── compare.js            # Manifest integrity and pixel comparator
+├── amendment4-evidence.js # Pure historical PNG evidence comparison
+├── capture-amendment4.js # Styled capture from an isolated revision
+├── compare-amendment4.js # Historical pair report and hard gate
 ├── membership.js         # Browser inspection and pure coverage accounting
 ├── membership.json       # Generated current-run membership evidence
 ├── playwright-run.json   # Generated current-run identity and start time
@@ -57,6 +60,9 @@ runner/
 | [runner.spec.js](runner.spec.js) | Sets each declared viewport, drives interactions, and captures checkpoints | Active |
 | [interactions.js](interactions.js) | Applies synchronous toggle and meter changes in browser and unit tests | Active |
 | [compare.js](compare.js) | Approval-manifest integrity and approved/candidate pixel comparison | Active |
+| [amendment4-evidence.js](amendment4-evidence.js) | Computes SHA-256 and exact pixel differences for historical evidence | Active |
+| [capture-amendment4.js](capture-amendment4.js) | Serves and captures one isolated revision after a stylesheet guard | Active |
+| [compare-amendment4.js](compare-amendment4.js) | Rejects identical or zero-difference historical capture pairs | Active |
 | [membership.js](membership.js) | Inspects computed rendered channels and aggregates designed-pair membership | Active |
 
 Each capture identity is
