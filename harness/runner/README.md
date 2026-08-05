@@ -3,8 +3,8 @@
 title: "Playwright Runner"
 description: "Chromium-only Playwright configuration and the registry-driven conformance runner"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-03"
-version: "1.0"
+date: "2026-08-05"
+version: "1.1"
 status: "Active"
 tags:
   - type: directory-readme
@@ -36,8 +36,11 @@ are out of scope.
 ```text
 runner/
 ├── playwright.config.js  # Chromium-only config; serves the reference app locally
+├── cases.js              # Viewport-qualified case identity and interaction lookup
 ├── runner.spec.js        # Registry-driven capture and comparison
 ├── compare.js            # Manifest integrity and pixel comparator
+├── membership.json       # Generated current-run membership evidence
+├── playwright-run.json   # Generated current-run identity and start time
 └── README.md             # This file
 ```
 
@@ -47,9 +50,20 @@ runner/
 
 | File | Description | Status |
 |------|-------------|--------|
-| [playwright.config.js](playwright.config.js) | Chromium project, local file server, viewport | ✅ Active |
-| [runner.spec.js](runner.spec.js) | Drives declared interactions; captures checkpoints | 🔄 In Progress |
-| [compare.js](compare.js) | Approval-manifest integrity and approved/candidate pixel comparison | 🔄 In Progress |
+| [playwright.config.js](playwright.config.js) | Chromium project, local file server, and list plus JSON reporters | Active |
+| [cases.js](cases.js) | Builds scenario by theme by viewport by checkpoint cases and capture identities | Active |
+| [runner.spec.js](runner.spec.js) | Sets each declared viewport, drives interactions, and captures checkpoints | Active |
+| [compare.js](compare.js) | Approval-manifest integrity and approved/candidate pixel comparison | Active |
+
+Each capture identity is
+`<scenario-id>/<theme>/<viewport>/<checkpoint>.png`. The generated matrix records
+the same viewport-qualified identity. A missing interaction named by a
+checkpoint is an error rather than a skipped action.
+
+The Playwright config is selected explicitly by the npm scripts. It starts the
+local reference server and writes a JSON result to the spec evidence directory.
+Before any test runs, the runner writes a unique run identity. The membership
+report carries that identity so metrics cannot consume output from an older run.
 
 ---
 

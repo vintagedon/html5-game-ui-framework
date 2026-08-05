@@ -3,8 +3,8 @@
 title: "Conformance Harness"
 description: "The scenario registry and its four consumers: reference app, Playwright runner, dependency auditor, and computed metrics"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-03"
-version: "1.0"
+date: "2026-08-05"
+version: "1.1"
 status: "Active"
 tags:
   - type: directory-readme
@@ -58,10 +58,11 @@ harness/
 | npm script | What it does |
 |------------|--------------|
 | `npm run validate` | Validate the registry against its schema and the frozen vocabulary |
-| `npm run metrics` | Compute metrics from the repository; fail on a raster, contrast, or pairing violation |
-| `npm run build` | `validate` then `metrics`; prepares the reference application |
-| `npm run test` | Run Node unit tests, then `build`, then the runner in compare mode |
-| `npm run capture` | `build` then run the runner in capture mode, writing candidate goldens |
+| `npm run metrics` | Consume current-run membership, compute metrics, and enforce the metric gates |
+| `npm run build` | Run validation and metrics after current Playwright membership exists |
+| `npm run playwright` | Run the self-contained Chromium harness and write membership evidence |
+| `npm run test` | Run Node tests, validation, Playwright, then metrics in artifact order |
+| `npm run capture` | Run the same order in capture mode, writing candidate goldens |
 
 ---
 

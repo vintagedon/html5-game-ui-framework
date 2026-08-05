@@ -248,6 +248,7 @@ playwright-report/
 harness/goldens/candidates/
 harness/metrics/metrics.json
 harness/runner/membership.json
+harness/runner/playwright-run.json
 harness/scratch/
 
 # ----------------------------------------------------------------------------

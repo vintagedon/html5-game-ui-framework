@@ -3,8 +3,8 @@
 title: "Golden Captures"
 description: "Approved baseline and candidate capture trees for the golden comparison workflow"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-03"
-version: "1.0"
+date: "2026-08-05"
+version: "1.1"
 status: "Active"
 tags:
   - type: directory-readme
@@ -42,10 +42,10 @@ goldens/
 └── README.md                # This file
 ```
 
-A capture's path is `<scenario-id>/<theme>/<checkpoint>.png`, identical under
-both trees so a candidate compares against its like-named baseline. The path is
-also its manifest key. Gate 3.3 adds the declared viewport to this identity before
-any capture is approved.
+A capture's path is `<scenario-id>/<theme>/<viewport>/<checkpoint>.png`,
+identical under both trees so a candidate compares against its like-named
+baseline. The viewport comes from the registry and the path is also its
+manifest key.
 
 The manifest format is a JSON object with `version: 1`, `algorithm: "sha256"`,
 and an `entries` object whose keys are capture identities and whose values are

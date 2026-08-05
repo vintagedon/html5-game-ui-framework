@@ -13,15 +13,29 @@
  * browser the host cannot run.
  */
 import { defineConfig, devices } from "@playwright/test";
+import { mkdirSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const RUNNER_DIR = fileURLToPath(new URL(".", import.meta.url));
+const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
+const JSON_REPORT =
+  process.env.GC_PLAYWRIGHT_JSON ||
+  join(
+    REPO_ROOT,
+    "..",
+    "work-logs/evidence/2026-08-05-h5gameui-03/gate-3.3-playwright-results.json",
+  );
+mkdirSync(dirname(JSON_REPORT), { recursive: true });
 
 export default defineConfig({
-  testDir: "./harness/runner",
-  testMatch: /.*\.spec\.js$/,
+  testDir: RUNNER_DIR,
+  testMatch: /runner\.spec\.js$/,
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: 0,
   workers: 1,
-  reporter: [["list"]],
+  reporter: [["list"], ["json", { outputFile: JSON_REPORT }]],
   snapshotPathTemplate: "",
   expect: { toHaveScreenshot: { animations: "disabled" } },
 
@@ -31,7 +45,7 @@ export default defineConfig({
   webServer: {
     command: "python3 -m http.server 8123 --bind 127.0.0.1",
     url: "http://127.0.0.1:8123/reference/",
-    cwd: process.cwd(),
+    cwd: REPO_ROOT,
     reuseExistingServer: true,
     timeout: 30_000,
   },

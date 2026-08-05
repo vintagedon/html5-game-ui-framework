@@ -20,13 +20,18 @@ import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 import CleanCSS from "clean-css";
 import { minify } from "terser";
-import { listScopeFiles, scopeSummary, RASTER_EXTS, REPO_ROOT } from "./scope.js";
+import { isRasterPath, listScopeFiles, scopeSummary, REPO_ROOT } from "./scope.js";
+import { readCurrentMembership } from "./membership.js";
 import { contrastGate } from "./contrast.js";
 import { EXEMPTIONS } from "./pairings.js";
 import { registry } from "../registry/scenarios.js";
 import { audit } from "../auditor/auditor.js";
 
 const files = listScopeFiles();
+const membership = readCurrentMembership({
+  runStatePath: join(REPO_ROOT, "harness/runner/playwright-run.json"),
+  membershipPath: join(REPO_ROOT, "harness/runner/membership.json"),
+});
 const read = (rel) => readFileSync(join(REPO_ROOT, rel), "utf8");
 const cssFiles = files.filter((f) => f.endsWith(".css"));
 const jsFiles = files.filter((f) => f.endsWith(".js"));
@@ -46,10 +51,14 @@ const semanticTokens = new Set([...semanticCss.matchAll(/(--gc-[a-z0-9-]+)\s*:/g
 const byLayer = (l) => registry.scenarios.filter((s) => s.layer === l).length;
 const themeCount = registry.themes.length;
 const scenarioCount = registry.scenarios.length;
-const captureCount = registry.scenarios.reduce((n, s) => n + s.themes.length * s.checkpoints.length, 0);
+const captureCount = registry.scenarios.reduce(
+  (count, scenario) =>
+    count + scenario.themes.length * scenario.viewports.length * scenario.checkpoints.length,
+  0,
+);
 
 // --- Raster gate ---
-const rasters = files.filter((f) => RASTER_EXTS.some((ext) => f.endsWith(ext)));
+const rasters = files.filter(isRasterPath);
 
 // --- External-request metric (static scan of scope source for off-origin refs) ---
 const offOrigin = [];
@@ -77,7 +86,7 @@ const metrics = [
   { label: "Framework rasters", value: rasters.length, scope: "raster scan of scope" },
   { label: "External requests", value: offOrigin.length, scope: "static scan of scope for off-origin url()/@import" },
   { label: "Scenarios", value: scenarioCount, scope: "registry" },
-  { label: "Capture checkpoints", value: captureCount, scope: "registry: themes × checkpoints" },
+  { label: "Capture checkpoints", value: captureCount, scope: "registry: themes × viewports × checkpoints" },
   { label: "Dependency violations", value: dep.violations.length, scope: "auditor over registry declarations" },
   { label: "Accessibility failures", value: contrast.violations.length, scope: "contrast gate: designed pairs below threshold (text 4.5:1 + non-text 3:1); undesigned-pairing membership is enforced at test time by the Playwright runner" },
   { label: "Contrast coverage (pair×theme)", value: contrast.standingChecks, scope: `designed pairs (${contrast.standingChecks / contrast.themeCount}) × themes (${contrast.themeCount}); a ratio is computed for every one` },
@@ -93,6 +102,7 @@ const out = {
     rasters,
     offOrigin,
     contrast,
+    membership,
     auditor: dep,
   },
 };

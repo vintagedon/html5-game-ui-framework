@@ -8,8 +8,9 @@
     "validate": "node harness/registry/validate.js",
     "metrics": "node harness/metrics/metrics.js",
     "build": "npm run validate && npm run metrics",
-    "test": "node --test harness/tests/*.test.js && npm run build && playwright test",
-    "capture": "npm run build && GC_CAPTURE=1 playwright test"
+    "playwright": "playwright test --config harness/runner/playwright.config.js",
+    "test": "node --test harness/tests/*.test.js && npm run validate && npm run playwright && npm run metrics",
+    "capture": "node --test harness/tests/*.test.js && npm run validate && GC_CAPTURE=1 npm run playwright && npm run metrics"
   },
   "license": "MIT",
   "devDependencies": {

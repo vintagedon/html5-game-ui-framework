@@ -8,10 +8,10 @@
  *
  * Imports the SAME registry the reference page renders from and drives each
  * declared interaction, taking a capture at each declared checkpoint under each
- * declared theme. No scenario id, interaction, or viewport is written literally
- * here — they all come from the registry. The Gate 2.4 mutation test relies on
- * that: changing a scenario's theme coverage in the registry changes both the
- * rendered page and this runner's executed matrix.
+ * declared theme and viewport. No scenario id, interaction, or viewport is
+ * written literally here. They all come from the registry. The Gate 2.4
+ * mutation test relies on that: changing a scenario's theme coverage in the
+ * registry changes both the rendered page and this runner's executed matrix.
  *
  * Modes:
  *   GC_CAPTURE=1  write candidate captures; do not fail on a missing/diffing
@@ -22,11 +22,17 @@
  */
 
 import { test } from "@playwright/test";
+import { randomUUID } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { registry } from "../registry/scenarios.js";
 import { compareCapture, readApprovalManifest } from "./compare.js";
+import {
+  buildCases,
+  captureIdentity,
+  resolveCheckpointInteractions,
+} from "./cases.js";
 import { semanticDeclarations } from "../metrics/contrast.js";
 import { designedPairs, EXEMPT_FGS } from "../metrics/pairings.js";
 
@@ -36,17 +42,12 @@ const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const CANDIDATES = join(ROOT, "goldens/candidates");
 const APPROVED = join(ROOT, "goldens/approved");
 const PAGE = `${BASE}/reference/`;
+const RUN_ID = randomUUID();
+const RUN_STATE = join(ROOT, "runner/playwright-run.json");
 const approvalManifest = readApprovalManifest();
 
-// One case per (scenario × theme × checkpoint), all sourced from the registry.
-const cases = [];
-for (const s of registry.scenarios) {
-  for (const theme of s.themes) {
-    for (const cp of s.checkpoints) {
-      cases.push({ id: s.id, theme, checkpoint: cp.name, scenario: s, after: cp.after });
-    }
-  }
-}
+// One case per scenario x theme x viewport x checkpoint, all registry-sourced.
+const cases = buildCases(registry);
 
 /** Resolve an interaction target selector within the scenario's section. */
 function within(id, selector) {
@@ -87,64 +88,93 @@ async function runInteraction(page, id, it) {
   }
 }
 
-// The manifest records every (scenario, theme, checkpoint) the runner executed,
+// The manifest records every scenario, theme, viewport, and checkpoint case,
 // so the single-declaration mutation test can observe the matrix directly.
 const manifest = [];
 const goldenCounts = { pass: 0, awaiting: 0, failure: 0 };
 
+test.beforeAll(() => {
+  writeFileSync(
+    RUN_STATE,
+    JSON.stringify(
+      { version: 1, runId: RUN_ID, startedAt: new Date().toISOString() },
+      null,
+      2,
+    ) + "\n",
+  );
+});
+
 for (const c of cases) {
-  test(`${c.id} [${c.theme}] ${c.checkpoint}`, async ({ page }) => {
-    await page.goto(PAGE, { waitUntil: "networkidle" });
-    await page.locator(`[data-scenario="${c.id}"]`).waitFor({ state: "visible" });
+  test(
+    `${c.id} [${c.theme}] [${c.viewport.name}] ${c.checkpoint.name}`,
+    async ({ page }) => {
+      await page.setViewportSize({
+        width: c.viewport.width,
+        height: c.viewport.height,
+      });
+      await page.goto(PAGE, { waitUntil: "networkidle" });
+      await page.locator(`[data-scenario="${c.id}"]`).waitFor({ state: "visible" });
 
-    // Set this case's theme on the root, then let transitions settle.
-    await page.evaluate((t) => {
-      document.documentElement.dataset.gcTheme = t;
-    }, c.theme);
-    await page.waitForTimeout(160);
+      // Set this case's theme on the root, then let transitions settle.
+      await page.evaluate((t) => {
+        document.documentElement.dataset.gcTheme = t;
+      }, c.theme);
+      await page.waitForTimeout(160);
 
-    // Run the interactions this checkpoint is declared "after", in order.
-    for (const name of c.after) {
-      const it = c.scenario.interactions.find((i) => i.name === name);
-      if (it) await runInteraction(page, c.id, it);
-    }
-    await page.waitForTimeout(80);
+      // Run the interactions this checkpoint is declared "after", in order.
+      for (const interaction of resolveCheckpointInteractions(
+        c.scenario,
+        c.checkpoint,
+      )) {
+        await runInteraction(page, c.id, interaction);
+      }
+      await page.waitForTimeout(80);
 
-    const rel = `${c.id}/${c.theme}/${c.checkpoint}.png`;
-    const candidatePath = join(CANDIDATES, rel);
-    const approvedPath = join(APPROVED, rel);
-    mkdirSync(dirname(candidatePath), { recursive: true });
+      const rel = captureIdentity(c);
+      const candidatePath = join(CANDIDATES, rel);
+      const approvedPath = join(APPROVED, rel);
+      mkdirSync(dirname(candidatePath), { recursive: true });
 
-    const png = await page
-      .locator(`[data-scenario="${c.id}"] .gc-specimen`)
-      .screenshot({ type: "png", animations: "disabled" });
-    writeFileSync(candidatePath, png);
+      const png = await page
+        .locator(`[data-scenario="${c.id}"] .gc-specimen`)
+        .screenshot({ type: "png", animations: "disabled" });
+      writeFileSync(candidatePath, png);
 
-    if (CAPTURE) {
-      manifest.push({ id: c.id, theme: c.theme, checkpoint: c.checkpoint, golden: "captured" });
-      return;
-    }
+      if (CAPTURE) {
+        manifest.push({
+          id: c.id,
+          theme: c.theme,
+          viewport: c.viewport.name,
+          checkpoint: c.checkpoint.name,
+          capture: rel,
+          golden: "captured",
+        });
+        return;
+      }
 
-    const result = compareCapture(png, {
-      approvedPath,
-      caseId: rel,
-      manifest: approvalManifest,
-    });
-    goldenCounts[result.status]++;
-    manifest.push({
-      id: c.id,
-      theme: c.theme,
-      checkpoint: c.checkpoint,
-      golden: result.status,
-      reason: result.reason,
-    });
-    if (result.status === "failure") {
-      const pixelDetail = result.diffPixels >= 0
-        ? `: ${result.diffPixels}/${result.total} pixels (${(result.ratio * 100).toFixed(2)}%)`
-        : "";
-      throw new Error(`golden ${result.reason} for ${rel}${pixelDetail}`);
-    }
-  });
+      const result = compareCapture(png, {
+        approvedPath,
+        caseId: rel,
+        manifest: approvalManifest,
+      });
+      goldenCounts[result.status]++;
+      manifest.push({
+        id: c.id,
+        theme: c.theme,
+        viewport: c.viewport.name,
+        checkpoint: c.checkpoint.name,
+        capture: rel,
+        golden: result.status,
+        reason: result.reason,
+      });
+      if (result.status === "failure") {
+        const pixelDetail = result.diffPixels >= 0
+          ? `: ${result.diffPixels}/${result.total} pixels (${(result.ratio * 100).toFixed(2)}%)`
+          : "";
+        throw new Error(`golden ${result.reason} for ${rel}${pixelDetail}`);
+      }
+    },
+  );
 }
 
 // After the run, persist the executed matrix for inspection/mutation tests.
@@ -273,6 +303,9 @@ test("membership: every rendered fg/bg pairing is designed", async ({ page }) =>
   // Report observed pairings (count is materially larger than the static seven).
   const totalExcludedDisabled = Object.values(excludedDisabledByScenario).reduce((a, b) => a + b, 0);
   const report = {
+    version: 1,
+    runId: RUN_ID,
+    generatedAt: new Date().toISOString(),
     distinctPairings: observed.size,
     designedKeys: DESIGNED_KEYS.size,
     excluded: {

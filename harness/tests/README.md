@@ -4,7 +4,7 @@ title: "Harness Unit Tests"
 description: "Node unit tests for pure conformance-harness logic"
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-08-05"
-version: "1.0"
+version: "1.1"
 status: "Active"
 tags:
   - type: directory-readme
@@ -28,10 +28,13 @@ floor beneath the composed reference application and Playwright suite.
 
 ```text
 tests/
-├── color.test.js     # Published contrast fixtures and color resolution
-├── compare.test.js   # Approval-manifest and PNG comparison state machine
-├── schema.test.js    # Registry validation and renderer-vocabulary behavior
-└── README.md         # This file
+├── color.test.js                # Published contrast fixtures and color resolution
+├── compare.test.js              # Approval-manifest and PNG comparison state machine
+├── membership-freshness.test.js # Current-run membership guard
+├── runner.test.js               # Viewport-qualified cases and interaction resolution
+├── schema.test.js               # Registry validation and renderer-vocabulary behavior
+├── scope.test.js                # Metric-scope file classification
+└── README.md                    # This file
 ```
 
 ---
@@ -42,7 +45,10 @@ tests/
 |------|-------------|--------|
 | [color.test.js](color.test.js) | WCAG contrast and CSS color-resolution unit tests | Active |
 | [compare.test.js](compare.test.js) | Approval-manifest and PNG comparator unit tests | Active |
+| [membership-freshness.test.js](membership-freshness.test.js) | Current Playwright-run membership guard | Active |
+| [runner.test.js](runner.test.js) | Viewport-qualified case identity and checkpoint resolution | Active |
 | [schema.test.js](schema.test.js) | Registry validation and renderer-vocabulary unit tests | Active |
+| [scope.test.js](scope.test.js) | Metric-scope file classification | Active |
 
 ---
 

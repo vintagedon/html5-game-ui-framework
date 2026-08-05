@@ -37,6 +37,12 @@ export const EXCLUDED = [
   "reference-files-*/",
 ];
 
+/** True when a path has a raster extension, regardless of filename casing. */
+export function isRasterPath(path) {
+  const normalized = path.toLowerCase();
+  return RASTER_EXTS.some((extension) => normalized.endsWith(extension));
+}
+
 /** Every file under the resolved scope, as repo-relative paths. */
 export function listScopeFiles() {
   const out = [];
