@@ -3,8 +3,8 @@
 title: "Scenario Registry"
 description: "The single scenario declaration, its schema, and the validator"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-03"
-version: "1.0"
+date: "2026-08-05"
+version: "1.1"
 status: "Active"
 tags:
   - type: directory-readme
@@ -20,11 +20,11 @@ related_documents:
 
 One machine-readable declaration per specimen: stable ID, layer membership,
 required tokens, theme and viewport coverage, initial state, scripted
-interactions, and named capture checkpoints. Four consumers — the reference
-application, the Playwright runner, the dependency auditor, and the metrics block
-— read this declaration and no other source. The token vocabulary and theme roster
-the validator checks against are derived from `src/`, not redeclared here, so a
-renamed token or theme surfaces as a validation failure.
+interactions, and named capture checkpoints. Four consumers read this
+declaration and no other source: the reference application, the Playwright
+runner, the dependency auditor, and the metrics block. The token vocabulary and
+theme roster the validator checks against are derived from `src/`, not redeclared
+here, so a renamed token or theme surfaces as a validation failure.
 
 ---
 

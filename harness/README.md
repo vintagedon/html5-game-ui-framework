@@ -14,6 +14,7 @@ related_documents:
   - "[Project Charter](../docs/project-charter.md)"
   - "[Token Reference](../docs/token-reference.md)"
   - "[Foundations Review](../docs/foundations-review-2026-08-02.md)"
+  - "[Harness Review](../docs/harness-review-2026-08-05.md)"
 ---
 -->
 
@@ -87,3 +88,4 @@ harness/
 | [Repository Root](../README.md) | Parent directory |
 | [Project Charter](../docs/project-charter.md) | Harness acceptance criteria (§3) and metric scope (§4.1) |
 | [Token Reference](../docs/token-reference.md) | Frozen vocabulary and the designed-pairings table the contrast gate enforces |
+| [Harness Review](../docs/harness-review-2026-08-05.md) | Current operator decisions and their evidence |

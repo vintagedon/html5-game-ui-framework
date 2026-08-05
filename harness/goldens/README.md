@@ -13,6 +13,7 @@ tags:
 related_documents:
   - "[Conformance Harness](../README.md)"
   - "[Playwright Runner](../runner/README.md)"
+  - "[Harness Review](../../docs/harness-review-2026-08-05.md)"
 ---
 -->
 
@@ -84,3 +85,4 @@ and visually matched.
 |----------|--------------|
 | [Conformance Harness](../README.md) | Parent directory |
 | [Playwright Runner](../runner/README.md) | Writes candidates; runs the comparison |
+| [Harness Review](../../docs/harness-review-2026-08-05.md) | Operator decision on the candidate baseline and approval process |
