@@ -50,3 +50,19 @@ export function audit(registry) {
 
   return { violations, checked, summary };
 }
+
+/**
+ * Convert dependency-auditor findings into metrics hard-gate failures.
+ * Keeping this formatting beside the auditor makes the failure contract
+ * unit-testable without executing the build-time metrics script.
+ * @param {{violations?: string[]}} result
+ * @returns {string[]}
+ */
+export function dependencyGateFailures(result) {
+  const violations = Array.isArray(result?.violations) ? result.violations : [];
+  if (!violations.length) return [];
+
+  return [
+    `${violations.length} dependency violation(s):\n  ${violations.join("\n  ")}`,
+  ];
+}

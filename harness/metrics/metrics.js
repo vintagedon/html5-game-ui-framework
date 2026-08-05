@@ -7,11 +7,11 @@
  * Link        : https://github.com/vintagedon/html5-game-ui-framework
  *
  * `npm run metrics`. Every number is computed, never typed by hand, and every
- * count cites the resolved scope in harness/metrics/scope.js. Two gates fail the
- * run: a non-zero framework raster count, and a contrast violation (a designed
- * pair below its threshold — text 4.5:1 or non-text 3:1 — or an undesigned
- * source pairing). Amendment 4 removed the former `nonTextAdvisory` bucket so
- * non-text failures exit non-zero like any other. Writes
+ * count cites the resolved scope in harness/metrics/scope.js. The run fails for
+ * a non-zero framework raster count, a dependency violation, a contrast
+ * violation, or an unclassified rendered observation. Amendment 4 removed the
+ * former `nonTextAdvisory` bucket so non-text failures exit non-zero like any
+ * other. Writes
  * harness/metrics/metrics.json for the reference page.
  */
 
@@ -25,7 +25,7 @@ import { readCurrentMembership } from "./membership.js";
 import { contrastGate } from "./contrast.js";
 import { EXEMPTIONS } from "./pairings.js";
 import { registry } from "../registry/scenarios.js";
-import { audit } from "../auditor/auditor.js";
+import { audit, dependencyGateFailures } from "../auditor/auditor.js";
 
 const files = listScopeFiles();
 const membership = readCurrentMembership({
@@ -119,6 +119,7 @@ for (const m of metrics) console.log(`${m.label.padEnd(34)} ${m.value}   [${m.sc
 
 const gateFailures = [];
 if (rasters.length) gateFailures.push(`framework raster count is ${rasters.length}, must be zero:\n  ${rasters.join("\n  ")}`);
+gateFailures.push(...dependencyGateFailures(dep));
 if (contrast.violations.length) gateFailures.push(`${contrast.violations.length} contrast violation(s):\n  ${contrast.violations.join("\n  ")}`);
 if (contrast.countAssertion) gateFailures.push(`contrast count assertion failed: ${contrast.countAssertion}`);
 if (membership.coverage.unclassifiedObservations) gateFailures.push(`${membership.coverage.unclassifiedObservations} unclassified rendered observation(s); must be zero`);
