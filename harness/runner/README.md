@@ -37,7 +37,7 @@ are out of scope.
 runner/
 ├── playwright.config.js  # Chromium-only config; serves the reference app locally
 ├── runner.spec.js        # Registry-driven capture and comparison
-├── compare.js            # Candidate-vs-approved pixel comparator (pixelmatch)
+├── compare.js            # Manifest integrity and pixel comparator
 └── README.md             # This file
 ```
 
@@ -49,7 +49,7 @@ runner/
 |------|-------------|--------|
 | [playwright.config.js](playwright.config.js) | Chromium project, local file server, viewport | ✅ Active |
 | [runner.spec.js](runner.spec.js) | Drives declared interactions; captures checkpoints | 🔄 In Progress |
-| [compare.js](compare.js) | Approved/candidate pixel comparison | 🔄 In Progress |
+| [compare.js](compare.js) | Approval-manifest integrity and approved/candidate pixel comparison | 🔄 In Progress |
 
 ---
 

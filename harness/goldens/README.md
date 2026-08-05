@@ -18,9 +18,10 @@ related_documents:
 
 # Golden Captures
 
-Two distinct trees. The runner writes captures to `candidates/` and compares them
-against `approved/`. The approved tree holds the operator-approved baseline and is
-tracked; the candidate tree is a build artifact and is gitignored.
+Two distinct trees plus a durable approval manifest. The runner writes captures
+to `candidates/` and compares them against `approved/`. The approved tree and
+`approval-manifest.json` are tracked; the candidate tree is a build artifact and
+is gitignored.
 
 **Agents never approve goldens and never write the approved path.** Approval is an
 operator action carrying the same posture as a push or a merge. An agent that breaks
@@ -34,14 +35,23 @@ candidate set and presents it for approval; it does not approve it.
 
 ```text
 goldens/
-├── approved/     # Operator-approved baseline (tracked; empty until approved)
+├── approved/                # Operator-approved PNGs (tracked; empty until approved)
 │   └── .gitkeep
-├── candidates/   # Runner output, one PNG per (scenario × theme × checkpoint) (gitignored)
-└── README.md     # This file
+├── candidates/              # Runner output (gitignored)
+├── approval-manifest.json   # Approved case identity to PNG SHA-256 (tracked)
+└── README.md                # This file
 ```
 
-A capture's path is `<scenario-id>/<theme>/<checkpoint>.png`, identical under both
-trees so a candidate compares against its like-named baseline.
+A capture's path is `<scenario-id>/<theme>/<checkpoint>.png`, identical under
+both trees so a candidate compares against its like-named baseline. The path is
+also its manifest key. Gate 3.3 adds the declared viewport to this identity before
+any capture is approved.
+
+The manifest format is a JSON object with `version: 1`, `algorithm: "sha256"`,
+and an `entries` object whose keys are capture identities and whose values are
+lowercase SHA-256 hashes of approved PNG bytes. The checked-in entry count is
+zero. Only the operator copies a reviewed PNG into `approved/` and adds its
+manifest entry.
 
 ---
 
@@ -50,11 +60,21 @@ trees so a candidate compares against its like-named baseline.
 | Step | Action | Who |
 |------|--------|-----|
 | Capture | `npm run capture` writes `candidates/` (no comparison) | Agent |
-| Approve | Copy a reviewed candidate to the same path under `approved/` | **Operator** |
-| Compare | `npm run test` compares each candidate to `approved/`; a diff fails the run | Agent |
+| Approve | Copy a reviewed candidate to `approved/` and record its SHA-256 in the manifest | **Operator** |
+| Compare | `npm run test` verifies manifest integrity, then compares candidate pixels | Agent |
 
-With no approved baseline, a checkpoint is reported "awaiting approval" rather than
-failing — the expected state until the operator approves the first set.
+Approval is durable state. A missing entry means the case is unapproved; an entry
+means its PNG must remain present, readable, parseable, hash-matched, size-matched,
+and visually matched.
+
+| Manifest entry | PNG on disk | Comparator result |
+|----------------|-------------|-------------------|
+| Absent | Absent | `awaiting` |
+| Absent | Present | `awaiting`, reported as an unapproved baseline |
+| Present | Absent | Failure |
+| Present | Unreadable, unparseable, or size-mismatched | Failure |
+| Present | Hash-mismatched | Failure |
+| Present | Hash-matched and pixels matched | Pass |
 
 ---
 

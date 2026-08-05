@@ -26,7 +26,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { registry } from "../registry/scenarios.js";
-import { compareCapture } from "./compare.js";
+import { compareCapture, readApprovalManifest } from "./compare.js";
 import { semanticDeclarations } from "../metrics/contrast.js";
 import { designedPairs, EXEMPT_FGS } from "../metrics/pairings.js";
 
@@ -36,6 +36,7 @@ const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const CANDIDATES = join(ROOT, "goldens/candidates");
 const APPROVED = join(ROOT, "goldens/approved");
 const PAGE = `${BASE}/reference/`;
+const approvalManifest = readApprovalManifest();
 
 // One case per (scenario × theme × checkpoint), all sourced from the registry.
 const cases = [];
@@ -89,6 +90,7 @@ async function runInteraction(page, id, it) {
 // The manifest records every (scenario, theme, checkpoint) the runner executed,
 // so the single-declaration mutation test can observe the matrix directly.
 const manifest = [];
+const goldenCounts = { pass: 0, awaiting: 0, failure: 0 };
 
 for (const c of cases) {
   test(`${c.id} [${c.theme}] ${c.checkpoint}`, async ({ page }) => {
@@ -118,20 +120,30 @@ for (const c of cases) {
       .screenshot({ type: "png", animations: "disabled" });
     writeFileSync(candidatePath, png);
 
-    manifest.push({ id: c.id, theme: c.theme, checkpoint: c.checkpoint });
-
-    if (CAPTURE) return; // candidate generation: no comparison
-
-    const result = compareCapture(png, approvedPath);
-    if (result.status === "diff") {
-      throw new Error(
-        `golden diff for ${rel}: ${result.diffPixels}/${result.total} pixels (${(result.ratio * 100).toFixed(2)}%)`,
-      );
+    if (CAPTURE) {
+      manifest.push({ id: c.id, theme: c.theme, checkpoint: c.checkpoint, golden: "captured" });
+      return;
     }
-    if (result.status === "size") {
-      throw new Error(`golden size mismatch for ${rel}`);
+
+    const result = compareCapture(png, {
+      approvedPath,
+      caseId: rel,
+      manifest: approvalManifest,
+    });
+    goldenCounts[result.status]++;
+    manifest.push({
+      id: c.id,
+      theme: c.theme,
+      checkpoint: c.checkpoint,
+      golden: result.status,
+      reason: result.reason,
+    });
+    if (result.status === "failure") {
+      const pixelDetail = result.diffPixels >= 0
+        ? `: ${result.diffPixels}/${result.total} pixels (${(result.ratio * 100).toFixed(2)}%)`
+        : "";
+      throw new Error(`golden ${result.reason} for ${rel}${pixelDetail}`);
     }
-    // "awaiting" (no approved baseline yet) is non-fatal until goldens are approved.
   });
 }
 
@@ -139,6 +151,11 @@ for (const c of cases) {
 test.afterAll(async () => {
   mkdirSync(CANDIDATES, { recursive: true });
   writeFileSync(join(CANDIDATES, "matrix.json"), JSON.stringify(manifest, null, 2) + "\n");
+  if (!CAPTURE) {
+    console.log(
+      `\ngoldens: ${goldenCounts.pass} approved pass, ${goldenCounts.awaiting} awaiting operator approval, ${goldenCounts.failure} failure`,
+    );
+  }
 });
 
 // ---------------------------------------------------------------------------

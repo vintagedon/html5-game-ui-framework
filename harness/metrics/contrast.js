@@ -63,7 +63,7 @@ for (const f of themeFiles) {
 const defaults = { ...primitives, ...semantic, ...components };
 
 /** Resolve an expression to an OKLCH color under a given token map, or null. */
-function resolveColor(expr, map, seen = new Set()) {
+export function resolveColor(expr, map, seen = new Set()) {
   if (expr == null) return null;
   const v = String(expr).trim();
   if (v === "" || seen.has(v)) return null;

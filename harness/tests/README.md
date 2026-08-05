@@ -28,8 +28,10 @@ floor beneath the composed reference application and Playwright suite.
 
 ```text
 tests/
-├── schema.test.js   # Registry validation and renderer-vocabulary behavior
-└── README.md        # This file
+├── color.test.js     # Published contrast fixtures and color resolution
+├── compare.test.js   # Approval-manifest and PNG comparison state machine
+├── schema.test.js    # Registry validation and renderer-vocabulary behavior
+└── README.md         # This file
 ```
 
 ---
@@ -38,6 +40,8 @@ tests/
 
 | File | Description | Status |
 |------|-------------|--------|
+| [color.test.js](color.test.js) | WCAG contrast and CSS color-resolution unit tests | Active |
+| [compare.test.js](compare.test.js) | Approval-manifest and PNG comparator unit tests | Active |
 | [schema.test.js](schema.test.js) | Registry validation and renderer-vocabulary unit tests | Active |
 
 ---
