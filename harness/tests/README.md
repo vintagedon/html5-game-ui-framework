@@ -4,7 +4,7 @@ title: "Harness Unit Tests"
 description: "Node unit tests for pure conformance-harness logic"
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-08-05"
-version: "1.1"
+version: "1.2"
 status: "Active"
 tags:
   - type: directory-readme
@@ -34,6 +34,7 @@ tests/
 ├── membership.test.js           # Rendered identity and coverage accounting
 ├── runner.test.js               # Viewport-qualified cases and interaction resolution
 ├── schema.test.js               # Registry validation and renderer-vocabulary behavior
+├── semantics.test.js            # Toggle and meter state synchronization
 ├── scope.test.js                # Metric-scope file classification
 └── README.md                    # This file
 ```
@@ -50,6 +51,7 @@ tests/
 | [membership.test.js](membership.test.js) | Rendered token identity, outline, coverage, and contextual-exemption tests | Active |
 | [runner.test.js](runner.test.js) | Viewport-qualified case identity and checkpoint resolution | Active |
 | [schema.test.js](schema.test.js) | Registry validation and renderer-vocabulary unit tests | Active |
+| [semantics.test.js](semantics.test.js) | Initial and interacted toggle/meter state agreement | Active |
 | [scope.test.js](scope.test.js) | Metric-scope file classification | Active |
 
 ---

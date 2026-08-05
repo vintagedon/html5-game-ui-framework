@@ -153,7 +153,7 @@ export const registry = {
       config: {
         samples: [
           { label: "Resting", variant: "resting" },
-          { label: "Toggle", variant: "toggle" },
+          { label: "Toggle", variant: "toggle", pressed: false },
           { label: "Disabled", variant: "disabled", disabled: true },
         ],
       },
@@ -222,7 +222,7 @@ export const registry = {
         samples: [{ label: "Charge", variant: "charge", value: 72, display: "72%" }],
       },
       interactions: [
-        { name: "drain", action: "set-value", target: '.gc-meter[data-variant="charge"] .gc-meter__fill', value: "38" },
+        { name: "drain", action: "set-value", target: '.gc-meter[data-variant="charge"]', value: "38" },
       ],
       checkpoints: [
         { name: "resting", after: [] },

@@ -47,7 +47,7 @@ function buttonSample({ label, variant, pressed, disabled }) {
       ["type", "button"],
       ["data-variant", variant],
       ...(disabled ? [["disabled", ""]] : []),
-      ...(pressed ? [["aria-pressed", "true"]] : []),
+      ...(pressed !== undefined ? [["aria-pressed", String(pressed)]] : []),
     ],
     [label],
   );
@@ -102,7 +102,7 @@ export function specimenRoot(s) {
         ...(c.samples || []).map((m) => {
           const head = el("div", [["class", "meter-label"]], [
             el("span", [], [m.label]),
-            el("span", [], [m.display]),
+            el("span", [["data-meter-display", ""]], [m.display]),
           ]);
           const fill = el("div", [
             ["class", "gc-meter__fill"],

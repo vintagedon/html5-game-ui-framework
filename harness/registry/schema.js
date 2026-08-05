@@ -27,7 +27,7 @@ export const ACTIONS = [
   "focus", // keyboard-focus target
   "type", // enter text value into target
   "toggle-pressed", // set aria-pressed on target (selected state)
-  "set-value", // set a numeric value, e.g. meter fill width
+  "set-value", // synchronize a meter's visual, visible, and accessible value
   "wait", // settle (animations / transitions) for value ms
   "noop", // no DOM change; names a checkpoint baseline
 ];

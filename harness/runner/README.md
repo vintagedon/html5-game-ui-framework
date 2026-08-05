@@ -4,7 +4,7 @@ title: "Playwright Runner"
 description: "Chromium-only Playwright configuration and the registry-driven conformance runner"
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-08-05"
-version: "1.2"
+version: "1.3"
 status: "Active"
 tags:
   - type: directory-readme
@@ -38,6 +38,7 @@ runner/
 ├── playwright.config.js  # Chromium-only config; serves the reference app locally
 ├── cases.js              # Viewport-qualified case identity and interaction lookup
 ├── runner.spec.js        # Registry-driven capture and comparison
+├── interactions.js       # Serializable toggle and meter state changes
 ├── compare.js            # Manifest integrity and pixel comparator
 ├── membership.js         # Browser inspection and pure coverage accounting
 ├── membership.json       # Generated current-run membership evidence
@@ -54,6 +55,7 @@ runner/
 | [playwright.config.js](playwright.config.js) | Chromium project, local file server, and list plus JSON reporters | Active |
 | [cases.js](cases.js) | Builds scenario by theme by viewport by checkpoint cases and capture identities | Active |
 | [runner.spec.js](runner.spec.js) | Sets each declared viewport, drives interactions, and captures checkpoints | Active |
+| [interactions.js](interactions.js) | Applies synchronous toggle and meter changes in browser and unit tests | Active |
 | [compare.js](compare.js) | Approval-manifest integrity and approved/candidate pixel comparison | Active |
 | [membership.js](membership.js) | Inspects computed rendered channels and aggregates designed-pair membership | Active |
 

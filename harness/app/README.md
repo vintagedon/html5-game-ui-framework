@@ -3,8 +3,8 @@
 title: "Reference Renderer"
 description: "Shared registry-to-DOM renderer for the reference application"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-03"
-version: "1.0"
+date: "2026-08-05"
+version: "1.1"
 status: "Active"
 tags:
   - type: directory-readme
@@ -26,6 +26,10 @@ makes it appear with no other file edited.
 The interaction targets a scenario declares (for example
 `.gc-button[data-variant="resting"]`) resolve against `[data-scenario="<id>"]`,
 which is the same contract the Playwright runner relies on.
+
+Interactive specimens render a complete initial state before the runner acts.
+Toggle buttons expose `aria-pressed="false"`, and meter markup keeps its fill,
+visible value, and accessible value addressable as one state unit.
 
 ---
 

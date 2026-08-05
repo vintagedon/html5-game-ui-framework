@@ -41,6 +41,7 @@ import {
   inspectRenderedSpecimen,
   recordMembershipSample,
 } from "./membership.js";
+import { applyMeterValue, applyTogglePressed } from "./interactions.js";
 
 const CAPTURE = !!process.env.GC_CAPTURE;
 const BASE = process.env.GC_BASE_URL || "http://127.0.0.1:8123";
@@ -87,12 +88,12 @@ async function runInteraction(page, id, it) {
       await page.locator(target).fill(String(it.value ?? ""));
       break;
     case "toggle-pressed":
-      await page.locator(target).evaluate((el) => el.setAttribute("aria-pressed", "true"));
+      await page.locator(target).evaluate(applyTogglePressed);
       break;
     case "set-value":
       await page
         .locator(target)
-        .evaluate((el, v) => el.style.setProperty("--gc-meter-value", `${v}%`), String(it.value));
+        .evaluate(applyMeterValue, String(it.value));
       break;
     case "wait":
       await page.waitForTimeout(Number(it.value) || 0);
