@@ -36,6 +36,7 @@ export const registry = {
       summary:
         "Internal palette literals are visible here for contract review; framework rules never consume primitives directly.",
       specimen: "palette",
+      initialState: "Primitive palette swatches are visible with no interaction applied.",
       tokens: [
         "--gc-palette-modern-00",
         "--gc-palette-modern-70",
@@ -72,6 +73,7 @@ export const registry = {
       title: "Semantic roles",
       summary: "These swatches change in place when the root theme attribute changes.",
       specimen: "semantic",
+      initialState: "Semantic role swatches are visible under the selected root theme.",
       tokens: [
         "--gc-surface-canvas",
         "--gc-surface-raised",
@@ -108,6 +110,7 @@ export const registry = {
       summary:
         "Raised content, structural border, themed depth, type roles, and generated surface technique share unchanged markup across themes.",
       specimen: "panel",
+      initialState: "The panel is visible at its resting elevation and border state.",
       tokens: [
         "--gc-panel-fill",
         "--gc-panel-text",
@@ -134,6 +137,7 @@ export const registry = {
       summary:
         "Hover, selected, and disabled fills derive from the same four OKLCH recipes under every theme.",
       specimen: "button",
+      initialState: "Resting, unpressed toggle, and disabled buttons are visible.",
       tokens: [
         "--gc-button-fill",
         "--gc-button-text",
@@ -173,6 +177,7 @@ export const registry = {
       title: "Text input",
       summary: "Hover, focus, typed, and disabled inputs share one recipe set across themes.",
       specimen: "input",
+      initialState: "An empty enabled input and a populated disabled input are visible.",
       tokens: [
         "--gc-input-fill",
         "--gc-input-text",
@@ -209,6 +214,7 @@ export const registry = {
       title: "Meter",
       summary: "A track and fill whose value transitions on change, themed through semantic tokens.",
       specimen: "meter",
+      initialState: "The charge meter displays and exposes a value of 72 percent.",
       tokens: ["--gc-meter-track", "--gc-meter-fill", "--gc-meter-text"],
       themes: ALL_THEMES,
       viewports: [DESKTOP],
@@ -232,6 +238,7 @@ export const registry = {
       summary:
         "Procedural noise, vector scrollwork, inset light, and displaced geometry from text assets. The effect binds under fantasy; the element remains in the DOM under every theme.",
       specimen: "spike",
+      initialState: "The generated surface and ornament are visible with no interaction applied.",
       tokens: [
         "--gc-surface-shape",
         "--gc-surface-edge-filter",

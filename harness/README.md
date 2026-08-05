@@ -43,6 +43,7 @@ This directory is the harness, not the framework. The metric scope
 harness/
 ├── registry/     # The single scenario declaration, schema, and validator
 ├── app/          # Shared registry-to-DOM renderer used by the reference page
+├── tests/        # Node unit tests for pure harness logic
 ├── runner/       # Chromium Playwright config and registry-driven runner
 ├── goldens/      # Approved (tracked) and candidate (generated) capture trees
 ├── metrics/      # Resolved metric scope and the computed metrics generator
@@ -59,7 +60,7 @@ harness/
 | `npm run validate` | Validate the registry against its schema and the frozen vocabulary |
 | `npm run metrics` | Compute metrics from the repository; fail on a raster, contrast, or pairing violation |
 | `npm run build` | `validate` then `metrics`; prepares the reference application |
-| `npm run test` | `build` then run the runner in compare mode against approved goldens |
+| `npm run test` | Run Node unit tests, then `build`, then the runner in compare mode |
 | `npm run capture` | `build` then run the runner in capture mode, writing candidate goldens |
 
 ---
@@ -70,6 +71,7 @@ harness/
 |-----------|-------------|
 | [registry/](registry/README.md) | The scenario registry, the schema it must satisfy, and the validator |
 | [app/](app/README.md) | The renderer that turns a scenario declaration into reference-page markup |
+| [tests/](tests/README.md) | Node unit tests for pure validator and renderer logic |
 | [runner/](runner/README.md) | Playwright configuration (Chromium only) and the registry-driven runner |
 | [goldens/](goldens/README.md) | Approved baseline captures (tracked) and candidate captures (generated) |
 | [metrics/](metrics/README.md) | The resolved metric-scope path list and the computed metrics generator |

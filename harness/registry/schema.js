@@ -15,6 +15,8 @@
  * would otherwise produce a green run of a broken specimen.
  */
 
+import { SPECIMEN_TYPES } from "../app/specimens.js";
+
 /**
  * The interaction verbs the runner knows how to drive. Defined here and imported
  * by the runner so a scenario cannot declare an action nobody executes.
@@ -48,6 +50,7 @@ export function validateRegistry(registry, contract) {
   const themeSet = new Set(contract.themes);
   const layerSet = new Set(contract.layers);
   const actionSet = new Set(ACTIONS);
+  const specimenSet = new Set(SPECIMEN_TYPES);
 
   if (!registry || typeof registry !== "object") {
     return ["registry: must be an object"];
@@ -83,7 +86,14 @@ export function validateRegistry(registry, contract) {
 
     if (!layerSet.has(s.layer)) push(errors, where, `undeclared layer "${s.layer}"`);
     if (typeof s.title !== "string" || !s.title) push(errors, where, "missing title");
-    if (typeof s.specimen !== "string" || !s.specimen) push(errors, where, "missing specimen");
+    if (typeof s.specimen !== "string" || !s.specimen) {
+      push(errors, where, "missing specimen");
+    } else if (!specimenSet.has(s.specimen)) {
+      push(errors, where, `unknown specimen "${s.specimen}"`);
+    }
+    if (typeof s.initialState !== "string" || !s.initialState.trim()) {
+      push(errors, where, "missing initialState");
+    }
 
     if (!Array.isArray(s.tokens)) {
       push(errors, where, "tokens must be an array");
@@ -105,7 +115,10 @@ export function validateRegistry(registry, contract) {
       push(errors, where, "must declare at least one viewport");
     } else {
       s.viewports.forEach((v, i) => {
-        if (!v || typeof v !== "object") return push(errors, where, `viewport[${i}] invalid`);
+        if (!v || typeof v !== "object") {
+          push(errors, where, `viewport[${i}] invalid`);
+          return;
+        }
         if (typeof v.name !== "string" || !v.name) push(errors, where, `viewport[${i}] missing name`);
         if (!POSITIVE_INT(v.width)) push(errors, where, `viewport[${i}] width must be a positive integer`);
         if (!POSITIVE_INT(v.height)) push(errors, where, `viewport[${i}] height must be a positive integer`);
@@ -117,8 +130,14 @@ export function validateRegistry(registry, contract) {
       push(errors, where, "interactions must be an array");
     } else {
       for (const it of s.interactions) {
-        if (!it || typeof it !== "object") return push(errors, where, "interaction invalid");
-        if (typeof it.name !== "string" || !it.name) return push(errors, where, "interaction missing name");
+        if (!it || typeof it !== "object") {
+          push(errors, where, "interaction invalid");
+          continue;
+        }
+        if (typeof it.name !== "string" || !it.name) {
+          push(errors, where, "interaction missing name");
+          continue;
+        }
         if (interactionNames.has(it.name)) push(errors, where, `duplicate interaction "${it.name}"`);
         interactionNames.add(it.name);
         if (!actionSet.has(it.action)) push(errors, where, `interaction "${it.name}" uses unknown action "${it.action}"`);
@@ -130,11 +149,21 @@ export function validateRegistry(registry, contract) {
     } else {
       const cpNames = new Set();
       for (const cp of s.checkpoints) {
-        if (!cp || typeof cp !== "object") return push(errors, where, "checkpoint invalid");
-        if (typeof cp.name !== "string" || !cp.name) return push(errors, where, "checkpoint missing name");
+        if (!cp || typeof cp !== "object") {
+          push(errors, where, "checkpoint invalid");
+          continue;
+        }
+        if (typeof cp.name !== "string" || !cp.name) {
+          push(errors, where, "checkpoint missing name");
+          continue;
+        }
         if (cpNames.has(cp.name)) push(errors, where, `duplicate checkpoint "${cp.name}"`);
         cpNames.add(cp.name);
-        const after = Array.isArray(cp.after) ? cp.after : [];
+        if ("after" in cp && !Array.isArray(cp.after)) {
+          push(errors, where, `checkpoint "${cp.name}" after must be an array`);
+          continue;
+        }
+        const after = cp.after || [];
         for (const a of after) {
           if (!interactionNames.has(a)) push(errors, where, `checkpoint "${cp.name}" references unknown interaction "${a}"`);
         }

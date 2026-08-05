@@ -18,6 +18,8 @@
  * layer. Scenario DATA never lives here; only the structural mapping does.
  */
 
+import { SPECIMEN_TYPES } from "./specimens.js";
+
 /** @param {string} tag @param {string[][]} [attrs] @param {(Node|string)[]} [kids] */
 function el(tag, attrs = [], kids = []) {
   const node = document.createElement(tag);
@@ -140,7 +142,9 @@ export function specimenRoot(s) {
       );
 
     default:
-      return el("div", [["class", "gc-specimen gc-panel"]], [`Unknown specimen "${s.specimen}"`]);
+      throw new TypeError(
+        `Unknown specimen "${s.specimen}". Expected one of: ${SPECIMEN_TYPES.join(", ")}`,
+      );
   }
 }
 

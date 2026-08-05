@@ -62,6 +62,7 @@ registry/
 | `layer` | One of `foundations`, `core`, `modules`, `consumers` |
 | `tokens` | Required tokens; each must exist in `src/tokens/` |
 | `themes` | Theme coverage; each must exist in `src/themes/` |
+| `initialState` | Nonempty description of the specimen state before interactions |
 | `viewports` | Named capture viewports |
 | `interactions` | Scripted actions the runner drives (`schema.js` defines the verbs) |
 | `checkpoints` | Named capture points, each `after` zero or more interactions |

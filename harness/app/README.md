@@ -33,8 +33,9 @@ which is the same contract the Playwright runner relies on.
 
 ```text
 app/
-├── render.js   # specimen builders and the scenario-section factory
-└── README.md   # This file
+├── render.js      # Specimen builders and the scenario-section factory
+├── specimens.js   # Pure specimen vocabulary shared with registry validation
+└── README.md      # This file
 ```
 
 ---
@@ -44,6 +45,7 @@ app/
 | File | Description | Status |
 |------|-------------|--------|
 | [render.js](render.js) | `specimenRoot(scenario)` and `scenarioSection(scenario)` | ✅ Active |
+| [specimens.js](specimens.js) | Frozen specimen vocabulary shared by renderer and validator | ✅ Active |
 
 ---
 
