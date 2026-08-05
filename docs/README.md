@@ -3,8 +3,8 @@
 title: "Documentation"
 description: "Project documentation, standards, and reference materials"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-03"
-version: "1.4"
+date: "2026-08-05"
+version: "1.5"
 status: "Active"
 tags:
   - type: directory-readme
@@ -18,9 +18,10 @@ related_documents:
 # Documentation
 
 Project documentation. The project charter holds frozen scope, architecture,
-and acceptance criteria. The token and cascade references describe the Phase 1
-contract, and the foundations review holds the operator decision surface. The
-`documentation-standards/` subdirectory governs repository documentation.
+and acceptance criteria. The token and cascade references describe the frozen
+foundations contract. The foundations review records the approved Phase 1
+decisions, and the harness review holds the current operator decision surface.
+The `documentation-standards/` subdirectory governs repository documentation.
 
 ---
 
@@ -43,9 +44,10 @@ docs/
 │   ├── script-header-powershell.md
 │   └── README.md
 ├── cascade-and-overrides.md         # Layer precedence and consumer override contract
-├── foundations-review-2026-08-02.md  # F-001 through F-006 operator questions
+├── foundations-review-2026-08-02.md  # Closed Phase 1 decisions
+├── harness-review-2026-08-05.md     # H-001 through H-006 decisions
 ├── project-charter.md              # Frozen scope, architecture, acceptance criteria
-├── token-reference.md              # Semantic freeze candidate and tier boundaries
+├── token-reference.md              # Frozen semantic vocabulary and tier boundaries
 └── README.md                       # This file
 ```
 
@@ -56,9 +58,10 @@ docs/
 | File | Description | Status |
 |------|-------------|--------|
 | [cascade-and-overrides.md](cascade-and-overrides.md) | Cascade order, zero-specificity defaults, and important-layer reversal | Active |
-| [foundations-review-2026-08-02.md](foundations-review-2026-08-02.md) | Closed approval questions for Phase 1 foundations and the spike | Under Review |
+| [foundations-review-2026-08-02.md](foundations-review-2026-08-02.md) | Closed approval questions for Phase 1 foundations and the spike | Approved |
+| [harness-review-2026-08-05.md](harness-review-2026-08-05.md) | Evidence and yes-or-no questions for the harness operator review | Under Review |
 | [project-charter.md](project-charter.md) | Frozen scope, architecture, roadmap, and acceptance criteria | Active |
-| [token-reference.md](token-reference.md) | Three-tier contract and semantic freeze candidate | Under Review |
+| [token-reference.md](token-reference.md) | Three-tier contract and frozen semantic vocabulary | Active |
 
 ---
 
