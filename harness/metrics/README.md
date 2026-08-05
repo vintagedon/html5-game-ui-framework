@@ -4,7 +4,7 @@ title: "Computed Framework Metrics"
 description: "Resolved framework scope, generated metrics, and current-run membership requirements"
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-08-05"
-version: "1.1"
+version: "1.2"
 status: "Active"
 tags:
   - type: directory-readme
@@ -52,6 +52,7 @@ metrics/
 | Gate | Requirement |
 |------|-------------|
 | Raster assets | Zero raster files in the resolved scope, with case-insensitive extensions |
+| Layer dependencies | Zero illegal registry dependencies, including module-to-module dependencies |
 | Contrast | Every designed pair meets its text or non-text threshold |
 | Membership freshness | Membership belongs to and follows the current Playwright run |
 | Membership classification | Every rendered observation is designed or has a named outcome; unclassified observations are zero |
@@ -63,6 +64,12 @@ The metrics block publishes five membership coverage values from the current
 browser run: designed pair identities, distinct observed pair identities,
 total pairing observations, counted exclusions by reason, and unclassified
 observations. The final value is a hard gate and must remain zero.
+
+`Static off-origin references` is a source scan of framework CSS and
+JavaScript. It is deliberately named separately from the runtime off-origin
+request count observed by the published-preview smoke test. `Contrast
+failures` counts failures from the designed-pair contrast gate; it is not a
+claim to cover every accessibility requirement.
 
 ---
 

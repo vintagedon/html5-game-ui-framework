@@ -4,7 +4,7 @@ title: "Playwright Runner"
 description: "Chromium-only Playwright configuration and the registry-driven conformance runner"
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-08-05"
-version: "1.5"
+version: "1.6"
 status: "Active"
 tags:
   - type: directory-readme
@@ -44,6 +44,8 @@ runner/
 ├── capture-amendment4.js # Styled capture from an isolated revision
 ├── compare-amendment4.js # Historical pair report and hard gate
 ├── check-auditor-page.js # Visible dependency-auditor browser check
+├── smoke-assertions.js  # Pure published-preview assertion verdicts
+├── smoke-published.js   # Published-URL Chromium smoke test
 ├── membership.js         # Browser inspection and pure coverage accounting
 ├── membership.json       # Generated current-run membership evidence
 ├── playwright-run.json   # Generated current-run identity and start time
@@ -65,6 +67,8 @@ runner/
 | [capture-amendment4.js](capture-amendment4.js) | Serves and captures one isolated revision after a stylesheet guard | Active |
 | [compare-amendment4.js](compare-amendment4.js) | Rejects identical or zero-difference historical capture pairs | Active |
 | [check-auditor-page.js](check-auditor-page.js) | Confirms dependency findings are visible and fails on any rendered violation | Active |
+| [smoke-assertions.js](smoke-assertions.js) | Builds separately reported published-preview verdicts | Active |
+| [smoke-published.js](smoke-published.js) | Checks the live nginx URL, browser errors, module failures, and runtime requests | Active |
 | [membership.js](membership.js) | Inspects computed rendered channels and aggregates designed-pair membership | Active |
 
 Each capture identity is

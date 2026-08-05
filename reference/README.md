@@ -1,26 +1,26 @@
 <!--
 ---
-title: "Phase 1 Reference Surface"
-description: "Hand-authored visual review page for foundations and the zero-raster spike"
+title: "Registry-Driven Reference Application"
+description: "Published conformance surface generated from the scenario registry"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-03"
-version: "1.0"
-status: "Under Review"
+date: "2026-08-05"
+version: "2.0"
+status: "Active"
 tags:
   - type: directory-readme
   - domain: harness
   - tech: [html, css, javascript, svg]
 related_documents:
-  - "[Foundations Review](../docs/foundations-review-2026-08-02.md)"
+  - "[Conformance Harness](../harness/README.md)"
   - "[Project Charter](../docs/project-charter.md)"
 ---
 -->
 
-# Phase 1 Reference Surface
+# Registry-Driven Reference Application
 
-This directory contains the temporary hand-authored page used to review the
-foundations contract and fantasy spike. Phase 2 replaces it with the
-registry-driven reference application, test runner, and computed metrics.
+This directory contains the reference application rendered from the scenario
+registry. It is the public-facing component registry, dependency-audit surface,
+computed metrics dashboard, and interaction target for the Playwright runner.
 
 ---
 
@@ -28,9 +28,9 @@ registry-driven reference application, test runner, and computed metrics.
 
 ```text
 reference/
-├── index.html       # Token scales, proof specimens, theme switcher, and spike
-├── reference.css    # Page composition in the consumer overrides layer
-├── reference.js     # Root-attribute theme switching only
+├── index.html       # Application shell with metrics, auditor, and scenario hosts
+├── reference.css    # Reference composition in the consumer overrides layer
+├── reference.js     # Registry rendering, theme switching, metrics, and audit output
 └── README.md        # This file
 ```
 
@@ -40,9 +40,9 @@ reference/
 
 | File | Description | Status |
 |------|-------------|--------|
-| [index.html](index.html) | Hand-authored Phase 1 review page | Under Review |
+| [index.html](index.html) | Registry-driven conformance application shell | Active |
 | [reference.css](reference.css) | Reference-page layout outside framework metric scope | Active |
-| [reference.js](reference.js) | Theme attribute interaction with no network or stylesheet swap | Active |
+| [reference.js](reference.js) | Renders registry scenarios, audit findings, metrics, and theme controls | Active |
 
 ---
 
@@ -51,4 +51,5 @@ reference/
 | Document | Relationship |
 |----------|--------------|
 | [Repository README](../README.md) | Repository orientation |
-| [Foundations Review](../docs/foundations-review-2026-08-02.md) | Closed operator questions for this surface |
+| [Conformance Harness](../harness/README.md) | Registry, runner, metrics, and auditor architecture |
+| [Project Charter](../docs/project-charter.md) | Frozen acceptance criteria and preview boundary |
