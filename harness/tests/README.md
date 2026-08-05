@@ -31,6 +31,7 @@ tests/
 ├── color.test.js                # Published contrast fixtures and color resolution
 ├── compare.test.js              # Approval-manifest and PNG comparison state machine
 ├── membership-freshness.test.js # Current-run membership guard
+├── membership.test.js           # Rendered identity and coverage accounting
 ├── runner.test.js               # Viewport-qualified cases and interaction resolution
 ├── schema.test.js               # Registry validation and renderer-vocabulary behavior
 ├── scope.test.js                # Metric-scope file classification
@@ -46,6 +47,7 @@ tests/
 | [color.test.js](color.test.js) | WCAG contrast and CSS color-resolution unit tests | Active |
 | [compare.test.js](compare.test.js) | Approval-manifest and PNG comparator unit tests | Active |
 | [membership-freshness.test.js](membership-freshness.test.js) | Current Playwright-run membership guard | Active |
+| [membership.test.js](membership.test.js) | Rendered token identity, outline, coverage, and contextual-exemption tests | Active |
 | [runner.test.js](runner.test.js) | Viewport-qualified case identity and checkpoint resolution | Active |
 | [schema.test.js](schema.test.js) | Registry validation and renderer-vocabulary unit tests | Active |
 | [scope.test.js](scope.test.js) | Metric-scope file classification | Active |

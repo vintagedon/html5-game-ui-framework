@@ -4,7 +4,7 @@ title: "Computed Framework Metrics"
 description: "Resolved framework scope, generated metrics, and current-run membership requirements"
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-08-05"
-version: "1.0"
+version: "1.1"
 status: "Active"
 tags:
   - type: directory-readme
@@ -54,9 +54,15 @@ metrics/
 | Raster assets | Zero raster files in the resolved scope, with case-insensitive extensions |
 | Contrast | Every designed pair meets its text or non-text threshold |
 | Membership freshness | Membership belongs to and follows the current Playwright run |
+| Membership classification | Every rendered observation is designed or has a named outcome; unclassified observations are zero |
 
 The capture-checkpoint count is registry-derived as scenario themes multiplied
 by viewports multiplied by checkpoints.
+
+The metrics block publishes five membership coverage values from the current
+browser run: designed pair identities, distinct observed pair identities,
+total pairing observations, counted exclusions by reason, and unclassified
+observations. The final value is a hard gate and must remain zero.
 
 ---
 

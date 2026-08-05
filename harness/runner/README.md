@@ -4,7 +4,7 @@ title: "Playwright Runner"
 description: "Chromium-only Playwright configuration and the registry-driven conformance runner"
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-08-05"
-version: "1.1"
+version: "1.2"
 status: "Active"
 tags:
   - type: directory-readme
@@ -39,6 +39,7 @@ runner/
 ├── cases.js              # Viewport-qualified case identity and interaction lookup
 ├── runner.spec.js        # Registry-driven capture and comparison
 ├── compare.js            # Manifest integrity and pixel comparator
+├── membership.js         # Browser inspection and pure coverage accounting
 ├── membership.json       # Generated current-run membership evidence
 ├── playwright-run.json   # Generated current-run identity and start time
 └── README.md             # This file
@@ -54,6 +55,7 @@ runner/
 | [cases.js](cases.js) | Builds scenario by theme by viewport by checkpoint cases and capture identities | Active |
 | [runner.spec.js](runner.spec.js) | Sets each declared viewport, drives interactions, and captures checkpoints | Active |
 | [compare.js](compare.js) | Approval-manifest integrity and approved/candidate pixel comparison | Active |
+| [membership.js](membership.js) | Inspects computed rendered channels and aggregates designed-pair membership | Active |
 
 Each capture identity is
 `<scenario-id>/<theme>/<viewport>/<checkpoint>.png`. The generated matrix records
@@ -64,6 +66,15 @@ The Playwright config is selected explicitly by the npm scripts. It starts the
 local reference server and writes a JSON result to the spec evidence directory.
 Before any test runs, the runner writes a unique run identity. The membership
 report carries that identity so metrics cannot consume output from an older run.
+
+The capture loop performs membership inspection after the checkpoint's
+interactions and immediately before its screenshot. The same loop records one
+sample for every matrix case, and the generated report fails if its sample
+count differs from the matrix count. The browser calls `getComputedStyle` for
+text, placeholder text, each painted border side, effective painted
+backgrounds, and focus outlines. Every result is a designed pairing, a named
+failure, or one of the report's counted exclusion reasons. No second traversal
+can drift away from the photographed states.
 
 ---
 

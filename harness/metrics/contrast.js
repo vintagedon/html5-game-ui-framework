@@ -178,19 +178,18 @@ function tokenOf(declValue) {
 }
 
 /**
- * Parse framework CSS into per-selector fg/bg token declarations. Used by the
+ * Parse framework CSS into per-selector color token declarations. Used by the
  * Playwright runner's browser membership check (A4.3): the runner walks the
- * rendered DOM and, for each element, finds the nearest ancestor whose matched
- * selector declares a foreground/background token, so inheritance is resolved
- * by the browser rather than by a static block scan.
+ * rendered DOM and resolves inheritance in the browser rather than by a static
+ * declaration-block membership scan.
  *
- * Foreground is captured in two channels — text colour and border colour —
- * because both are designed pairings (text 4.5:1, borders 3:1) and both must be
- * checked for membership. bg is background[-color]. Each entry is
- * { selector, fColor, fBorder, bg } (any may be null).
+ * Foreground is captured in text, border, and outline channels. Background is
+ * background[-color]. Source expressions stay attached so the runner can prove
+ * that each selected token identity corresponds to the computed value.
  */
 const FG_BORDER_LONGHAND = ["border-color", "border-top-color", "border-bottom-color", "border-left-color", "border-right-color"];
 const FG_BORDER_SHORTHAND = ["border", "border-top", "border-right", "border-bottom", "border-left"];
+const FG_OUTLINE = ["outline-color", "outline"];
 
 /** Extract the colour token from a `border` shorthand (e.g.
  *  "var(--gc-border-width) solid var(--gc-panel-border)") by resolving each
@@ -204,8 +203,7 @@ function borderColorToken(declValue, map) {
   return null;
 }
 
-export function fgBgDeclarations() {
-  const css = frameworkCssSource();
+function colorDeclarations(css) {
   const map = defaults;
   const out = [];
   for (const block of innermostBlocks(css)) {
@@ -216,10 +214,36 @@ export function fgBgDeclarations() {
       FG_BORDER_LONGHAND.map((p) => tokenOf(decls[p])).find((t) => t) ||
       FG_BORDER_SHORTHAND.map((p) => borderColorToken(decls[p], map)).find((t) => t) ||
       null;
-    const bg = tokenOf(decls["background-color"] || decls["background"]);
-    if (fColor || fBorder || bg) out.push({ selector: block.selector, fColor, fBorder, bg });
+    const fOutline = FG_OUTLINE.map((p) =>
+      p === "outline"
+        ? borderColorToken(decls[p], map)
+        : tokenOf(decls[p]),
+    ).find((t) => t) || null;
+    const backgroundExpression = decls["background-color"] || decls["background"] || null;
+    const bg = tokenOf(backgroundExpression);
+    if (fColor || fBorder || fOutline || bg) {
+      const placeholder = block.selector.includes("::placeholder");
+      out.push({
+        selector: placeholder
+          ? block.selector.replaceAll("::placeholder", "")
+          : block.selector,
+        pseudo: placeholder ? "::placeholder" : null,
+        fColor,
+        fColorExpression: fColor ? decls.color : null,
+        fBorder,
+        fBorderExpression: fBorder ? `var(${fBorder})` : null,
+        fOutline,
+        fOutlineExpression: fOutline ? `var(${fOutline})` : null,
+        bg,
+        bgExpression: bg ? backgroundExpression : null,
+      });
+    }
   }
   return out;
+}
+
+export function fgBgDeclarations() {
+  return colorDeclarations(frameworkCssSource());
 }
 
 /**
@@ -229,12 +253,29 @@ export function fgBgDeclarations() {
  */
 export function semanticDeclarations() {
   const map = defaults;
-  const sem = (t) => (t ? resolveSemantic(t, map) : null);
-  return fgBgDeclarations().map((d) => ({
+  const stateRepresentatives = {
+    "--gc-control-fill-hover": "--gc-surface-interactive",
+    "--gc-control-fill-active": "--gc-surface-interactive",
+    "--gc-control-fill-disabled": "--gc-surface-interactive",
+    "--gc-control-fill-selected": "--gc-control-fill-selected",
+  };
+  const descriptor = (token, expression) => token
+    ? {
+        token,
+        semantic: stateRepresentatives[token] || resolveSemantic(token, map),
+        expression,
+      }
+    : null;
+  const referenceCss = stripComments(
+    readFileSync(join(REPO_ROOT, "reference/reference.css"), "utf8"),
+  );
+  return colorDeclarations(frameworkCssSource() + "\n" + referenceCss).map((d) => ({
     s: d.selector,
-    fc: sem(d.fColor),
-    fb: sem(d.fBorder),
-    b: sem(d.bg),
+    p: d.pseudo,
+    fc: descriptor(d.fColor, d.fColorExpression),
+    fb: descriptor(d.fBorder, d.fBorderExpression),
+    fo: descriptor(d.fOutline, d.fOutlineExpression),
+    b: descriptor(d.bg, d.bgExpression),
   }));
 }
 

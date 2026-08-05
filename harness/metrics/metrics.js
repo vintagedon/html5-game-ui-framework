@@ -91,6 +91,11 @@ const metrics = [
   { label: "Accessibility failures", value: contrast.violations.length, scope: "contrast gate: designed pairs below threshold (text 4.5:1 + non-text 3:1); undesigned-pairing membership is enforced at test time by the Playwright runner" },
   { label: "Contrast coverage (pair×theme)", value: contrast.standingChecks, scope: `designed pairs (${contrast.standingChecks / contrast.themeCount}) × themes (${contrast.themeCount}); a ratio is computed for every one` },
   { label: "Contrast exemptions (declared)", value: EXEMPTIONS.length, scope: "enumerated in pairings.js; applied and counted by the runner: " + EXEMPTIONS.map((e) => `${e.token} (${e.reason})`).join("; ") },
+  { label: "Designed pair identities", value: membership.coverage.designedPairIdentities, scope: "designed-pairing table identities" },
+  { label: "Observed pair identities", value: membership.coverage.distinctObservedIdentities, scope: "distinct designed identities observed in rendered capture states" },
+  { label: "Pairing observations", value: membership.coverage.totalObservations, scope: "all rendered observations across scenario × theme × viewport × checkpoint" },
+  { label: "Membership exclusions", value: Object.values(membership.coverage.exclusionsByReason).reduce((sum, count) => sum + count, 0), scope: Object.entries(membership.coverage.exclusionsByReason).map(([reason, count]) => `${reason}: ${count}`).join("; ") },
+  { label: "Unclassified observations", value: membership.coverage.unclassifiedObservations, scope: "rendered observations not mapped to a designed identity; must be zero" },
 ];
 
 const out = {
@@ -116,6 +121,7 @@ const gateFailures = [];
 if (rasters.length) gateFailures.push(`framework raster count is ${rasters.length}, must be zero:\n  ${rasters.join("\n  ")}`);
 if (contrast.violations.length) gateFailures.push(`${contrast.violations.length} contrast violation(s):\n  ${contrast.violations.join("\n  ")}`);
 if (contrast.countAssertion) gateFailures.push(`contrast count assertion failed: ${contrast.countAssertion}`);
+if (membership.coverage.unclassifiedObservations) gateFailures.push(`${membership.coverage.unclassifiedObservations} unclassified rendered observation(s); must be zero`);
 
 if (gateFailures.length) {
   console.error(`\nMETRICS GATE FAILED:\n${gateFailures.join("\n")}`);

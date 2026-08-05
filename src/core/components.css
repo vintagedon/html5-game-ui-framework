@@ -88,6 +88,10 @@
     color: var(--gc-input-text);
   }
 
+  :where(.gc-input)::placeholder {
+    color: var(--gc-input-placeholder);
+  }
+
   :where(.gc-button:hover:not(:disabled), .gc-input:hover:not(:disabled)) {
     background-color: var(--gc-control-fill-hover);
   }
