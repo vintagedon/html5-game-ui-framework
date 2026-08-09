@@ -25,13 +25,6 @@
     gap: var(--gc-space-5);
   }
 
-  .phase-notice {
-    padding: var(--gc-space-3) var(--gc-space-4);
-    border-inline-start: var(--gc-border-medium) solid var(--gc-status-warning);
-    background: color-mix(in oklch, var(--gc-status-warning) 12%, transparent);
-    color: var(--gc-text-secondary);
-  }
-
   .reference-title {
     font-family: var(--gc-font-display);
     font-size: var(--gc-type-display-size);
@@ -70,6 +63,17 @@
     gap: var(--gc-space-4);
   }
 
+  .scenario-head {
+    display: grid;
+    gap: var(--gc-space-2);
+  }
+
+  .scenario-meta {
+    color: var(--gc-text-muted);
+    font-family: var(--gc-font-code);
+    font-size: var(--gc-type-caption-size);
+  }
+
   .section-heading {
     font-family: var(--gc-font-display);
     font-size: var(--gc-type-title-size);
@@ -81,8 +85,7 @@
     color: var(--gc-text-secondary);
   }
 
-  .token-grid,
-  .proof-grid {
+  .token-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
     gap: var(--gc-space-3);
@@ -116,14 +119,55 @@
     font-size: var(--gc-type-title-size);
   }
 
-  .gc-meter {
-    --gc-meter-value: 72%;
-  }
-
   .meter-label {
     display: flex;
     justify-content: space-between;
     color: var(--gc-meter-text);
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: var(--gc-space-3);
+  }
+
+  .metric-card {
+    display: grid;
+    gap: var(--gc-space-1);
+    padding: var(--gc-space-4);
+    border: var(--gc-border-width) solid var(--gc-border-default);
+    border-radius: var(--gc-radius-control);
+    background: var(--gc-surface-raised);
+    box-shadow: var(--gc-elevation-low);
+  }
+
+  .metric-value {
+    font-family: var(--gc-font-code);
+    font-size: var(--gc-type-title-size);
+    color: var(--gc-accent);
+  }
+
+  .metric-label {
+    color: var(--gc-text-secondary);
+    font-size: var(--gc-type-label-size);
+  }
+
+  .metric-scope {
+    color: var(--gc-text-muted);
+    font-family: var(--gc-font-code);
+    font-size: var(--gc-type-caption-size);
+  }
+
+  .audit-violations {
+    margin: 0;
+    padding: var(--gc-space-4);
+    border: var(--gc-border-width) solid var(--gc-status-danger);
+    border-radius: var(--gc-radius-panel);
+    background: color-mix(in oklch, var(--gc-status-danger) 12%, transparent);
+    color: var(--gc-text-primary);
+    list-style: none;
+    display: grid;
+    gap: var(--gc-space-2);
   }
 
   .spike-heading,

@@ -9,7 +9,9 @@
     --gc-palette-modern-10: oklch(96% 0.008 255);
     --gc-palette-modern-20: oklch(91% 0.012 255);
     --gc-palette-modern-40: oklch(65% 0.025 255);
+    --gc-palette-modern-44: oklch(56% 0.012 255);
     --gc-palette-modern-55: oklch(46% 0.025 255);
+    --gc-palette-modern-60: oklch(44% 0.025 255);
     --gc-palette-modern-70: oklch(34% 0.035 255);
     --gc-palette-modern-85: oklch(22% 0.03 255);
     --gc-palette-modern-95: oklch(14% 0.025 255);
@@ -28,6 +30,7 @@
     --gc-palette-scifi-00: oklch(97% 0.02 210);
     --gc-palette-scifi-20: oklch(82% 0.08 210);
     --gc-palette-scifi-45: oklch(65% 0.18 210);
+    --gc-palette-scifi-55: oklch(56% 0.09 235);
     --gc-palette-scifi-70: oklch(36% 0.09 235);
     --gc-palette-scifi-90: oklch(17% 0.055 245);
     --gc-palette-scifi-98: oklch(8% 0.025 250);

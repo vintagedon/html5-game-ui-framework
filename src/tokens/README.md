@@ -3,9 +3,9 @@
 title: "Token Source"
 description: "Three-tier CSS custom property contract for framework foundations"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-03"
-version: "1.0"
-status: "Under Review"
+date: "2026-08-05"
+version: "1.1"
+status: "Active"
 tags:
   - type: directory-readme
   - domain: foundations
@@ -29,7 +29,7 @@ semantic or component tokens but never primitive tokens directly.
 ```text
 tokens/
 ├── primitives.css   # Internal literal values
-├── semantic.css     # Public freeze-candidate vocabulary
+├── semantic.css     # Frozen public semantic vocabulary
 ├── components.css   # Component defaults and shared state recipes
 └── README.md        # This file
 ```
@@ -41,12 +41,12 @@ tokens/
 | File | Description | Status |
 |------|-------------|--------|
 | [primitives.css](primitives.css) | Internal literal scales and theme palettes | Active |
-| [semantic.css](semantic.css) | Public semantic contract with modern defaults | Under Review |
-| [components.css](components.css) | Defaults for the Phase 1 proof specimens | Under Review |
+| [semantic.css](semantic.css) | Frozen public semantic contract with modern defaults | Active |
+| [components.css](components.css) | Defaults for registered core specimens | Active |
 
 ---
 
-## 4. Related
+## 3. Related
 
 | Document | Relationship |
 |----------|--------------|
