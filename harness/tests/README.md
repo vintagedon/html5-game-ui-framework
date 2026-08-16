@@ -34,6 +34,7 @@ tests/
 ├── compare.test.js              # Approval-manifest and PNG comparison state machine
 ├── membership-freshness.test.js # Current-run membership guard
 ├── membership.test.js           # Rendered identity and coverage accounting
+├── reference-corpus.test.js     # UI pack catalog schema and map derivation
 ├── runner.test.js               # Viewport-qualified cases and interaction resolution
 ├── schema.test.js               # Registry validation and renderer-vocabulary behavior
 ├── semantics.test.js            # Toggle and meter state synchronization
@@ -54,6 +55,7 @@ tests/
 | [compare.test.js](compare.test.js) | Approval-manifest and PNG comparator unit tests | Active |
 | [membership-freshness.test.js](membership-freshness.test.js) | Current Playwright-run membership guard | Active |
 | [membership.test.js](membership.test.js) | Rendered token identity, outline, coverage, and contextual-exemption tests | Active |
+| [reference-corpus.test.js](reference-corpus.test.js) | UI pack catalog schema, redaction, derivation bond, and fixture guards | Active |
 | [runner.test.js](runner.test.js) | Viewport-qualified case identity and checkpoint resolution | Active |
 | [schema.test.js](schema.test.js) | Registry validation and renderer-vocabulary unit tests | Active |
 | [semantics.test.js](semantics.test.js) | Initial and interacted toggle/meter state agreement | Active |

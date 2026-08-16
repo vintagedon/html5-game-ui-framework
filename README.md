@@ -114,6 +114,7 @@ html5-game-ui-framework/
 │   ├── foundations-review-2026-08-02.md  # Approved foundation decisions
 │   ├── harness-review-2026-08-05.md  # Harness approval questions
 │   ├── project-charter.md     # Frozen scope and architecture
+│   ├── reference-corpus/      # Catalog and capability map derived from the UI pack corpus
 │   └── token-reference.md     # Frozen semantic vocabulary
 ├── harness/                   # Registry, app, tests, runner, goldens, metrics, auditor
 ├── internal-files/            # Ideation and source materials (gitignored)
@@ -122,6 +123,7 @@ html5-game-ui-framework/
 ├── reference-files-assets/    # Third-party art packs (gitignored, never redistributed)
 ├── reference-files-games/     # Third-party game templates (gitignored)
 ├── reference-files-ui/        # Third-party UI packs (gitignored)
+├── scripts/                   # Corpus audit and research tooling (built-in Node APIs only)
 ├── src/                       # Framework and theme publication source
 │   ├── core/                  # Domain-neutral proof primitives
 │   ├── modules/               # Reserved consumer-driven module boundary
@@ -145,7 +147,7 @@ html5-game-ui-framework/
 
 The spec queue and work logs are shared estate directories at `/opt/agents/repos/spec/` and `/opt/agents/repos/work-logs/`, peers of this repository rather than a parent workspace. Several agent estates work this repository through one lifecycle, so the queue and the registry are held in common.
 
-The three `reference-files-*` directories hold licensed third-party packs used as requirement and technique reference. They are excluded from version control. Their licences permit use inside finished projects and prohibit redistribution as templates, asset packs, or component libraries.
+The three `reference-files-*` directories hold licensed third-party packs used as requirement and technique reference. They are excluded from version control. Their licences permit use inside finished projects and prohibit redistribution as templates, asset packs, or component libraries. The UI corpus has a tracked, public-derived catalog (`docs/reference-corpus/`) that records pack facts, license posture, and capability evidence without reproducing any pack source; `npm run corpus:audit` reconciles it against the private tree on ML01.
 
 ---
 
@@ -186,4 +188,4 @@ Third-party reference material held locally under `reference-files-*` is license
 
 ---
 
-Last Updated: August 5, 2026 | Status: Harness Review
+Last Updated: August 16, 2026 | Status: Harness Review

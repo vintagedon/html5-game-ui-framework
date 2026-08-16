@@ -1,0 +1,3194 @@
+{
+  "schemaVersion": 1,
+  "sourceRoot": "reference-files-ui",
+  "snapshot": {
+    "packCount": 24,
+    "fileCount": 5963,
+    "totalBytes": 197620622,
+    "extensionCounts": {
+      ".aseprite": 33,
+      ".css": 18,
+      ".csv": 1,
+      ".gif": 2,
+      ".gpl": 1,
+      ".html": 67,
+      ".js": 52,
+      ".json": 111,
+      ".md": 68,
+      ".ogg": 64,
+      ".ora": 1,
+      ".png": 4414,
+      ".ps1": 2,
+      ".py": 2,
+      ".rpy": 2,
+      ".svg": 916,
+      ".txt": 11,
+      ".wav": 176,
+      ".webp": 22
+    },
+    "corpusDigest": "sha256:08e35633a15eac784e09e80fe9ee88d3e9a84a6f0b3851d7abe38dcda69c5438"
+  },
+  "packs": [
+    {
+      "id": "achievement-toast-notification-system-html5",
+      "displayName": "Achievement Toast + Notification System (HTML5)",
+      "snapshot": {
+        "fileCount": 35,
+        "totalBytes": 216150,
+        "extensionCounts": {
+          ".css": 2,
+          ".html": 2,
+          ".js": 4,
+          ".json": 2,
+          ".md": 7,
+          ".png": 3,
+          ".ps1": 2,
+          ".svg": 12,
+          ".txt": 1
+        },
+        "digest": "sha256:3fe24eed2fdc3790e895189faee01ab93e4c1c6efc8e8f83c928bb3decc675e0"
+      },
+      "sourceKinds": [
+        "interactive-code",
+        "data-recipe",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 2,
+        "stylesheets": 2,
+        "scripts": 4,
+        "dataFiles": 2,
+        "images": 15,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "Six named toast types, stacking behavior, edge positioning, duplicate-key merging, and a progress-bar variant"
+        },
+        {
+          "path": "LICENSE.txt",
+          "proves": "Finished-product use granted; raw-file redistribution as a competing pack prohibited; credit optional"
+        },
+        {
+          "path": "index.html",
+          "proves": "Runnable live demo wiring all toast types and controls"
+        },
+        {
+          "path": "src/achievement-toast-system.js",
+          "proves": "Self-contained core class separate from its demo shell"
+        },
+        {
+          "path": "docs/api-reference.md",
+          "proves": "Documented programmatic surface for the core class"
+        },
+        {
+          "path": "docs/theme-guide.md",
+          "proves": "CSS-variable theming contract for the toast surface"
+        },
+        {
+          "path": "data/notification-presets.json",
+          "proves": "Named event presets kept as data beside the runtime code"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "pack-license-file",
+        "locator": "LICENSE.txt"
+      },
+      "licenseFacts": {
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "License grants use in free and commercial games and bars reselling or repackaging the raw files; credit appreciated but not required."
+      },
+      "shippingPosture": "derived-technique-only",
+      "capabilityIds": [
+        "CAP-001"
+      ],
+      "overlapGroupIds": [
+        "OVL-005"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-001",
+          "fit": "Vector Vortex's run feedback and achievement moments need exactly this stacking notification region."
+        },
+        {
+          "candidateId": "GC-005",
+          "fit": "A high-score arcade needs score milestone and save-confirmation toasts."
+        },
+        {
+          "candidateId": "GC-004",
+          "fit": "Idle progression milestones and reward notifications consume the same stacking region."
+        }
+      ],
+      "disposition": "game-driven-candidate"
+    },
+    {
+      "id": "card-system-pixel",
+      "displayName": "Card System Pixel (Aseprite card library)",
+      "snapshot": {
+        "fileCount": 1821,
+        "totalBytes": 13846409,
+        "extensionCounts": {
+          ".aseprite": 30,
+          ".gif": 1,
+          ".png": 1790
+        },
+        "digest": "sha256:c6ca353acf3d469ae1680f7ed9b3c698316312f5388f3d402bee8f9169653dc1"
+      },
+      "sourceKinds": [
+        "visual-source",
+        "editable-source"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": false,
+        "htmlDocuments": 0,
+        "stylesheets": 0,
+        "scripts": 0,
+        "dataFiles": 0,
+        "images": 1791,
+        "audioFiles": 0,
+        "editableSources": 30
+      },
+      "evidence": [
+        {
+          "path": "cards-rpg/",
+          "proves": "Nine-frame Aseprite+PNG card families (attack, bleeding, charm, cloud, defense) with per-family masters"
+        },
+        {
+          "path": "card-package/",
+          "proves": "Packaged sheet master and no-chroma variant for pipeline import"
+        },
+        {
+          "path": "modular-cards/",
+          "proves": "Modular part masters and a parts directory for composable card frames"
+        },
+        {
+          "path": "opening-animations/",
+          "proves": "Card-opening animation frame sets for reveal sequences"
+        },
+        {
+          "path": "chroma-animation-overlay/",
+          "proves": "Four chroma overlay variants for recolor pipelines"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "none-found",
+        "locator": null
+      },
+      "licenseFacts": {
+        "finishedProductUse": "unclear",
+        "sourceRedistribution": "unclear",
+        "attribution": "unclear",
+        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+      },
+      "shippingPosture": "license-review-required",
+      "capabilityIds": [
+        "CAP-011",
+        "CAP-012"
+      ],
+      "overlapGroupIds": [
+        "OVL-009"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-003",
+          "fit": "A pixel-styled deckbuilder consumes these card families and modular frames directly."
+        }
+      ],
+      "disposition": "license-review-required"
+    },
+    {
+      "id": "equipment-compare-ui-pack",
+      "displayName": "RPG Equipment Compare UI Pack",
+      "snapshot": {
+        "fileCount": 219,
+        "totalBytes": 4685939,
+        "extensionCounts": {
+          ".css": 1,
+          ".html": 2,
+          ".json": 4,
+          ".md": 2,
+          ".png": 140,
+          ".svg": 70
+        },
+        "digest": "sha256:760f2837fff15653a3100e231778d2d5caeb0551426d9c4a1b8a187789fc4416"
+      },
+      "sourceKinds": [
+        "visual-source",
+        "layout-manifest",
+        "data-recipe"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 2,
+        "stylesheets": 1,
+        "scripts": 0,
+        "dataFiles": 4,
+        "images": 210,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "66 modular components, two 1280x720 reference screens, rarity slot variants, and an explicit no-logic scope statement"
+        },
+        {
+          "path": "manifest.json",
+          "proves": "Asset paths, dimensions, types, rarity values, and 9-slice margins as import metadata"
+        },
+        {
+          "path": "templates/equipment_compare_layout.json",
+          "proves": "Coordinate reference for the composed comparison screen"
+        },
+        {
+          "path": "templates/tooltip_hud_layout.json",
+          "proves": "Coordinate reference for a tooltip HUD screen"
+        },
+        {
+          "path": "tokens/design_tokens.json",
+          "proves": "Colors, rarity values, typography fallbacks, and slice sizes as data"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "readme-external-terms",
+        "locator": "README.md"
+      },
+      "licenseFacts": {
+        "finishedProductUse": "unclear",
+        "sourceRedistribution": "unclear",
+        "attribution": "unclear",
+        "note": "The README licence section defers all terms to the product's itch.io purchase page and states the archive adds nothing; the terms themselves are not in the pack."
+      },
+      "shippingPosture": "license-review-required",
+      "capabilityIds": [
+        "CAP-008",
+        "CAP-010",
+        "CAP-011",
+        "CAP-017"
+      ],
+      "overlapGroupIds": [],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-002",
+          "fit": "Rogue Cellar's loot decisions need the compare columns, stat-delta rows, and rarity slots this pack composes."
+        }
+      ],
+      "disposition": "license-review-required"
+    },
+    {
+      "id": "explorer-map-ui-pack",
+      "displayName": "Explorer Map UI Pack",
+      "snapshot": {
+        "fileCount": 214,
+        "totalBytes": 5644924,
+        "extensionCounts": {
+          ".css": 1,
+          ".html": 1,
+          ".json": 4,
+          ".md": 1,
+          ".png": 138,
+          ".svg": 69
+        },
+        "digest": "sha256:7aa03f2ce2cf798b30b7809fa7231b021fefc5d5812ef01576ea5468fe8fe55c"
+      },
+      "sourceKinds": [
+        "visual-source",
+        "layout-manifest",
+        "data-recipe"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 1,
+        "scripts": 0,
+        "dataFiles": 4,
+        "images": 207,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "World map and minimap scope, a 16-marker set, and the pack palette"
+        },
+        {
+          "path": "manifest.json",
+          "proves": "Import metadata including suggested 9-slice margins for map chrome"
+        },
+        {
+          "path": "tokens/design_tokens.json",
+          "proves": "Design tokens exposed as JSON beside CSS"
+        },
+        {
+          "path": "svg/screens/",
+          "proves": "Composed world-map and minimap HUD reference screens"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "readme-external-terms",
+        "locator": "README.md"
+      },
+      "licenseFacts": {
+        "finishedProductUse": "unclear",
+        "sourceRedistribution": "unclear",
+        "attribution": "unclear",
+        "note": "No terms text exists in the pack; the README scope and folder layout cannot substitute for the purchase-page terms."
+      },
+      "shippingPosture": "license-review-required",
+      "capabilityIds": [
+        "CAP-007"
+      ],
+      "overlapGroupIds": [],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-002",
+          "fit": "Rogue Cellar's dungeon overlay needs minimap frames, markers, and a legend drawer without world-data coupling."
+        }
+      ],
+      "disposition": "license-review-required"
+    },
+    {
+      "id": "gilded-grove-alchemy-card-pack",
+      "displayName": "Gilded Grove Alchemy Card Pack",
+      "snapshot": {
+        "fileCount": 218,
+        "totalBytes": 27238213,
+        "extensionCounts": {
+          ".css": 1,
+          ".html": 1,
+          ".json": 5,
+          ".md": 2,
+          ".png": 149,
+          ".svg": 59,
+          ".txt": 1
+        },
+        "digest": "sha256:a31ba09d78836aa3cbfd8e4f0b79ea5ce988bccef51a5bf2ef53c80125c42d17"
+      },
+      "sourceKinds": [
+        "visual-source",
+        "layout-manifest",
+        "data-recipe"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 1,
+        "scripts": 0,
+        "dataFiles": 5,
+        "images": 208,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "52 SVG assets, five rarity card frames, deckbuilder pieces, atlas, and layout templates"
+        },
+        {
+          "path": "LICENSE.txt",
+          "proves": "Royalty-free purchaser license permitting commercial shipping while barring raw-file redistribution"
+        },
+        {
+          "path": "manifest.json",
+          "proves": "Frame data and asset paths as import metadata"
+        },
+        {
+          "path": "atlas/",
+          "proves": "Engine-friendly texture atlas with JSON frame data"
+        },
+        {
+          "path": "templates/",
+          "proves": "Card layout and deckbuilder prefab metadata"
+        },
+        {
+          "path": "tokens/",
+          "proves": "Design tokens and CSS variables"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "pack-license-file",
+        "locator": "LICENSE.txt"
+      },
+      "licenseFacts": {
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "License grants use, modification, and shipping in commercial games and bars redistribution of raw files; it is silent on attribution, so no attribution requirement appears in local terms."
+      },
+      "shippingPosture": "derived-technique-only",
+      "capabilityIds": [
+        "CAP-011",
+        "CAP-012"
+      ],
+      "overlapGroupIds": [
+        "OVL-009"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-003",
+          "fit": "An alchemy deckbuilder is the stated target: rarity frames, cost badges, and deckbuilder surfaces."
+        }
+      ],
+      "disposition": "hold-for-consumer"
+    },
+    {
+      "id": "impact-juice-combat-polish-bundle",
+      "displayName": "Impact Juice Combat Polish Bundle",
+      "snapshot": {
+        "fileCount": 686,
+        "totalBytes": 74725431,
+        "extensionCounts": {
+          ".css": 1,
+          ".html": 1,
+          ".json": 18,
+          ".md": 3,
+          ".png": 467,
+          ".svg": 159,
+          ".txt": 1,
+          ".wav": 36
+        },
+        "digest": "sha256:6a89e08a0ff3a3c78ec5ae0ef3dbe8f56ac9ebed617b0175f605d92a7e912269"
+      },
+      "sourceKinds": [
+        "visual-source",
+        "audio-source",
+        "data-recipe",
+        "layout-manifest"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 1,
+        "scripts": 0,
+        "dataFiles": 18,
+        "images": 626,
+        "audioFiles": 36,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "70 SVG assets, 12 VFX sheets, 36 mono WAV SFX, and engine-agnostic JSON timing recipes"
+        },
+        {
+          "path": "LICENSE.txt",
+          "proves": "Personal and commercial project use granted; raw source redistribution prohibited"
+        },
+        {
+          "path": "data/combat_feedback_recipes.json",
+          "proves": "Hitstop, shake, flash, popup, VFX, and SFX pairing expressed as data recipes"
+        },
+        {
+          "path": "data/feedback_event_schema.json",
+          "proves": "A schema separating feedback events from their presentations"
+        },
+        {
+          "path": "data/camera_shake_curves.json",
+          "proves": "Shake expressed as curves rather than code"
+        },
+        {
+          "path": "preview.html",
+          "proves": "Runnable offline preview of the bundle"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "pack-license-file",
+        "locator": "LICENSE.txt"
+      },
+      "licenseFacts": {
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "License permits use in commercial games and modification inside projects; it is silent on attribution, so no attribution requirement appears in local terms."
+      },
+      "shippingPosture": "derived-technique-only",
+      "capabilityIds": [
+        "CAP-005",
+        "CAP-006",
+        "CAP-013"
+      ],
+      "overlapGroupIds": [],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-001",
+          "fit": "Vector Vortex Spec 03 names this bundle as read-only timing-vocabulary evidence for combat polish."
+        }
+      ],
+      "disposition": "reference-lab-candidate"
+    },
+    {
+      "id": "inventory-grid-grabber-html5",
+      "displayName": "GridGrabber Grid Inventory (Rosebud export)",
+      "snapshot": {
+        "fileCount": 9,
+        "totalBytes": 57083,
+        "extensionCounts": {
+          ".html": 1,
+          ".js": 4,
+          ".json": 1,
+          ".md": 3
+        },
+        "digest": "sha256:fbcbbc49038743abaf06e3ebfb6cfd0139203131e6271264298bdcefa3f37d09"
+      },
+      "sourceKinds": [
+        "interactive-code",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 0,
+        "scripts": 4,
+        "dataFiles": 1,
+        "images": 0,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "Beginner drag-and-drop grid inventory with stacking and CSS-variable slot states"
+        },
+        {
+          "path": "INTEGRATION.md",
+          "proves": "Step-by-step integration guide for embedding the inventory"
+        },
+        {
+          "path": "index.html",
+          "proves": "Runnable demo entry"
+        },
+        {
+          "path": "inventory.js",
+          "proves": "Grid logic, drag-and-drop, and stacking isolated from the demo shell"
+        },
+        {
+          "path": "export-metadata.json",
+          "proves": "Rosebud platform provenance (project GridGrabber, April 2026 export)"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "none-found",
+        "locator": null
+      },
+      "licenseFacts": {
+        "finishedProductUse": "unclear",
+        "sourceRedistribution": "unclear",
+        "attribution": "unclear",
+        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+      },
+      "shippingPosture": "license-review-required",
+      "capabilityIds": [
+        "CAP-010"
+      ],
+      "overlapGroupIds": [
+        "OVL-006"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-002",
+          "fit": "Rogue Cellar's beginner-tier inventory grid with drag, drop, and stacking behavior."
+        }
+      ],
+      "disposition": "license-review-required"
+    },
+    {
+      "id": "inventory-loot-and-legend-inventory-pro",
+      "displayName": "Loot and Legend Inventory Pro",
+      "snapshot": {
+        "fileCount": 13,
+        "totalBytes": 448317,
+        "extensionCounts": {
+          ".css": 1,
+          ".html": 1,
+          ".js": 1,
+          ".json": 1,
+          ".md": 1,
+          ".webp": 8
+        },
+        "digest": "sha256:a52c0122041edaf68a6b56eeb5b7910eb9f99a5637fd597f1b0bea50914ba0e2"
+      },
+      "sourceKinds": [
+        "interactive-code",
+        "visual-source",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 1,
+        "scripts": 1,
+        "dataFiles": 1,
+        "images": 8,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "Eight equipment slots, rarity color coding, filter and sort controls, loot tables, and tooltips"
+        },
+        {
+          "path": "index.html",
+          "proves": "Runnable demo with equipment panel, grid, and tooltip overlay"
+        },
+        {
+          "path": "main.js",
+          "proves": "Rarity system, loot tables, equipment binding, and filter/sort logic"
+        },
+        {
+          "path": "style.css",
+          "proves": "Rarity tier color rules and slot styling"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "none-found",
+        "locator": null
+      },
+      "licenseFacts": {
+        "finishedProductUse": "unclear",
+        "sourceRedistribution": "unclear",
+        "attribution": "unclear",
+        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+      },
+      "shippingPosture": "license-review-required",
+      "capabilityIds": [
+        "CAP-010",
+        "CAP-011",
+        "CAP-017"
+      ],
+      "overlapGroupIds": [
+        "OVL-006"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-002",
+          "fit": "The full-featured counterpart supplies equipment binding and rarity-coded grid behavior for the same consumer."
+        }
+      ],
+      "disposition": "license-review-required"
+    },
+    {
+      "id": "moonlit-pact-vn-gui-kit-renpy",
+      "displayName": "Moonlit Pact VN GUI Kit for Ren'Py",
+      "snapshot": {
+        "fileCount": 676,
+        "totalBytes": 12112948,
+        "extensionCounts": {
+          ".html": 1,
+          ".js": 1,
+          ".json": 3,
+          ".md": 4,
+          ".png": 425,
+          ".rpy": 2,
+          ".svg": 227,
+          ".txt": 1,
+          ".wav": 12
+        },
+        "digest": "sha256:6a0436773365e83c75fd56e2b691033fc6cc727c954179bc1d560a45ba801729"
+      },
+      "sourceKinds": [
+        "visual-source",
+        "audio-source",
+        "layout-manifest",
+        "data-recipe",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 0,
+        "scripts": 1,
+        "dataFiles": 3,
+        "images": 652,
+        "audioFiles": 12,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "210 SVG GUI assets, three themes, dialogue boxes, choice buttons, nameplates, save slots, and 12 WAV SFX"
+        },
+        {
+          "path": "LICENSE.txt",
+          "proves": "Personal and commercial project use granted; raw source redistribution prohibited"
+        },
+        {
+          "path": "renpy/moonlit_pact_gui_snippets.rpy",
+          "proves": "Ren'Py screen-language integration snippets for the kit"
+        },
+        {
+          "path": "examples/sample_script.rpy",
+          "proves": "A sample script exercising the kit's screens"
+        },
+        {
+          "path": "data/nine_slice.json",
+          "proves": "Nine-slice metadata for the GUI frames"
+        },
+        {
+          "path": "data/pack-index.json",
+          "proves": "Machine-readable pack index of the 210 assets"
+        },
+        {
+          "path": "preview.html",
+          "proves": "Runnable offline preview of the kit"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "pack-license-file",
+        "locator": "LICENSE.txt"
+      },
+      "licenseFacts": {
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "License permits use in commercial games and modification inside projects; it is silent on attribution, so no attribution requirement appears in local terms."
+      },
+      "shippingPosture": "derived-technique-only",
+      "capabilityIds": [
+        "CAP-013",
+        "CAP-015"
+      ],
+      "overlapGroupIds": [],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-006",
+          "fit": "The Within Parameters migration is the natural consumer of dialogue, choice, and save-slot evidence."
+        }
+      ],
+      "disposition": "defer"
+    },
+    {
+      "id": "neon-rpg-icon-pack",
+      "displayName": "Neon RPG Icon Pack",
+      "snapshot": {
+        "fileCount": 104,
+        "totalBytes": 15702936,
+        "extensionCounts": {
+          ".md": 1,
+          ".png": 103
+        },
+        "digest": "sha256:e26f3c422cb28bd8f8593341cc7624f04d9b0d03acd234c4e293d17ff0344480"
+      },
+      "sourceKinds": [
+        "visual-source",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": false,
+        "htmlDocuments": 0,
+        "stylesheets": 0,
+        "scripts": 0,
+        "dataFiles": 0,
+        "images": 103,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "Five RPG categories (armors, items, magics, spells, UI) sized for inventory slots"
+        },
+        {
+          "path": "armors/",
+          "proves": "Armor piece sprites at slot-ready sizes"
+        },
+        {
+          "path": "items/",
+          "proves": "Consumable and loot item sprites"
+        },
+        {
+          "path": "magics/",
+          "proves": "Magic weapon and component sprites"
+        },
+        {
+          "path": "spells/",
+          "proves": "Spell effect icon sprites"
+        },
+        {
+          "path": "ui/",
+          "proves": "Generic UI status symbols"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "none-found",
+        "locator": null
+      },
+      "licenseFacts": {
+        "finishedProductUse": "unclear",
+        "sourceRedistribution": "unclear",
+        "attribution": "unclear",
+        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+      },
+      "shippingPosture": "license-review-required",
+      "capabilityIds": [
+        "CAP-016"
+      ],
+      "overlapGroupIds": [
+        "OVL-007"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-002",
+          "fit": "Slot-ready neon icons cover the item categories a roguelike inventory renders."
+        }
+      ],
+      "disposition": "license-review-required"
+    },
+    {
+      "id": "neon-ui-mega-bundle",
+      "displayName": "Neon UI Mega Bundle",
+      "snapshot": {
+        "fileCount": 11,
+        "totalBytes": 68679,
+        "extensionCounts": {
+          ".html": 5,
+          ".md": 6
+        },
+        "digest": "sha256:b6a75525feb47776c5ab4edb9a3e4c5213897b371f1fcb2d6f53e62d428951e3"
+      },
+      "sourceKinds": [
+        "interactive-code",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 5,
+        "stylesheets": 0,
+        "scripts": 0,
+        "dataFiles": 0,
+        "images": 0,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "Five standalone CSS packs sharing one dark base and a six-color CSS-variable neon palette"
+        },
+        {
+          "path": "buttons/index.html",
+          "proves": "Runnable button variant demo including tab buttons"
+        },
+        {
+          "path": "icons/index.html",
+          "proves": "Runnable inline SVG icon set demo"
+        },
+        {
+          "path": "panels-and-windows/index.html",
+          "proves": "Runnable panel, card, toast, and modal chrome demo"
+        },
+        {
+          "path": "toggles-and-switches/index.html",
+          "proves": "Runnable toggle, checkbox, and radio control demo"
+        },
+        {
+          "path": "ui-sliders-and-bars/index.html",
+          "proves": "Runnable health, XP, progress, and volume slider demo"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "none-found",
+        "locator": null
+      },
+      "licenseFacts": {
+        "finishedProductUse": "unclear",
+        "sourceRedistribution": "unclear",
+        "attribution": "unclear",
+        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+      },
+      "shippingPosture": "license-review-required",
+      "capabilityIds": [
+        "CAP-004",
+        "CAP-018",
+        "CAP-020"
+      ],
+      "overlapGroupIds": [
+        "OVL-004"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-004",
+          "fit": "An idle arcade consumes the toggles, sliders, and bars as its primary settings surface."
+        },
+        {
+          "candidateId": "GC-005",
+          "fit": "A neon high-score arcade needs exactly these button, panel, and slider primitives."
+        }
+      ],
+      "disposition": "license-review-required"
+    },
+    {
+      "id": "obsidian-grimoire-ui",
+      "displayName": "Obsidian Grimoire UI (packaged product)",
+      "snapshot": {
+        "fileCount": 15,
+        "totalBytes": 1172271,
+        "extensionCounts": {
+          ".css": 1,
+          ".html": 1,
+          ".js": 1,
+          ".json": 1,
+          ".md": 3,
+          ".png": 1,
+          ".txt": 1,
+          ".webp": 6
+        },
+        "digest": "sha256:9035733941c83f781269bd4399e4d9e45a0940a063bbbdc4f9e25b9de684d63b"
+      },
+      "sourceKinds": [
+        "interactive-code",
+        "visual-source",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 1,
+        "scripts": 1,
+        "dataFiles": 1,
+        "images": 7,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "Dark fantasy status bar and slider template positioning"
+        },
+        {
+          "path": "USAGE.md",
+          "proves": "Integration walkthrough for the template"
+        },
+        {
+          "path": "LICENSE.txt",
+          "proves": "Personal and commercial use granted inside finished projects; standalone redistribution prohibited"
+        },
+        {
+          "path": "index.html",
+          "proves": "Runnable demo with health, mana, and XP bars and slider controls"
+        },
+        {
+          "path": "main.js",
+          "proves": "Demo wiring separated from the template's CSS surface"
+        },
+        {
+          "path": "export-metadata.json",
+          "proves": "Version 1.1.0 product metadata with feature list"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "pack-license-file",
+        "locator": "LICENSE.txt"
+      },
+      "licenseFacts": {
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "License permits use in games, apps, and client projects and bars standalone redistribution of source files; it is silent on attribution, so no attribution requirement appears in local terms."
+      },
+      "shippingPosture": "derived-technique-only",
+      "capabilityIds": [
+        "CAP-004",
+        "CAP-018",
+        "CAP-021"
+      ],
+      "overlapGroupIds": [
+        "OVL-001"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-002",
+          "fit": "Dark-fantasy HUD meters and sliders match the roguelike's status surface needs."
+        }
+      ],
+      "disposition": "defer"
+    },
+    {
+      "id": "pixel-combat-text-status-fx-kit",
+      "displayName": "Pixel Combat Text & Status FX Kit",
+      "snapshot": {
+        "fileCount": 578,
+        "totalBytes": 1252886,
+        "extensionCounts": {
+          ".gif": 1,
+          ".gpl": 1,
+          ".html": 1,
+          ".json": 50,
+          ".md": 3,
+          ".ora": 1,
+          ".png": 518,
+          ".py": 2,
+          ".txt": 1
+        },
+        "digest": "sha256:11057ad944f3a128f65d22358fc8b038164e06f2426d43ef9b2563870d039236"
+      },
+      "sourceKinds": [
+        "visual-source",
+        "editable-source",
+        "data-recipe",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 0,
+        "scripts": 0,
+        "dataFiles": 50,
+        "images": 519,
+        "audioFiles": 0,
+        "editableSources": 1
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "52 combat glyphs, 40 status icons, 10 callouts, 10 impact effects, and event/motion/priority presets"
+        },
+        {
+          "path": "LICENSE.txt",
+          "proves": "Unlimited project use granted; standalone redistribution and extraction-enabling products prohibited; credit optional"
+        },
+        {
+          "path": "IMPORT_GUIDE.md",
+          "proves": "Per-engine import settings including web/canvas"
+        },
+        {
+          "path": "START_HERE.html",
+          "proves": "Runnable offline preset builder and asset browser"
+        },
+        {
+          "path": "presets/combat_feedback_presets.json",
+          "proves": "Event-to-presentation mappings with priority, color, motion, and stacking"
+        },
+        {
+          "path": "VALIDATION_REPORT.json",
+          "proves": "Machine-verified pack QA report"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "pack-license-file",
+        "locator": "LICENSE.txt"
+      },
+      "licenseFacts": {
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "License permits use in any number of projects and bars redistribution as standalone files or packs; attribution appreciated but not required."
+      },
+      "shippingPosture": "derived-technique-only",
+      "capabilityIds": [
+        "CAP-005",
+        "CAP-006"
+      ],
+      "overlapGroupIds": [],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-001",
+          "fit": "Combat callouts, status ticks, and priority presets feed Vector Vortex's polish pass vocabulary."
+        }
+      ],
+      "disposition": "reference-lab-candidate"
+    },
+    {
+      "id": "progression-system-complete",
+      "displayName": "Progression System Complete (bundle snapshot one)",
+      "snapshot": {
+        "fileCount": 41,
+        "totalBytes": 388198,
+        "extensionCounts": {
+          ".css": 1,
+          ".html": 20,
+          ".js": 13,
+          ".json": 2,
+          ".md": 4,
+          ".webp": 1
+        },
+        "digest": "sha256:a08b30a385dc87a0224cfbedcf3b435a720a6ec84750d6c4b61ca6e1aac39eac"
+      },
+      "sourceKinds": [
+        "interactive-code",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 20,
+        "stylesheets": 1,
+        "scripts": 13,
+        "dataFiles": 2,
+        "images": 1,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "17 self-contained progression templates: skill trees, idle loops, quest boards, reward chests, settings, saves, notifications"
+        },
+        {
+          "path": "neon-ui-notifications-pack/README.md",
+          "proves": "Toast, banner, and badge notification component pack with source split"
+        },
+        {
+          "path": "securesave-pro/README.md",
+          "proves": "Save manager with settings manager and scene integration"
+        },
+        {
+          "path": "securesave-pro/export-metadata.json",
+          "proves": "Provenance metadata for the save system"
+        },
+        {
+          "path": "neon-reward-chest-system/index.html",
+          "proves": "Runnable animated reward chest reveal"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "none-found",
+        "locator": null
+      },
+      "licenseFacts": {
+        "finishedProductUse": "unclear",
+        "sourceRedistribution": "unclear",
+        "attribution": "unclear",
+        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+      },
+      "shippingPosture": "license-review-required",
+      "capabilityIds": [
+        "CAP-001",
+        "CAP-003",
+        "CAP-014",
+        "CAP-019"
+      ],
+      "overlapGroupIds": [
+        "OVL-003",
+        "OVL-004",
+        "OVL-005",
+        "OVL-011"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-004",
+          "fit": "An idle arcade composes these skill trees, upgrade panels, and reward presentations directly."
+        }
+      ],
+      "disposition": "license-review-required"
+    },
+    {
+      "id": "quest-journal-codex-ui-kit",
+      "displayName": "Quest Journal + Codex UI Kit",
+      "snapshot": {
+        "fileCount": 136,
+        "totalBytes": 5517653,
+        "extensionCounts": {
+          ".css": 1,
+          ".html": 1,
+          ".json": 4,
+          ".md": 1,
+          ".png": 86,
+          ".svg": 43
+        },
+        "digest": "sha256:261617fd81f521e661d84649f1bd479d15ba466f6a2c5a627e2da77f4cf9403f"
+      },
+      "sourceKinds": [
+        "visual-source",
+        "layout-manifest",
+        "data-recipe"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 1,
+        "scripts": 0,
+        "dataFiles": 4,
+        "images": 129,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "Fantasy quest journal and lore codex scope with palette and engine hints"
+        },
+        {
+          "path": "manifest.json",
+          "proves": "Import metadata with suggested 9-slice margins including tooltip and toast surfaces"
+        },
+        {
+          "path": "templates/quest_journal_layout.json",
+          "proves": "Composed journal screen coordinate reference"
+        },
+        {
+          "path": "templates/codex_entry_layout.json",
+          "proves": "Codex entry layout reference"
+        },
+        {
+          "path": "tokens/design_tokens.json",
+          "proves": "Design tokens as JSON beside CSS"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "none-found",
+        "locator": null
+      },
+      "licenseFacts": {
+        "finishedProductUse": "unclear",
+        "sourceRedistribution": "unclear",
+        "attribution": "unclear",
+        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+      },
+      "shippingPosture": "license-review-required",
+      "capabilityIds": [
+        "CAP-001",
+        "CAP-009",
+        "CAP-017"
+      ],
+      "overlapGroupIds": [],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-002",
+          "fit": "A roguelike's quest log and bestiary codex map onto the journal and entry layouts."
+        }
+      ],
+      "disposition": "license-review-required"
+    },
+    {
+      "id": "runic-fantasy-ui-tabs",
+      "displayName": "Runic Fantasy UI Tabs (cleaned product)",
+      "snapshot": {
+        "fileCount": 9,
+        "totalBytes": 93636,
+        "extensionCounts": {
+          ".css": 1,
+          ".html": 1,
+          ".js": 2,
+          ".json": 1,
+          ".md": 2,
+          ".png": 1,
+          ".txt": 1
+        },
+        "digest": "sha256:ea2c66b715c96323b5d65586638df27658a72b6193cda13a4bd90d64f511442f"
+      },
+      "sourceKinds": [
+        "interactive-code",
+        "layout-manifest",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 1,
+        "scripts": 2,
+        "dataFiles": 1,
+        "images": 1,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "ARIA tab behavior, keyboard navigation (arrows, Home, End, Enter, Space), three themes, and three layouts"
+        },
+        {
+          "path": "LICENSE.txt",
+          "proves": "Use and modification in projects granted; raw package redistribution prohibited; credit optional"
+        },
+        {
+          "path": "index.html",
+          "proves": "Runnable demo of every tab layout and state"
+        },
+        {
+          "path": "tabs.js",
+          "proves": "Reusable tab behavior exposed as a global init function"
+        },
+        {
+          "path": "styles/site.css",
+          "proves": "Complete fantasy tab styling driven by CSS variables"
+        },
+        {
+          "path": "manifest.json",
+          "proves": "Packaged product manifest"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "pack-license-file",
+        "locator": "LICENSE.txt"
+      },
+      "licenseFacts": {
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "License permits use in games, apps, and client work including integrated redistribution, barring only the raw unmodified package; credit optional."
+      },
+      "shippingPosture": "derived-technique-only",
+      "capabilityIds": [
+        "CAP-002"
+      ],
+      "overlapGroupIds": [
+        "OVL-002"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-002",
+          "fit": "Inventory, equipment, and quest panels in a roguelike shell need exactly this tab behavior."
+        },
+        {
+          "candidateId": "GC-004",
+          "fit": "Idle progression panels (upgrades, skills, settings) organize under one tab set."
+        }
+      ],
+      "disposition": "standalone-spec-candidate"
+    },
+    {
+      "id": "runic-relic-rpg-icons-144",
+      "displayName": "Runic Relic RPG Icons 144",
+      "snapshot": {
+        "fileCount": 731,
+        "totalBytes": 22645451,
+        "extensionCounts": {
+          ".css": 1,
+          ".html": 1,
+          ".json": 3,
+          ".md": 2,
+          ".png": 578,
+          ".svg": 145,
+          ".txt": 1
+        },
+        "digest": "sha256:c8eccdd66a69e87e90a800843fd0d225532adc55870ba0cd941abeef1fae541c"
+      },
+      "sourceKinds": [
+        "visual-source",
+        "data-recipe",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 1,
+        "scripts": 0,
+        "dataFiles": 3,
+        "images": 723,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "144 SVG icons in six categories with PNG exports at four sizes and atlas metadata"
+        },
+        {
+          "path": "LICENSE.txt",
+          "proves": "Royalty-free purchaser license permitting commercial shipping; raw-file redistribution barred"
+        },
+        {
+          "path": "manifest.json",
+          "proves": "Import metadata for icons and atlas"
+        },
+        {
+          "path": "tokens/design_tokens.json",
+          "proves": "Icon palette tokens as data"
+        },
+        {
+          "path": "preview/preview.html",
+          "proves": "Runnable icon preview page"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "pack-license-file",
+        "locator": "LICENSE.txt"
+      },
+      "licenseFacts": {
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "License grants use, modification, and shipping in commercial games and bars raw-file redistribution; it is silent on attribution, so no attribution requirement appears in local terms."
+      },
+      "shippingPosture": "derived-technique-only",
+      "capabilityIds": [
+        "CAP-016"
+      ],
+      "overlapGroupIds": [
+        "OVL-007"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-002",
+          "fit": "Engraved relic medallions give a roguelike's shops and tooltips a readable second icon style."
+        }
+      ],
+      "disposition": "defer"
+    },
+    {
+      "id": "skill-progression-system-complete",
+      "displayName": "Skill Progression System Complete (bundle snapshot two)",
+      "snapshot": {
+        "fileCount": 41,
+        "totalBytes": 392050,
+        "extensionCounts": {
+          ".css": 1,
+          ".html": 21,
+          ".js": 13,
+          ".json": 2,
+          ".md": 3,
+          ".webp": 1
+        },
+        "digest": "sha256:2c17e1fe8f5e6cd4ec4af6ee90821ca73381d7f69b34685ed553eec415e08135"
+      },
+      "sourceKinds": [
+        "interactive-code"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 21,
+        "stylesheets": 1,
+        "scripts": 13,
+        "dataFiles": 2,
+        "images": 1,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "neon-skill-ui-pack/index.html",
+          "proves": "Runnable skill tree node and connector UI demo"
+        },
+        {
+          "path": "neon-ui-notifications-pack/README.md",
+          "proves": "Notification component pack carried between bundle snapshots"
+        },
+        {
+          "path": "neon-settings-menu-css/index.html",
+          "proves": "Runnable CSS settings menu demo"
+        },
+        {
+          "path": "secure-save-pro/README.md",
+          "proves": "Save and settings manager system with scene integration"
+        },
+        {
+          "path": "neon-reward-chest-system/index.html",
+          "proves": "Runnable reward chest reveal carried between snapshots"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "none-found",
+        "locator": null
+      },
+      "licenseFacts": {
+        "finishedProductUse": "unclear",
+        "sourceRedistribution": "unclear",
+        "attribution": "unclear",
+        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+      },
+      "shippingPosture": "license-review-required",
+      "capabilityIds": [
+        "CAP-001",
+        "CAP-003",
+        "CAP-014",
+        "CAP-019"
+      ],
+      "overlapGroupIds": [
+        "OVL-003",
+        "OVL-004",
+        "OVL-005",
+        "OVL-011"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-004",
+          "fit": "The newer bundle snapshot supplies the same progression surfaces for an idle arcade."
+        }
+      ],
+      "disposition": "license-review-required"
+    },
+    {
+      "id": "tiny-save-settings-menu-starter",
+      "displayName": "Tiny Save / Settings Menu Starter",
+      "snapshot": {
+        "fileCount": 24,
+        "totalBytes": 2558490,
+        "extensionCounts": {
+          ".css": 1,
+          ".html": 2,
+          ".js": 3,
+          ".md": 7,
+          ".png": 6,
+          ".svg": 4,
+          ".txt": 1
+        },
+        "digest": "sha256:3b7c9ec39a4223379db31bf0e792bc92f821b34ae6908d460908066fa6a4bfc3"
+      },
+      "sourceKinds": [
+        "interactive-code",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 2,
+        "stylesheets": 1,
+        "scripts": 3,
+        "dataFiles": 0,
+        "images": 10,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "Four-tab overlay (save slots, settings, controls, data) persisted to a single local key"
+        },
+        {
+          "path": "LICENSE.txt",
+          "proves": "Use in free and commercial games granted; standalone template redistribution barred; credit optional"
+        },
+        {
+          "path": "index.html",
+          "proves": "Runnable demo of all four tabs"
+        },
+        {
+          "path": "app.js",
+          "proves": "Demo wiring with persistence and tab switching"
+        },
+        {
+          "path": "styles.css",
+          "proves": "Menu overlay and tab panel styling"
+        },
+        {
+          "path": "templates/html-integration-snippet.html",
+          "proves": "Integration template for common patterns"
+        },
+        {
+          "path": "docs/",
+          "proves": "Integration and usage documentation set"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "pack-license-file",
+        "locator": "LICENSE.txt"
+      },
+      "licenseFacts": {
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "License permits use in commercial games and bars sharing the starter source as a standalone template; credit appreciated but not required."
+      },
+      "shippingPosture": "derived-technique-only",
+      "capabilityIds": [
+        "CAP-002",
+        "CAP-003",
+        "CAP-004"
+      ],
+      "overlapGroupIds": [
+        "OVL-011"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-001",
+          "fit": "Vector Vortex's settings and best-score persistence mirror this starter's shape."
+        },
+        {
+          "candidateId": "GC-005",
+          "fit": "A high-score arcade needs exactly this small save/settings overlay."
+        },
+        {
+          "candidateId": "GC-006",
+          "fit": "Save-slot browsing and controls display serve the visual novel migration."
+        },
+        {
+          "candidateId": "GC-004",
+          "fit": "An idle arcade's settings and save overlay mirrors this starter."
+        }
+      ],
+      "disposition": "standalone-spec-candidate"
+    },
+    {
+      "id": "tiny-ui-sfx-pack",
+      "displayName": "Tiny UI SFX Pack (64 procedural WAV)",
+      "snapshot": {
+        "fileCount": 150,
+        "totalBytes": 5517801,
+        "extensionCounts": {
+          ".css": 1,
+          ".html": 1,
+          ".js": 3,
+          ".json": 3,
+          ".md": 7,
+          ".png": 6,
+          ".svg": 64,
+          ".txt": 1,
+          ".wav": 64
+        },
+        "digest": "sha256:96b0cf615c0bf1a4554eb6de81975c0fa4110a849a1dc86978510e3804fc3a1e"
+      },
+      "sourceKinds": [
+        "audio-source",
+        "data-recipe",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 1,
+        "scripts": 3,
+        "dataFiles": 3,
+        "images": 70,
+        "audioFiles": 64,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "64 procedural WAV effects across 8 UI categories with recipe sources and no third-party samples"
+        },
+        {
+          "path": "tiny-ui-sfx-pack/LICENSE.txt",
+          "proves": "Use in commercial projects granted; standalone pack redistribution barred; credit optional"
+        },
+        {
+          "path": "tiny-ui-sfx-pack/README.md",
+          "proves": "Original product readme"
+        },
+        {
+          "path": "tiny-ui-sfx-pack/data/sfx-index.json",
+          "proves": "Full metadata index for all 64 sounds"
+        },
+        {
+          "path": "tiny-ui-sfx-pack/source/sfx-recipes.json",
+          "proves": "Deterministic procedural generation recipes"
+        },
+        {
+          "path": "tiny-ui-sfx-pack/templates/ui-sound-map.json",
+          "proves": "Recommended sound-to-event mapping"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "pack-license-file",
+        "locator": "tiny-ui-sfx-pack/LICENSE.txt"
+      },
+      "licenseFacts": {
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "License permits use in commercial games and bars giving away the source pack; attribution appreciated but not required."
+      },
+      "shippingPosture": "derived-technique-only",
+      "capabilityIds": [
+        "CAP-013"
+      ],
+      "overlapGroupIds": [
+        "OVL-008"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-001",
+          "fit": "Vector Vortex's synthesized UI audio can adopt the category mapping and level discipline."
+        },
+        {
+          "candidateId": "GC-005",
+          "fit": "Menu and score-table feedback sounds for a small arcade."
+        }
+      ],
+      "disposition": "hold-for-consumer"
+    },
+    {
+      "id": "ui-feedback-sfx-pack-v2",
+      "displayName": "UI Feedback SFX Pack v2 (Template Foundry)",
+      "snapshot": {
+        "fileCount": 211,
+        "totalBytes": 2823697,
+        "extensionCounts": {
+          ".css": 1,
+          ".csv": 1,
+          ".html": 1,
+          ".js": 4,
+          ".json": 5,
+          ".md": 6,
+          ".ogg": 64,
+          ".svg": 64,
+          ".txt": 1,
+          ".wav": 64
+        },
+        "digest": "sha256:02544128638ed6144df6f5f14ad694d98de03d8d90bf78354db0a2bc72570999"
+      },
+      "sourceKinds": [
+        "audio-source",
+        "data-recipe",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 1,
+        "scripts": 4,
+        "dataFiles": 5,
+        "images": 64,
+        "audioFiles": 128,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "64 synthetic designs with WAV and OGG exports, category-aware mastering, and JSON/CSV indexes"
+        },
+        {
+          "path": "LICENSE.txt",
+          "proves": "Template Foundry license granting project use and team sharing while barring marketplace and repository upload"
+        },
+        {
+          "path": "package.json",
+          "proves": "Packaged build with its own manifest"
+        },
+        {
+          "path": "preview.html",
+          "proves": "Runnable offline audition page"
+        },
+        {
+          "path": "data/",
+          "proves": "Index and metadata data set"
+        },
+        {
+          "path": "source/",
+          "proves": "Deterministic source recipes and build script"
+        },
+        {
+          "path": "docs/USAGE.md",
+          "proves": "Category map and mixing guidance"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "pack-license-file",
+        "locator": "LICENSE.txt"
+      },
+      "licenseFacts": {
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "License permits use in commercial projects and bars upload to marketplaces or public repositories; attribution appreciated but not required."
+      },
+      "shippingPosture": "derived-technique-only",
+      "capabilityIds": [
+        "CAP-013"
+      ],
+      "overlapGroupIds": [
+        "OVL-008"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-001",
+          "fit": "Vector Vortex's audio mapping candidates can adopt the category level discipline."
+        },
+        {
+          "candidateId": "GC-005",
+          "fit": "Broad UI feedback coverage for a classic arcade shell."
+        }
+      ],
+      "disposition": "hold-for-consumer"
+    },
+    {
+      "id": "ui-rpg-cards",
+      "displayName": "UI RPG Cards (Aseprite sheets)",
+      "snapshot": {
+        "fileCount": 6,
+        "totalBytes": 86425,
+        "extensionCounts": {
+          ".aseprite": 3,
+          ".png": 3
+        },
+        "digest": "sha256:7730acd1cc48c4ec47bf81d053d8f06e0db8044ff8fc5ffef50225c25d8c6b43"
+      },
+      "sourceKinds": [
+        "visual-source",
+        "editable-source"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": false,
+        "htmlDocuments": 0,
+        "stylesheets": 0,
+        "scripts": 0,
+        "dataFiles": 0,
+        "images": 3,
+        "audioFiles": 0,
+        "editableSources": 3
+      },
+      "evidence": [
+        {
+          "path": ".",
+          "proves": "Six-file Aseprite+PNG sheet set covering cards, buttons, and banners with no documentation or terms"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "none-found",
+        "locator": null
+      },
+      "licenseFacts": {
+        "finishedProductUse": "unclear",
+        "sourceRedistribution": "unclear",
+        "attribution": "unclear",
+        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+      },
+      "shippingPosture": "license-review-required",
+      "capabilityIds": [
+        "CAP-011",
+        "CAP-012"
+      ],
+      "overlapGroupIds": [
+        "OVL-009"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-003",
+          "fit": "Sheet-level button and banner art complements a deckbuilder's card frames."
+        }
+      ],
+      "disposition": "license-review-required"
+    },
+    {
+      "id": "ui-tabs-fantasy-html5-tabs-pack",
+      "displayName": "Runic Tab-Craft (raw Rosebud export)",
+      "snapshot": {
+        "fileCount": 5,
+        "totalBytes": 41876,
+        "extensionCounts": {
+          ".css": 1,
+          ".html": 1,
+          ".js": 2,
+          ".json": 1
+        },
+        "digest": "sha256:f541331d9294624a9f78df4cd71294159b7009ed93eeae722c037a4b40cfb770"
+      },
+      "sourceKinds": [
+        "interactive-code"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 1,
+        "scripts": 2,
+        "dataFiles": 1,
+        "images": 0,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "export-metadata.json",
+          "proves": "Rosebud platform provenance (project Runic Tab-Craft, April 2026 export)"
+        },
+        {
+          "path": "index.html",
+          "proves": "Runnable tab demo entry"
+        },
+        {
+          "path": "tabs.js",
+          "proves": "Tab behavior script predating the cleaned product"
+        },
+        {
+          "path": "styles/",
+          "proves": "Fantasy tab styling directory carried from the export"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "none-found",
+        "locator": null
+      },
+      "licenseFacts": {
+        "finishedProductUse": "unclear",
+        "sourceRedistribution": "unclear",
+        "attribution": "unclear",
+        "note": "The raw export carries no terms; the cleaned twin runic-fantasy-ui-tabs ships a license that may govern the family."
+      },
+      "shippingPosture": "license-review-required",
+      "capabilityIds": [
+        "CAP-002"
+      ],
+      "overlapGroupIds": [
+        "OVL-002"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-002",
+          "fit": "Same tab surfaces as its cleaned twin; cited for provenance rather than preference."
+        }
+      ],
+      "disposition": "license-review-required"
+    },
+    {
+      "id": "ui-theme-dark-fantasy",
+      "displayName": "Obsidian Grimoire UI (raw Rosebud export)",
+      "snapshot": {
+        "fileCount": 10,
+        "totalBytes": 383159,
+        "extensionCounts": {
+          ".css": 1,
+          ".html": 1,
+          ".js": 1,
+          ".json": 1,
+          ".webp": 6
+        },
+        "digest": "sha256:d442b58ef82dd6b79ee36ae0d47c5fd421ae52d536efdff12424f03ecc0e699a"
+      },
+      "sourceKinds": [
+        "interactive-code",
+        "visual-source"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 1,
+        "scripts": 1,
+        "dataFiles": 1,
+        "images": 6,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "export-metadata.json",
+          "proves": "Rosebud provenance under the name Obsidian Grimoire UI (March 2026 export)"
+        },
+        {
+          "path": "index.html",
+          "proves": "Runnable demo entry"
+        },
+        {
+          "path": "main.js",
+          "proves": "Demo wiring"
+        },
+        {
+          "path": "style.css",
+          "proves": "Dark fantasy status bar and slider styling"
+        },
+        {
+          "path": "assets/",
+          "proves": "Six WebP UI assets including orbs and ornate border"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "none-found",
+        "locator": null
+      },
+      "licenseFacts": {
+        "finishedProductUse": "unclear",
+        "sourceRedistribution": "unclear",
+        "attribution": "unclear",
+        "note": "The raw export carries no terms; the packaged twin obsidian-grimoire-ui ships a license that may govern the family."
+      },
+      "shippingPosture": "license-review-required",
+      "capabilityIds": [
+        "CAP-018",
+        "CAP-021"
+      ],
+      "overlapGroupIds": [
+        "OVL-001"
+      ],
+      "bestGameConsumers": [
+        {
+          "candidateId": "GC-002",
+          "fit": "Same dark-fantasy HUD surfaces as its packaged twin; cited for provenance rather than preference."
+        }
+      ],
+      "disposition": "license-review-required"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "CAP-001",
+      "name": "Notification region",
+      "purpose": "A stacking toast and banner region that renders queued game events with per-type icons, timing, and merge rules.",
+      "lanes": [
+        "game-driven",
+        "independent-module"
+      ],
+      "destination": "core",
+      "readiness": "ready-to-spec",
+      "contributions": [
+        {
+          "packId": "achievement-toast-notification-system-html5",
+          "note": "docs/api-reference.md and src/achievement-toast-system.js define the region API, stacking, and merge behavior"
+        },
+        {
+          "packId": "progression-system-complete",
+          "note": "neon-ui-notifications-pack/README.md documents toast, banner, and badge variants as components"
+        },
+        {
+          "packId": "skill-progression-system-complete",
+          "note": "neon-ui-notifications-pack/README.md carries the same component split into the newer snapshot"
+        },
+        {
+          "packId": "quest-journal-codex-ui-kit",
+          "note": "manifest.json lists toast among its 9-sliced chrome surfaces"
+        }
+      ],
+      "interactionAccessibility": {
+        "keyboard": "Region is passive; any action inside a toast must remain reachable through the page's focus order",
+        "focus": "Toast stack must not trap focus; hover-pause needs a focus equivalent",
+        "announcement": "Polite live-region semantics for incoming events; assertive reserved for warnings",
+        "motion": "Entry and exit motion must respect reduced-motion preferences"
+      },
+      "sourceBoundary": {
+        "derivable": "Stacking limits, per-type icon mapping, duplicate-key merge semantics, edge positioning, timing constants, and the live-region announcement contract",
+        "notCopyable": "The pack's JavaScript class, CSS rules, SVG icon sprites, preset JSON payloads, and marketing copy"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-001",
+        "GC-005"
+      ],
+      "missingEvidence": "Nothing structural; only the Vector Vortex backport decision determines whether the framework or the game-local candidate owns the first implementation."
+    },
+    {
+      "id": "CAP-002",
+      "name": "Tab set",
+      "purpose": "An accessible tab list that switches between panel regions with full keyboard traversal and theme-independent structure.",
+      "lanes": [
+        "independent-module",
+        "game-driven"
+      ],
+      "destination": "core",
+      "readiness": "ready-to-spec",
+      "contributions": [
+        {
+          "packId": "runic-fantasy-ui-tabs",
+          "note": "README.md and tabs.js document ARIA roles, arrow/Home/End/Enter/Space traversal, disabled states, and three layouts"
+        },
+        {
+          "packId": "ui-tabs-fantasy-html5-tabs-pack",
+          "note": "index.html and tabs.js preserve the pre-cleanup export for provenance"
+        },
+        {
+          "packId": "tiny-save-settings-menu-starter",
+          "note": "README.md documents the four-tab overlay composition"
+        }
+      ],
+      "interactionAccessibility": {
+        "keyboard": "Arrow-key traversal with Home and End jumps; activation on Enter and Space or on focus per mode",
+        "focus": "Roving tabindex on the tab list; panels remain in the page's focus order",
+        "announcement": "Tab and tabpanel roles with selected state and labelled panels"
+      },
+      "sourceBoundary": {
+        "derivable": "The keyboard traversal contract, roving tabindex behavior, disabled and hidden panel semantics, and layout variants",
+        "notCopyable": "The pack's tabs.js implementation, CSS fantasy styling, theme variables, and demo markup"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-002",
+        "GC-004"
+      ],
+      "missingEvidence": "Vector Vortex Spec 02 builds a game-local three-tab settings surface; the backport map decides whether its traversal choices reconcile here."
+    },
+    {
+      "id": "CAP-003",
+      "name": "Save and settings screen",
+      "purpose": "A modal screen composing save-slot browsing, settings groups, controls display, and data import or export.",
+      "lanes": [
+        "independent-module"
+      ],
+      "destination": "module",
+      "readiness": "ready-to-spec",
+      "contributions": [
+        {
+          "packId": "tiny-save-settings-menu-starter",
+          "note": "README.md documents four tabs, slot count, quick-save, rebindable display, and JSON data portability"
+        },
+        {
+          "packId": "progression-system-complete",
+          "note": "securesave-pro/README.md documents the save and settings manager split"
+        },
+        {
+          "packId": "skill-progression-system-complete",
+          "note": "secure-save-pro/README.md and neon-settings-menu-css/index.html carry the same systems into the newer snapshot"
+        }
+      ],
+      "interactionAccessibility": {
+        "keyboard": "Full keyboard operation of the overlay including slot actions and confirmations",
+        "focus": "Focus trapped inside the open screen and restored on close",
+        "announcement": "Save and load outcomes announced through the notification region semantics"
+      },
+      "sourceBoundary": {
+        "derivable": "Screen composition, tab grouping, slot states, and the boundary where consumer persistence adapters plug in",
+        "notCopyable": "The packs' JavaScript modules, LocalStorage key schemes, styling, and Phaser scene code"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-001",
+        "GC-005",
+        "GC-006"
+      ],
+      "missingEvidence": "The persistence adapter contract needs one consumer decision (key versioning and migration policy) before the module spec freezes."
+    },
+    {
+      "id": "CAP-004",
+      "name": "Settings input primitives",
+      "purpose": "Toggle, slider, and select controls tuned for settings surfaces with consistent state and value announcement.",
+      "lanes": [
+        "independent-module"
+      ],
+      "destination": "core",
+      "readiness": "ready-to-spec",
+      "contributions": [
+        {
+          "packId": "tiny-save-settings-menu-starter",
+          "note": "README.md documents audio sliders, display options, and gameplay toggles"
+        },
+        {
+          "packId": "neon-ui-mega-bundle",
+          "note": "toggles-and-switches/index.html and ui-sliders-and-bars/index.html demo the control variants"
+        },
+        {
+          "packId": "obsidian-grimoire-ui",
+          "note": "README.md and index.html document custom fantasy sliders"
+        }
+      ],
+      "interactionAccessibility": {
+        "keyboard": "Sliders step by arrow keys with Home and End bounds; toggles activate on Space",
+        "focus": "Visible focus on every control; no pointer-only state changes",
+        "announcement": "Value changes announced with units for volume-type settings"
+      },
+      "sourceBoundary": {
+        "derivable": "Control state inventories, value ranges, step behavior, and theming hooks",
+        "notCopyable": "The packs' CSS implementations, glow styling, and JavaScript wiring"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-004",
+        "GC-005"
+      ],
+      "missingEvidence": "Only the decision whether the meter primitive or a new slider primitive owns the range-input family."
+    },
+    {
+      "id": "CAP-005",
+      "name": "Combat feedback recipes",
+      "purpose": "A data vocabulary that pairs combat events with hitstop, shake, flash, popup, VFX, and sound responses.",
+      "lanes": [
+        "reference-lab",
+        "game-driven"
+      ],
+      "destination": "reference-lab",
+      "readiness": "ready-to-spec",
+      "contributions": [
+        {
+          "packId": "impact-juice-combat-polish-bundle",
+          "note": "data/combat_feedback_recipes.json, feedback_event_schema.json, and camera_shake_curves.json express timing and pairing as data"
+        },
+        {
+          "packId": "pixel-combat-text-status-fx-kit",
+          "note": "presets/combat_feedback_presets.json maps events to priority, color, motion, and stacking"
+        }
+      ],
+      "interactionAccessibility": {
+        "motion": "Shake and hitstop must be reducible without changing the game digest; reduced-motion substitutes are part of the vocabulary",
+        "audio": "Every paired sound needs a silent fallback path",
+        "playfield": "Feedback must not obscure the playfield's critical state"
+      },
+      "sourceBoundary": {
+        "derivable": "The event taxonomy, timing vocabulary, pairing structure, and priority stacking rules",
+        "notCopyable": "The packs' JSON payload values as a redistributable preset library, SVG/PNG sheets, WAV files, and generator sources"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-001"
+      ],
+      "missingEvidence": "A lab rendering is needed to check the vocabulary against the framework's token and motion rules before any runtime module is proposed."
+    },
+    {
+      "id": "CAP-006",
+      "name": "Combat text and status FX presentation",
+      "purpose": "Floating combat text callouts and status icon presentation with frame timing, scale, and stacking behavior.",
+      "lanes": [
+        "reference-lab",
+        "game-driven"
+      ],
+      "destination": "reference-lab",
+      "readiness": "ready-to-spec",
+      "contributions": [
+        {
+          "packId": "pixel-combat-text-status-fx-kit",
+          "note": "README.md documents 10 callouts at 8 frames, 10 impact effects, and 80ms frame timing"
+        },
+        {
+          "packId": "impact-juice-combat-polish-bundle",
+          "note": "README.md documents popup text assets and upward-drift spawn behavior"
+        }
+      ],
+      "interactionAccessibility": {
+        "motion": "Drift and scale must flatten under reduced motion while preserving the message",
+        "announcement": "Combat callouts are decorative; the underlying events need separate text equivalents",
+        "playfield": "Stacking rules prevent callout pileups over the player"
+      },
+      "sourceBoundary": {
+        "derivable": "Frame timing, stacking limits, priority ordering, and the event-to-callout mapping structure",
+        "notCopyable": "The pixel glyph sheets, status icon art, atlas JSON, and OpenRaster sources"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-001"
+      ],
+      "missingEvidence": "Whether the framework renders callouts as DOM chrome over the playfield or leaves them to the consumer renderer; the lab answers it."
+    },
+    {
+      "id": "CAP-007",
+      "name": "Map and minimap chrome",
+      "purpose": "Panel frames, markers, legend drawers, and coordinate bars for world maps and minimaps without owning map data.",
+      "lanes": [
+        "independent-module",
+        "game-driven"
+      ],
+      "destination": "module",
+      "readiness": "needs-license-review",
+      "contributions": [
+        {
+          "packId": "explorer-map-ui-pack",
+          "note": "README.md lists the 16-marker set and chrome surfaces; manifest.json carries 9-slice margins for map panels"
+        }
+      ],
+      "interactionAccessibility": {
+        "keyboard": "Marker and legend navigation needs a list alternative to pointer panning",
+        "focus": "Markers must expose reachable focus targets",
+        "announcement": "Region and marker labels announced on traversal",
+        "pointer": "Pan and zoom need keyboard and reduced-motion paths"
+      },
+      "sourceBoundary": {
+        "derivable": "Chrome component inventory, marker taxonomy, and the boundary where consumer world data plugs in",
+        "notCopyable": "The pack's SVG art, PNG exports, palette values as files, and manifest payloads"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-002"
+      ],
+      "missingEvidence": "The only composited evidence source defers its terms to a purchase page; a second independent source or recorded terms is needed."
+    },
+    {
+      "id": "CAP-008",
+      "name": "Equipment compare surface",
+      "purpose": "Side-by-side item comparison columns with stat delta rows, requirement and set-bonus cards, and slot sockets.",
+      "lanes": [
+        "game-driven"
+      ],
+      "destination": "module",
+      "readiness": "needs-license-review",
+      "contributions": [
+        {
+          "packId": "equipment-compare-ui-pack",
+          "note": "README.md and templates/equipment_compare_layout.json document the comparison columns and delta rows as a composed screen"
+        }
+      ],
+      "interactionAccessibility": {
+        "keyboard": "Compare surfaces must be readable as tables or lists, not pointer-only layouts",
+        "announcement": "Delta direction and magnitude announced per stat row"
+      },
+      "sourceBoundary": {
+        "derivable": "Column composition, delta row semantics, and requirement presentation structure",
+        "notCopyable": "The pack's SVG components, PNG exports, token files, and layout manifest payloads"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-002"
+      ],
+      "missingEvidence": "Purchase-page terms for the only deep source, plus one live consumer to prove the layout under real item data."
+    },
+    {
+      "id": "CAP-009",
+      "name": "Quest journal and codex",
+      "purpose": "A journal screen composing quest entries, objectives, completion states, and a lore codex with searchable entries.",
+      "lanes": [
+        "game-driven",
+        "independent-module"
+      ],
+      "destination": "module",
+      "readiness": "needs-license-review",
+      "contributions": [
+        {
+          "packId": "quest-journal-codex-ui-kit",
+          "note": "README.md and templates/quest_journal_layout.json plus codex_entry_layout.json compose both screens"
+        }
+      ],
+      "interactionAccessibility": {
+        "keyboard": "Entry lists and search fields fully keyboard operable",
+        "focus": "Entry selection reflected in focus and reading order",
+        "announcement": "Completion state changes announced"
+      },
+      "sourceBoundary": {
+        "derivable": "Entry structure, objective states, and codex organization semantics",
+        "notCopyable": "The kit's SVG art, PNG exports, tokens, and layout manifests"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-002"
+      ],
+      "missingEvidence": "A second independent source and recorded terms; one kit cannot freeze a module contract."
+    },
+    {
+      "id": "CAP-010",
+      "name": "Inventory grid and rarity",
+      "purpose": "A slot grid with drag and drop, stacking, equipment binding, and rarity-tier presentation.",
+      "lanes": [
+        "game-driven"
+      ],
+      "destination": "module",
+      "readiness": "needs-license-review",
+      "contributions": [
+        {
+          "packId": "inventory-grid-grabber-html5",
+          "note": "README.md and inventory.js document beginner drag, drop, and stacking behavior"
+        },
+        {
+          "packId": "inventory-loot-and-legend-inventory-pro",
+          "note": "README.md documents equipment slots, rarity coding, filter and sort, and tooltips"
+        },
+        {
+          "packId": "equipment-compare-ui-pack",
+          "note": "README.md documents eight rarity slot variants as components"
+        }
+      ],
+      "interactionAccessibility": {
+        "keyboard": "Grid navigation by arrow keys with select, move, and drop actions",
+        "focus": "Slot focus visible and ordered; drag has a keyboard equivalent",
+        "announcement": "Item name, rarity, and count announced on focus",
+        "pointer": "Pointer drag must duplicate a keyboard move flow"
+      },
+      "sourceBoundary": {
+        "derivable": "Grid semantics, move and stack rules as UI behavior, rarity presentation hooks, and filter surface",
+        "notCopyable": "Both packs' JavaScript logic, CSS, item art, and loot table payloads"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-002"
+      ],
+      "missingEvidence": "Every source sits in a license-unclear pack; terms or operator posture must be recorded before the module spec."
+    },
+    {
+      "id": "CAP-011",
+      "name": "Rarity tier vocabulary",
+      "purpose": "An ordered tier scale above the status family, shared by slots, cards, and compare surfaces.",
+      "lanes": [
+        "independent-module"
+      ],
+      "destination": "foundations",
+      "readiness": "ready-to-spec",
+      "contributions": [
+        {
+          "packId": "gilded-grove-alchemy-card-pack",
+          "note": "README.md documents five front frames from common to legendary"
+        },
+        {
+          "packId": "equipment-compare-ui-pack",
+          "note": "README.md documents eight slot variants including the rarity ladder"
+        },
+        {
+          "packId": "inventory-loot-and-legend-inventory-pro",
+          "note": "README.md documents rarity color coding"
+        },
+        {
+          "packId": "card-system-pixel",
+          "note": "cards-rpg/ separates card families that pair with rarity tiers"
+        },
+        {
+          "packId": "ui-rpg-cards",
+          "note": "The sheet set provides a third independent card source"
+        }
+      ],
+      "interactionAccessibility": {
+        "announcement": "Tier must never be color-only; a name travels with every tiered item"
+      },
+      "sourceBoundary": {
+        "derivable": "Tier count, ordering, and naming as a token family with non-color differentiators",
+        "notCopyable": "Each pack's rarity color values as files, frame art, gems, and token payloads"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-003",
+        "GC-002"
+      ],
+      "missingEvidence": "Charter gates the tier scale on three independent sources; five now exist, so only the vocabulary freeze decision remains."
+    },
+    {
+      "id": "CAP-012",
+      "name": "Card frame system",
+      "purpose": "Card frames, cost badges, hand layouts, and deck viewer surfaces for card-driven games.",
+      "lanes": [
+        "game-driven"
+      ],
+      "destination": "module",
+      "readiness": "needs-game-proof",
+      "contributions": [
+        {
+          "packId": "gilded-grove-alchemy-card-pack",
+          "note": "README.md documents frames, cost badges, rarity gems, and deckbuilder pieces with layout templates"
+        },
+        {
+          "packId": "card-system-pixel",
+          "note": "modular-cards/ and opening-animations/ provide modular frames and reveal sequences"
+        },
+        {
+          "packId": "ui-rpg-cards",
+          "note": "The sheet set supplies button and banner companions for card UI"
+        }
+      ],
+      "interactionAccessibility": {
+        "keyboard": "Hand and deck navigation by keyboard with selection states",
+        "focus": "Card focus visible in fan and grid layouts",
+        "announcement": "Card name, cost, and tier announced together"
+      },
+      "sourceBoundary": {
+        "derivable": "Frame anatomy, cost placement, hand fan structure, and reveal sequencing as behavior",
+        "notCopyable": "All card art, Aseprite sources, atlases, and prefab metadata"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-003"
+      ],
+      "missingEvidence": "No consumer game exercises a card loop yet; the deckbuilder candidate supplies the pressure."
+    },
+    {
+      "id": "CAP-013",
+      "name": "UI feedback audio mapping",
+      "purpose": "A sound-to-event mapping discipline covering categories, levels, and pairing rules for UI feedback.",
+      "lanes": [
+        "reference-lab"
+      ],
+      "destination": "consumer-recipe",
+      "readiness": "needs-game-proof",
+      "contributions": [
+        {
+          "packId": "tiny-ui-sfx-pack",
+          "note": "tiny-ui-sfx-pack/templates/ui-sound-map.json maps sounds to UI events across 8 categories"
+        },
+        {
+          "packId": "ui-feedback-sfx-pack-v2",
+          "note": "README.md and docs/USAGE.md document category-aware mastering levels and mixing guidance"
+        },
+        {
+          "packId": "impact-juice-combat-polish-bundle",
+          "note": "data/combat_feedback_recipes.json pairs SFX with combat events"
+        },
+        {
+          "packId": "moonlit-pact-vn-gui-kit-renpy",
+          "note": "README.md documents 12 VN UI SFX with waveform previews"
+        }
+      ],
+      "interactionAccessibility": {
+        "audio": "Every audible cue needs a visual equivalent; volume and mute states are first-class"
+      },
+      "sourceBoundary": {
+        "derivable": "Category taxonomy, level discipline, pairing rules, and the integration recipe shape",
+        "notCopyable": "All WAV and OGG exports, recipe payloads, build scripts, and waveform previews"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-001",
+        "GC-005"
+      ],
+      "missingEvidence": "The framework ships no audio runtime by charter; a consumer recipe needs one game to prove the mapping end to end."
+    },
+    {
+      "id": "CAP-014",
+      "name": "Skill tree and progression UI",
+      "purpose": "Node and connector presentation for skill trees and upgrade panels with unlock, affordability, and path states.",
+      "lanes": [
+        "game-driven"
+      ],
+      "destination": "module",
+      "readiness": "needs-game-proof",
+      "contributions": [
+        {
+          "packId": "progression-system-complete",
+          "note": "README.md indexes skill tree, upgrade, and merge templates across the bundle"
+        },
+        {
+          "packId": "skill-progression-system-complete",
+          "note": "neon-skill-ui-pack/index.html renders node and connector components"
+        }
+      ],
+      "interactionAccessibility": {
+        "keyboard": "Tree traversal by keyboard across connector paths",
+        "focus": "Node state (locked, affordable, owned) visible at focus",
+        "announcement": "Node names with prerequisite and cost context announced",
+        "motion": "Unlock effects reducible without losing state change signal"
+      },
+      "sourceBoundary": {
+        "derivable": "Node state inventory, connector visualization, and traversal semantics",
+        "notCopyable": "Bundle HTML/CSS implementations and any progression rules or save formats"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-004"
+      ],
+      "missingEvidence": "Progression rules are game territory; an idle or RPG consumer must prove which presentation parts are reusable."
+    },
+    {
+      "id": "CAP-015",
+      "name": "VN dialogue and choices",
+      "purpose": "Dialogue boxes, nameplates, choice buttons, and quick menus for narrative games.",
+      "lanes": [
+        "game-driven"
+      ],
+      "destination": "module",
+      "readiness": "defer",
+      "contributions": [
+        {
+          "packId": "moonlit-pact-vn-gui-kit-renpy",
+          "note": "README.md documents dialogue boxes, choice buttons, nameplates, and save slots across three themes"
+        }
+      ],
+      "interactionAccessibility": {
+        "keyboard": "Choice selection and history navigation by keyboard",
+        "focus": "Choice focus visible against varied backgrounds",
+        "announcement": "Dialogue text flows through the reading order; auto-advance is interruptible"
+      },
+      "sourceBoundary": {
+        "derivable": "Dialogue surface composition, choice semantics, and nameplate structure",
+        "notCopyable": "The kit's SVG/PNG GUI art, Ren'Py snippets, and SFX"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-006"
+      ],
+      "missingEvidence": "Charter defers the dialogue module until Within Parameters completes its delivery sequence; this is sequencing, not evidence."
+    },
+    {
+      "id": "CAP-016",
+      "name": "Icon taxonomy and sizing",
+      "purpose": "A category taxonomy and size ladder for game icons tied to the charter's chrome and content icon families.",
+      "lanes": [
+        "reference-lab"
+      ],
+      "destination": "reference-lab",
+      "readiness": "needs-game-proof",
+      "contributions": [
+        {
+          "packId": "runic-relic-rpg-icons-144",
+          "note": "README.md documents six categories at 64 to 512 px with SVG sources"
+        },
+        {
+          "packId": "neon-rpg-icon-pack",
+          "note": "README.md documents five slot-sized categories"
+        }
+      ],
+      "interactionAccessibility": {
+        "announcement": "Icons carry labels or accessible names; nothing is icon-only"
+      },
+      "sourceBoundary": {
+        "derivable": "Category coverage, size ladder, and readability thresholds",
+        "notCopyable": "All icon art, atlases, and token files from both packs"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-002"
+      ],
+      "missingEvidence": "The charter froze icon geometry; what is missing is a consumer proving which categories a real game needs."
+    },
+    {
+      "id": "CAP-017",
+      "name": "Tooltip and stat deltas",
+      "purpose": "Hover and focus tooltips carrying item stats, requirement gates, and comparison deltas.",
+      "lanes": [
+        "game-driven",
+        "independent-module"
+      ],
+      "destination": "core",
+      "readiness": "needs-license-review",
+      "contributions": [
+        {
+          "packId": "equipment-compare-ui-pack",
+          "note": "templates/tooltip_hud_layout.json composes a tooltip HUD screen"
+        },
+        {
+          "packId": "inventory-loot-and-legend-inventory-pro",
+          "note": "README.md documents tooltip display alongside the inventory grid"
+        },
+        {
+          "packId": "quest-journal-codex-ui-kit",
+          "note": "manifest.json includes a 9-sliced tooltip surface"
+        }
+      ],
+      "interactionAccessibility": {
+        "keyboard": "Tooltips appear on focus, not only hover",
+        "focus": "Tooltip content reachable or fully announced",
+        "announcement": "Delta rows announce direction and value",
+        "pointer": "Dismiss and pin affordances work without pointer dependence"
+      },
+      "sourceBoundary": {
+        "derivable": "Tooltip trigger semantics, placement rules, and delta row structure",
+        "notCopyable": "The packs' tooltip art, layout manifests, and styling"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-002"
+      ],
+      "missingEvidence": "All three citing sources are license-unclear; terms must be recorded before the primitive spec cites them."
+    },
+    {
+      "id": "CAP-018",
+      "name": "Meter and status bar family",
+      "purpose": "Segmented and continuous meters for health, experience, and resource display with critical states.",
+      "lanes": [
+        "independent-module"
+      ],
+      "destination": "core",
+      "readiness": "ready-to-spec",
+      "contributions": [
+        {
+          "packId": "obsidian-grimoire-ui",
+          "note": "README.md and index.html document health, mana, and XP bars with a critical-health state"
+        },
+        {
+          "packId": "ui-theme-dark-fantasy",
+          "note": "style.css carries the export-era status bar styling for comparison"
+        },
+        {
+          "packId": "neon-ui-mega-bundle",
+          "note": "ui-sliders-and-bars/index.html demos health, XP, and progress variants"
+        }
+      ],
+      "interactionAccessibility": {
+        "announcement": "Meter values exposed as text; critical state never color-only",
+        "motion": "Fill animation flattens under reduced motion"
+      },
+      "sourceBoundary": {
+        "derivable": "Meter variants, segmentation rules, critical thresholds, and label affordances",
+        "notCopyable": "Both packs' CSS, orb art, and demo scripts"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-002",
+        "GC-004"
+      ],
+      "missingEvidence": "The framework already proves a meter primitive; only the extension set (segmented, dual, critical) needs freezing."
+    },
+    {
+      "id": "CAP-019",
+      "name": "Idle reward presentation",
+      "purpose": "Daily boards, reward chests, and upgrade lists as presentation patterns for idle and live-game economies.",
+      "lanes": [
+        "game-driven"
+      ],
+      "destination": "game-only",
+      "readiness": "needs-game-proof",
+      "contributions": [
+        {
+          "packId": "progression-system-complete",
+          "note": "README.md indexes daily quest boards and reward chest systems"
+        },
+        {
+          "packId": "skill-progression-system-complete",
+          "note": "neon-reward-chest-system/index.html renders the chest reveal in the newer snapshot"
+        }
+      ],
+      "interactionAccessibility": {
+        "keyboard": "Claim and reveal actions keyboard operable",
+        "announcement": "Reward outcomes announced in text",
+        "motion": "Reveal sequences reducible without hiding the reward"
+      },
+      "sourceBoundary": {
+        "derivable": "Presentation sequencing and state surfaces only",
+        "notCopyable": "All bundle HTML/CSS and any economy rules, timers, or save formats"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-004"
+      ],
+      "missingEvidence": "Economy rules, timers, and persistence are game territory by definition; only a real idle consumer can say what UI survives."
+    },
+    {
+      "id": "CAP-020",
+      "name": "Neon theme technique",
+      "purpose": "Dark-base neon glow technique for the arcade theme family.",
+      "lanes": [
+        "reference-lab"
+      ],
+      "destination": "theme",
+      "readiness": "defer",
+      "contributions": [
+        {
+          "packId": "neon-ui-mega-bundle",
+          "note": "README.md documents the shared dark base and six-color CSS-variable palette across five packs"
+        }
+      ],
+      "interactionAccessibility": {
+        "motion": "Glow pulsing must respect reduced motion",
+        "announcement": "Glow is never the only state signal"
+      },
+      "sourceBoundary": {
+        "derivable": "Glow layering and palette structure as technique",
+        "notCopyable": "The bundle's CSS implementations and demo markup"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-004",
+        "GC-005"
+      ],
+      "missingEvidence": "Nothing pending: the shipped arcade theme already absorbed this technique; the pack remains reference material."
+    },
+    {
+      "id": "CAP-021",
+      "name": "Dark fantasy theme technique",
+      "purpose": "Parchment, brass, and ornamental border technique for the fantasy theme family.",
+      "lanes": [
+        "reference-lab"
+      ],
+      "destination": "theme",
+      "readiness": "defer",
+      "contributions": [
+        {
+          "packId": "obsidian-grimoire-ui",
+          "note": "README.md and assets/ document the ornate border and panel technique the zero-raster spike replaced"
+        },
+        {
+          "packId": "ui-theme-dark-fantasy",
+          "note": "style.css and assets/ carry the export-era technique for comparison"
+        }
+      ],
+      "interactionAccessibility": {
+        "motion": "Ornamental animation must respect reduced motion"
+      },
+      "sourceBoundary": {
+        "derivable": "Border and texture construction as technique",
+        "notCopyable": "Both packs' WebP assets, CSS, and demo scripts"
+      },
+      "excludedConcerns": [
+        "game-rules",
+        "persistence-ownership",
+        "canvas-webgl-rendering",
+        "vendor-specific-styling"
+      ],
+      "bestGameConsumers": [
+        "GC-002"
+      ],
+      "missingEvidence": "Nothing pending: the fantasy theme and zero-raster spike already absorbed this technique."
+    }
+  ],
+  "overlapGroups": [
+    {
+      "id": "OVL-001",
+      "relationship": "version-family",
+      "description": "Two snapshots of the Obsidian Grimoire product: a raw March 2026 Rosebud export and the packaged 1.1.0 product that carries license and docs.",
+      "packIds": [
+        "obsidian-grimoire-ui",
+        "ui-theme-dark-fantasy"
+      ],
+      "evidence": [
+        {
+          "packId": "obsidian-grimoire-ui",
+          "path": "export-metadata.json",
+          "proves": "Packaged product metadata naming the product and version"
+        },
+        {
+          "packId": "ui-theme-dark-fantasy",
+          "path": "export-metadata.json",
+          "proves": "Rosebud export under the same product name one revision earlier"
+        }
+      ]
+    },
+    {
+      "id": "OVL-002",
+      "relationship": "version-family",
+      "description": "Two snapshots of the fantasy tabs product: the raw Runic Tab-Craft Rosebud export and the cleaned upload that ships license, manifest, and docs.",
+      "packIds": [
+        "runic-fantasy-ui-tabs",
+        "ui-tabs-fantasy-html5-tabs-pack"
+      ],
+      "evidence": [
+        {
+          "packId": "runic-fantasy-ui-tabs",
+          "path": "README.md",
+          "proves": "Describes itself as the cleaned upload with branding and helper scripts removed"
+        },
+        {
+          "packId": "ui-tabs-fantasy-html5-tabs-pack",
+          "path": "export-metadata.json",
+          "proves": "Rosebud export metadata naming the project Runic Tab-Craft"
+        }
+      ]
+    },
+    {
+      "id": "OVL-003",
+      "relationship": "version-family",
+      "description": "Two snapshots of the progression bundle with 15 shared sub-pack names and version drift (for example idle-factory v2 versus v4 and clicker3 versus clicker-3).",
+      "packIds": [
+        "progression-system-complete",
+        "skill-progression-system-complete"
+      ],
+      "evidence": [
+        {
+          "packId": "progression-system-complete",
+          "path": "README.md",
+          "proves": "Sub-pack index including v2-generation names"
+        },
+        {
+          "packId": "skill-progression-system-complete",
+          "path": "neon-skill-ui-pack/index.html",
+          "proves": "Newer-generation sub-pack naming within the same family"
+        }
+      ]
+    },
+    {
+      "id": "OVL-004",
+      "relationship": "duplicate",
+      "description": "The mega-bundle sliders-and-bars pack and its standalone variant carried inside both progression bundles.",
+      "packIds": [
+        "neon-ui-mega-bundle",
+        "progression-system-complete",
+        "skill-progression-system-complete"
+      ],
+      "evidence": [
+        {
+          "packId": "neon-ui-mega-bundle",
+          "path": "ui-sliders-and-bars/index.html",
+          "proves": "Original slider and bar demo in the bundle"
+        },
+        {
+          "packId": "progression-system-complete",
+          "path": "README.md",
+          "proves": "Index entry describes its sliders-and-bars pack as the standalone variant of the mega-bundle pack"
+        }
+      ]
+    },
+    {
+      "id": "OVL-005",
+      "relationship": "complementary-source",
+      "description": "Independent notification implementations at different depths: a documented drop-in system and component-level notification packs.",
+      "packIds": [
+        "achievement-toast-notification-system-html5",
+        "progression-system-complete",
+        "skill-progression-system-complete"
+      ],
+      "evidence": [
+        {
+          "packId": "achievement-toast-notification-system-html5",
+          "path": "README.md",
+          "proves": "Full drop-in system with API docs and presets"
+        },
+        {
+          "packId": "progression-system-complete",
+          "path": "neon-ui-notifications-pack/README.md",
+          "proves": "Component-level toast, banner, and badge split"
+        }
+      ]
+    },
+    {
+      "id": "OVL-006",
+      "relationship": "complementary-source",
+      "description": "Two inventory systems explicitly cross-referenced as beginner and advanced counterparts.",
+      "packIds": [
+        "inventory-grid-grabber-html5",
+        "inventory-loot-and-legend-inventory-pro"
+      ],
+      "evidence": [
+        {
+          "packId": "inventory-grid-grabber-html5",
+          "path": "README.md",
+          "proves": "Related-documents section names the advanced inventory as the next step up"
+        },
+        {
+          "packId": "inventory-loot-and-legend-inventory-pro",
+          "path": "README.md",
+          "proves": "Describes itself as the full-featured counterpart to the beginner grid-grabber"
+        }
+      ]
+    },
+    {
+      "id": "OVL-007",
+      "relationship": "complementary-source",
+      "description": "Two RPG icon sets where the engraved SVG pack positions itself against the neon PNG set.",
+      "packIds": [
+        "neon-rpg-icon-pack",
+        "runic-relic-rpg-icons-144"
+      ],
+      "evidence": [
+        {
+          "packId": "runic-relic-rpg-icons-144",
+          "path": "README.md",
+          "proves": "Markets itself as the warm engraved alternative to neon PNG-only icon sets"
+        },
+        {
+          "packId": "neon-rpg-icon-pack",
+          "path": "README.md",
+          "proves": "The neon PNG set it references, with matching category coverage"
+        }
+      ]
+    },
+    {
+      "id": "OVL-008",
+      "relationship": "complementary-source",
+      "description": "Two procedural UI SFX products with parallel category systems and index metadata.",
+      "packIds": [
+        "tiny-ui-sfx-pack",
+        "ui-feedback-sfx-pack-v2"
+      ],
+      "evidence": [
+        {
+          "packId": "tiny-ui-sfx-pack",
+          "path": "tiny-ui-sfx-pack/data/sfx-index.json",
+          "proves": "64-sound index across 8 categories"
+        },
+        {
+          "packId": "ui-feedback-sfx-pack-v2",
+          "path": "README.md",
+          "proves": "64 designs across 8 categories with JSON and CSV indexes"
+        }
+      ]
+    },
+    {
+      "id": "OVL-009",
+      "relationship": "complementary-source",
+      "description": "Three independent card sources (SVG product, pixel Aseprite family, Aseprite sheet set) that together evidence the ordered tier scale.",
+      "packIds": [
+        "card-system-pixel",
+        "gilded-grove-alchemy-card-pack",
+        "ui-rpg-cards"
+      ],
+      "evidence": [
+        {
+          "packId": "gilded-grove-alchemy-card-pack",
+          "path": "README.md",
+          "proves": "Five rarity frames from common to legendary"
+        },
+        {
+          "packId": "card-system-pixel",
+          "path": "cards-rpg/",
+          "proves": "Independent pixel card family source"
+        },
+        {
+          "packId": "ui-rpg-cards",
+          "path": ".",
+          "proves": "A third sheet-level card source"
+        }
+      ]
+    },
+    {
+      "id": "OVL-011",
+      "relationship": "complementary-source",
+      "description": "Save and settings implementations converging from the starter menu and the save or settings systems carried inside both bundle snapshots.",
+      "packIds": [
+        "progression-system-complete",
+        "skill-progression-system-complete",
+        "tiny-save-settings-menu-starter"
+      ],
+      "evidence": [
+        {
+          "packId": "tiny-save-settings-menu-starter",
+          "path": "README.md",
+          "proves": "Four-tab save and settings overlay"
+        },
+        {
+          "packId": "progression-system-complete",
+          "path": "securesave-pro/README.md",
+          "proves": "Independent save and settings manager system"
+        },
+        {
+          "packId": "skill-progression-system-complete",
+          "path": "secure-save-pro/README.md",
+          "proves": "The same system family in the newer snapshot"
+        }
+      ]
+    }
+  ],
+  "gameCandidates": [
+    {
+      "id": "GC-001",
+      "name": "Vector Vortex",
+      "status": "in-flight",
+      "complexity": "moderate",
+      "engineCapability": "Rotated Canvas playfield with topology shifts, deterministic fixed-tick loop, and seeded runs (Specs 01 through 03)",
+      "gameuiPressure": "Wireframe shell, HUD strip, three-tab settings, pause and run-ended flow, feedback events, notifications, and audio mapping (Specs 02 and 03)",
+      "supportingPackIds": [
+        "achievement-toast-notification-system-html5",
+        "impact-juice-combat-polish-bundle",
+        "pixel-combat-text-status-fx-kit",
+        "tiny-save-settings-menu-starter",
+        "tiny-ui-sfx-pack",
+        "ui-feedback-sfx-pack-v2"
+      ],
+      "expectedSpecs": "Currently in Specs 02 and 03; any GameUI backport is one separately approved spec afterward",
+      "risk": "Mid-spec repin is prohibited; game-local candidates must finish before backport reconciliation"
+    },
+    {
+      "id": "GC-002",
+      "name": "Rogue Cellar Crawl",
+      "status": "candidate",
+      "complexity": "moderate",
+      "engineCapability": "Canvas 2D tile roguelike with field-of-view, turn scheduling, and item generation",
+      "gameuiPressure": "Canvas host chrome, inventory grid with rarity tiers, equipment compare, tooltips, minimap, quest log, and save slots",
+      "supportingPackIds": [
+        "equipment-compare-ui-pack",
+        "explorer-map-ui-pack",
+        "inventory-grid-grabber-html5",
+        "inventory-loot-and-legend-inventory-pro",
+        "neon-rpg-icon-pack",
+        "obsidian-grimoire-ui",
+        "quest-journal-codex-ui-kit",
+        "runic-fantasy-ui-tabs",
+        "runic-relic-rpg-icons-144",
+        "ui-tabs-fantasy-html5-tabs-pack",
+        "ui-theme-dark-fantasy"
+      ],
+      "expectedSpecs": "Two to three specs mirroring the Vector Vortex arc: core playable, shell and UI, then polish",
+      "risk": "Its strongest evidence sits in license-unclear packs, so terms posture gates the module specs"
+    },
+    {
+      "id": "GC-003",
+      "name": "Alchemy Deck Run",
+      "status": "candidate",
+      "complexity": "moderate",
+      "engineCapability": "Card draw and play loop with animated card transitions on DOM or Canvas",
+      "gameuiPressure": "Card frames with rarity tiers, hand fan, deck viewer, and reward selection",
+      "supportingPackIds": [
+        "card-system-pixel",
+        "gilded-grove-alchemy-card-pack",
+        "ui-rpg-cards"
+      ],
+      "expectedSpecs": "Two specs: core card play, then deck UI polish",
+      "risk": "The tier vocabulary must freeze first, and card animation belongs to the consumer renderer"
+    },
+    {
+      "id": "GC-004",
+      "name": "Neon Idle Arcade",
+      "status": "candidate",
+      "complexity": "low",
+      "engineCapability": "Tick-driven economy simulation with prestige reset",
+      "gameuiPressure": "Meters, sliders, upgrade lists, skill tree, notifications, and settings",
+      "supportingPackIds": [
+        "achievement-toast-notification-system-html5",
+        "neon-ui-mega-bundle",
+        "progression-system-complete",
+        "runic-fantasy-ui-tabs",
+        "skill-progression-system-complete",
+        "tiny-save-settings-menu-starter"
+      ],
+      "expectedSpecs": "Two specs",
+      "risk": "Progression rules dominate; much of the UI repeats already-proven primitives, so framework novelty is lowest"
+    },
+    {
+      "id": "GC-005",
+      "name": "High-Score Arcade",
+      "status": "candidate",
+      "complexity": "low",
+      "engineCapability": "Fixed-screen deterministic arcade loop with score state",
+      "gameuiPressure": "Title and pause shell, settings, name entry, high-score table, and toasts",
+      "supportingPackIds": [
+        "achievement-toast-notification-system-html5",
+        "neon-ui-mega-bundle",
+        "tiny-save-settings-menu-starter",
+        "tiny-ui-sfx-pack",
+        "ui-feedback-sfx-pack-v2"
+      ],
+      "expectedSpecs": "One to two specs",
+      "risk": "Little new UI beyond what Vector Vortex already exercises"
+    },
+    {
+      "id": "GC-006",
+      "name": "Within Parameters migration",
+      "status": "candidate",
+      "complexity": "moderate",
+      "engineCapability": "Existing visual novel engine; migration onto framework modules only",
+      "gameuiPressure": "Dialogue panel, choices, dossier, route tracker, and save slots",
+      "supportingPackIds": [
+        "moonlit-pact-vn-gui-kit-renpy",
+        "tiny-save-settings-menu-starter"
+      ],
+      "expectedSpecs": "Deferred by charter until the current delivery sequence completes",
+      "risk": "Charter-frozen sequencing; the dialogue module must not start early"
+    }
+  ]
+}

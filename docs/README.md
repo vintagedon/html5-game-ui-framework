@@ -47,6 +47,10 @@ docs/
 ├── foundations-review-2026-08-02.md  # Closed Phase 1 decisions
 ├── harness-review-2026-08-05.md     # H-001 through H-006 decisions
 ├── project-charter.md              # Frozen scope, architecture, acceptance criteria
+├── reference-corpus/               # UI pack catalog and capability map (public-derived)
+│   ├── ui-pack-inventory.json
+│   ├── ui-pack-capability-map.md
+│   └── README.md
 ├── token-reference.md              # Frozen semantic vocabulary and tier boundaries
 └── README.md                       # This file
 ```
@@ -70,6 +74,7 @@ docs/
 | Directory | Description |
 |-----------|-------------|
 | [documentation-standards/](documentation-standards/README.md) | Template library for READMEs, KB articles, charters, one-pagers, script headers, and guidelines |
+| [reference-corpus/](reference-corpus/README.md) | Tracked catalog and ranked capability map derived from the gitignored `reference-files-ui/` corpus; facts and technique only, never pack source |
 
 ---
 

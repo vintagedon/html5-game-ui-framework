@@ -10,7 +10,9 @@
     "build": "npm run validate && npm run metrics",
     "playwright": "playwright test --config harness/runner/playwright.config.js",
     "test": "node --test harness/tests/*.test.js && npm run validate && npm run playwright && npm run metrics",
-    "capture": "node --test harness/tests/*.test.js && npm run validate && GC_CAPTURE=1 npm run playwright && npm run metrics"
+    "capture": "node --test harness/tests/*.test.js && npm run validate && GC_CAPTURE=1 npm run playwright && npm run metrics",
+    "corpus:test": "node --test harness/tests/reference-corpus.test.js",
+    "corpus:audit": "node scripts/reference-corpus/audit-ui-packs.mjs"
   },
   "license": "MIT",
   "devDependencies": {
