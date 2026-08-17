@@ -3,8 +3,8 @@
 title: "Reference Corpus Scripts"
 description: "Scanner, validator, and source-audit tooling for the UI pack catalog"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-16"
-version: "1.0"
+date: "2026-08-17"
+version: "1.1"
 status: "Active"
 tags:
   - type: directory-readme
@@ -42,7 +42,7 @@ scripts/reference-corpus/
 | File | Description | Status |
 |------|-------------|--------|
 | [corpus-scan.mjs](corpus-scan.mjs) | Walks a corpus root without following symbolic links or leaving it; computes per-pack and corpus counts, extension classes, runtime evidence, and digests | ✅ Active |
-| [validate-catalog.mjs](validate-catalog.mjs) | Validates a parsed catalog value: enums, stable IDs, canonical ordering, bidirectional references, license coherence, source-kind consistency, redaction rules, and the game-rule exclusion contract for core and module destinations | ✅ Active |
+| [validate-catalog.mjs](validate-catalog.mjs) | Validates a parsed catalog value: enums, stable IDs (pack ids are exact directory names and may carry version dots), canonical ordering, bidirectional references, license coherence under the operator-resolution model (facts are grounded in local terms or the recorded resolution; only genuinely unclear facts route to licence review), source-kind consistency, redaction rules, and the game-rule exclusion contract for core and module destinations | ✅ Active |
 | [audit-ui-packs.mjs](audit-ui-packs.mjs) | Compares the tracked catalog with the live private corpus one-for-one and verifies every cited evidence path exists | ✅ Active |
 
 ---
