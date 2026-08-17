@@ -155,6 +155,20 @@ Every pack carries at least one evidence-supported capability or an explicit rev
 
 Groups record relationships from evidence and do not merge or prefer one purchased source. Where a version family pairs a raw export with a cleaned product, both remain recorded and the family's license question is surfaced rather than silently resolved.
 
+### 4.1 Card-Source Framing and the Two-Treatment Intent (OVL-009)
+
+OVL-009 holds three independent, derived-technique-only card sources — `card-system-pixel` (pixel Aseprite family), `gilded-grove-alchemy-card-pack` (SVG product), and `ui-rpg-cards` (Aseprite sheet set) — which together clear the charter's three-source gate for a card frame family.
+
+**One component, two theme renderings.** The intended treatments are theme renderings of a single card component, not two components: a pixel treatment (arcade theme) and an alchemy treatment (fantasy theme), sharing one slot contract — energy, name, tier, item art, short description, and type or element. The slot contract is the component; the themes dress it.
+
+**Embedded shine reference.** `card-system-pixel` bundles an embedded card-shine and rainbow animation effect (from argametina, not a separately listed pack). It is recorded as a card-shine and holographic technique reference for the cards module, studied as technique only.
+
+**Zero-raster posture.** All card treatments are recreated in CSS and inline SVG and ship no pack raster. The pixel treatment renders pixel-style element bands rather than reproducing any pack's illustrated backgrounds.
+
+### 4.2 Combat-Feedback Lab Deepening (OVL-010)
+
+`impact-signal-combat-feedback-pack` joins `impact-juice-combat-polish-bundle` and `pixel-combat-text-status-fx-kit` in OVL-010, mapping to CAP-005, CAP-006, and CAP-013. Its 20 cross-engine presets deepen the non-owning combat-feedback lab's evidence — per-event timing recipes with an accessibility block, floating-text timing, and paired stingers — without claiming any runtime module. The two private feel-test fixtures exist to exercise exactly this lab's questions (impact, timing, shake, hit-stop, readability) against animated actors and known button states, and are excluded from ranking and from every ranked lane.
+
 ## 5. Ranked Candidate Lanes
 
 Three lanes answer three different planning questions and are never collapsed into one master ranking: what a game should prove next (game-driven), what the framework can build without waiting (independent module), and what should be studied before either (reference lab). Rankings use seven rubric factors scored 0 to 3 — evidence depth, framework fit, real consumer pressure, interaction and accessibility value, licensing clarity, boundedness, and overlap safety — with the total shown per factor, never as an unexplained number. Tie-break order: higher total, then licensing clarity, then evidence depth, then ascending capability ID. Readiness `defer` entries are listed but not queueable.
@@ -194,6 +208,8 @@ The framework can specify these without a dispatched game, subject to the coordi
 | CAP-007 | Map and minimap chrome | 2 | 3 | 2 | 2 | 1 | 2 | 3 | 15 | ready-to-spec | explorer-map-ui-pack |
 | CAP-017 | Tooltip and stat deltas | 2 | 3 | 2 | 3 | 1 | 2 | 2 | 15 | ready-to-spec | equipment-compare-ui-pack, inventory-loot-and-legend-inventory-pro, quest-journal-codex-ui-kit |
 | CAP-009 | Quest journal and codex | 2 | 3 | 1 | 2 | 1 | 2 | 3 | 14 | ready-to-spec | quest-journal-codex-ui-kit |
+
+**The meter rung strengthened.** `8bit-rpg-bars-ui-pack` maps to CAP-018 with direct bar-shape evidence — segmented HP and MP meters, vertical bars, cast and boss bars, damage trails, pip strips, and a documented 9-slice modular parts system — strengthening the meter rung as the first ladder step. It deepens an existing capability rather than adding a new one; the rung was already queueable, and this evidence hardens it.
 
 ### 5.3 Reference lab candidates
 
