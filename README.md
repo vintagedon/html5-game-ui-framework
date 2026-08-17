@@ -79,6 +79,7 @@ approval manifest.
 | Repository hydration | ✅ Complete | Public baseline initialized on `main` |
 | Foundations | ✅ Complete | The 83-token semantic vocabulary, cascade contract, state recipes, and four themes are approved |
 | Zero-raster spike | ✅ Complete | Four dark-fantasy techniques render with zero framework raster files; the position holds |
+| Reference corpus | ✅ Complete | Catalog and capability map of the UI pack corpus; license posture resolved and the candidate-coordination rule adopted |
 | Harness | 🔄 Under Review | Harness hardening and preview publication are complete; five approval questions remain with the operator |
 | Core primitives | 🔄 Proof Set | Button, panel, input, and meter exist only to verify foundations |
 | Modules | ⬜ Planned | Composed from core; no module-to-module dependency |
@@ -117,12 +118,7 @@ html5-game-ui-framework/
 │   ├── reference-corpus/      # Catalog and capability map derived from the UI pack corpus
 │   └── token-reference.md     # Frozen semantic vocabulary
 ├── harness/                   # Registry, app, tests, runner, goldens, metrics, auditor
-├── internal-files/            # Ideation and source materials (gitignored)
 ├── reference/                 # Registry-driven reference application
-├── recycle-bin/               # Agent trash can (gitignored)
-├── reference-files-assets/    # Third-party art packs (gitignored, never redistributed)
-├── reference-files-games/     # Third-party game templates (gitignored)
-├── reference-files-ui/        # Third-party UI packs (gitignored)
 ├── scripts/                   # Corpus audit and research tooling (built-in Node APIs only)
 ├── src/                       # Framework and theme publication source
 │   ├── core/                  # Domain-neutral proof primitives
@@ -131,7 +127,6 @@ html5-game-ui-framework/
 │   ├── tokens/                # Primitive, semantic, and component tiers
 │   ├── gc.css                 # Public entry and cascade layer order
 │   └── gc.js                  # Public ESM entry; injects shared SVG defs
-├── staging/                   # Pre-commit staging area (gitignored)
 ├── .gitignore
 ├── .markdownlint.json         # Markdown lint configuration (tracked; project config)
 ├── cspell.json                # Spell-check dictionary (tracked; project config)

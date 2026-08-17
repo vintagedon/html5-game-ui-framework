@@ -5,7 +5,7 @@ description: "Ranked operator review surface derived from the UI reference corpu
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-08-16"
 version: "1.0"
-status: "Under Review"
+status: "Active"
 tags:
   - type: report
   - domain: [research, consumers]
@@ -30,6 +30,18 @@ This map is the operator decision surface for the private UI reference corpus. I
 2. If an independent framework module lands before a game dispatches, that game may pin and consume it.
 3. If a game has already started, it does not repin GameUI mid-spec. It finishes its game-local candidate, and later backport or reconciliation decides the framework result.
 4. Reference labs may proceed in parallel when they do not claim ownership of a runtime module under active development.
+
+---
+
+## Operator Resolutions (2026-08-16)
+
+The operator has answered the licensing and coordination questions. The remaining UIREF items are forward-queue choices, not blockers.
+
+- **UIREF-001 confirmed.** Licenses complete but silent on attribution are recorded as `attribution: not-supported`.
+- **UIREF-002 and the no-terms cluster resolved.** The operator holds the vendor terms for these packs externally (predominantly Template Factory / Foundry, whose terms permit derived products), and the framework's posture is derived-technique-only under a never-copy rule, so no pack source is ever redistributed. A missing local terms file therefore records that nothing was in the archive, not a restriction, and does not gate derived work. All corpus packs are cleared for derived-technique use; the thirteen packs previously marked `license-review-required` advance to `derived-technique-only`, and license review no longer gates CAP-007, CAP-008, CAP-009, CAP-010, or CAP-017. The one estate exception, an asset whose terms forbid derived products, is not part of this corpus.
+- **UIREF-008 adopted.** The coordination rule above is standing policy and is codified in the framework `AGENTS.md`.
+
+The §2 posture tables and §5 readiness cells below record the executor's original evidence audit; where they read `license-review-required` or `needs-license-review`, this resolution supersedes them for planning. UIREF-005, 006, 007, 009, and 010 remain open as the operator's next-queue choices.
 
 ---
 

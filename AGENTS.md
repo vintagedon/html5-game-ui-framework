@@ -50,8 +50,16 @@ These are non-negotiable. Each exists because violating it breaks something an a
 - **No raster assets in the framework or its themes.** Texture, ornament, and frames are produced with CSS and inline SVG. The framework raster count is a published metric and its correct value is zero.
 - **No module may depend on another module.** Modules compose core primitives. A primitive that two modules both need is promoted to core, never shared sideways.
 - **Frozen token names are API.** Renaming a semantic token is a major version. Values stay tunable until v1.0; the vocabulary does not. No hue-named tokens (`pink`), no domain-named tokens (`mana`, `hp`, `xp`).
-- **Harvest requirements and technique, never source.** Reference packs under `reference-files-*` may be read to learn what a component must do and how an effect is achieved. Their rule blocks, markup, and files are never copied into this repository. Their licences prohibit redistribution as a component library, and this repository is exactly that.
+- **Harvest requirements and technique, never source.** Reference packs under `reference-files-*` may be read to learn what a component must do and how an effect is achieved. Their rule blocks, markup, and files are never copied into this repository. Their licences prohibit redistribution as a component library, and this repository is exactly that. A pack with no local licence file records that no terms were in the archive, not that it is restricted; because nothing from a pack is redistributed, a missing terms file never gates derived-technique work. A pack whose terms forbid derived products is the one exception and is studied for nothing.
 - **A component without a registered scenario is incomplete.** Scenario registration ships in the same change as the component, not afterward.
+
+## Candidate Coordination
+
+A capability can originate in either track. It may start in a game and be backported when the game finishes, or start in the framework, feed a game that works out its kinks, and have the refined version backported later. Origin is not fixed; the framework and games are two independent tracks that meet only at backport.
+
+Backport is one-way and one-time. A game in flight pins the framework version it started on and rides it to completion; the framework never reaches into an active game, and a framework change never forces an update on a game already building. When a game finishes, or when a game surface is already mature enough to seed the framework, that result is reviewed once and folded in. There is no live sync and no mid-flight reconciliation.
+
+The single scheduling constraint is one owner at a time: two tracks do not actively iterate the same surface in parallel. A surface a game is currently proving is not also built in the framework until that game backports it; everything no live game is actively proving is free to build in the framework now. The capability map in `docs/reference-corpus/` applies this rule to its ranked lanes and queue.
 
 ## Documentation Conventions
 
