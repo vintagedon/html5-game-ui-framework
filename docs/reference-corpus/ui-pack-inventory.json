@@ -2,33 +2,108 @@
   "schemaVersion": 1,
   "sourceRoot": "reference-files-ui",
   "snapshot": {
-    "packCount": 24,
-    "fileCount": 5963,
-    "totalBytes": 197620622,
+    "packCount": 28,
+    "fileCount": 6407,
+    "totalBytes": 201459226,
     "extensionCounts": {
       ".aseprite": 33,
-      ".css": 18,
-      ".csv": 1,
+      ".cs": 1,
+      ".css": 20,
+      ".csv": 2,
+      ".gd": 1,
       ".gif": 2,
       ".gpl": 1,
-      ".html": 67,
+      ".html": 70,
       ".js": 52,
-      ".json": 111,
-      ".md": 68,
+      ".json": 119,
+      ".md": 77,
       ".ogg": 64,
       ".ora": 1,
-      ".png": 4414,
+      ".png": 4765,
       ".ps1": 2,
       ".py": 2,
       ".rpy": 2,
-      ".svg": 916,
-      ".txt": 11,
-      ".wav": 176,
+      ".svg": 969,
+      ".txt": 14,
+      ".wav": 188,
       ".webp": 22
     },
-    "corpusDigest": "sha256:08e35633a15eac784e09e80fe9ee88d3e9a84a6f0b3851d7abe38dcda69c5438"
+    "corpusDigest": "sha256:dc44ad604c7f5ba8ea9d399cbb556bcafccd8e377ebe7583ce93e6f89bc525a0"
   },
   "packs": [
+    {
+      "id": "8bit-rpg-bars-ui-pack",
+      "displayName": "8-bit RPG Bars UI Pack",
+      "snapshot": {
+        "fileCount": 170,
+        "totalBytes": 2960549,
+        "extensionCounts": {
+          ".css": 1,
+          ".html": 1,
+          ".json": 5,
+          ".md": 2,
+          ".png": 120,
+          ".svg": 40,
+          ".txt": 1
+        },
+        "digest": "sha256:2b182f0a7683fdbce1b122c749f73c99d463a278973b4fb27917830565527d6b"
+      },
+      "sourceKinds": [
+        "visual-source",
+        "layout-manifest",
+        "data-recipe",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 1,
+        "scripts": 0,
+        "dataFiles": 5,
+        "images": 160,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "35 reusable UI graphics: 16 bar and meter variants (segmented, vertical, cast, boss), 3 pip strips, 5 modular 9-slice parts, and 3 HUD panels"
+        },
+        {
+          "path": "manifest.json",
+          "proves": "Dimensions, paths, and metadata for every visual file, including the 8 px suggested 9-slice and the 4 px fill grid"
+        },
+        {
+          "path": "reference-layouts/",
+          "proves": "Two 1280x720 HUD placement references documenting asset paths, positions, and sizes as data recipes"
+        },
+        {
+          "path": "tokens/design_tokens.json",
+          "proves": "27-colour palette and layout values shipped as JSON/CSS design tokens"
+        },
+        {
+          "path": "LICENSE.txt",
+          "proves": "Template Foundry licence: commercial and non-commercial game use granted; raw-file redistribution prohibited"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "pack-license-file",
+        "locator": "LICENSE.txt"
+      },
+      "licenseFacts": {
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "Template Foundry licence grants use in commercial and non-commercial game projects and bars reselling or redistributing the raw files; silent on attribution (UIREF-001 interpretation)."
+      },
+      "shippingPosture": "derived-technique-only",
+      "capabilityIds": [
+        "CAP-018"
+      ],
+      "overlapGroupIds": [],
+      "bestGameConsumers": [],
+      "disposition": "standalone-spec-candidate"
+    },
     {
       "id": "achievement-toast-notification-system-html5",
       "displayName": "Achievement Toast + Notification System (HTML5)",
@@ -180,12 +255,12 @@
         "locator": null
       },
       "licenseFacts": {
-        "finishedProductUse": "unclear",
-        "sourceRedistribution": "unclear",
-        "attribution": "unclear",
-        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "No terms file ships in the archive; the operator resolution of 2026-08-16 (UIREF-002) holds the vendor terms externally and clears every corpus pack for derived-technique use under the never-copy rule. The missing file records absence, not a restriction."
       },
-      "shippingPosture": "license-review-required",
+      "shippingPosture": "derived-technique-only",
       "capabilityIds": [
         "CAP-011",
         "CAP-012"
@@ -199,7 +274,70 @@
           "fit": "A pixel-styled deckbuilder consumes these card families and modular frames directly."
         }
       ],
-      "disposition": "license-review-required"
+      "disposition": "hold-for-consumer"
+    },
+    {
+      "id": "emberguard-combat-pixel-pack",
+      "displayName": "Emberguard Combat Pixel Pack (private feel-test fixture)",
+      "snapshot": {
+        "fileCount": 143,
+        "totalBytes": 224045,
+        "extensionCounts": {
+          ".json": 1,
+          ".md": 2,
+          ".png": 139,
+          ".txt": 1
+        },
+        "digest": "sha256:f5ab10be2f837c2542252e0fb21260276f7f5bab6dce64e7d325ce74d2bc7e87"
+      },
+      "sourceKinds": [
+        "visual-source",
+        "data-recipe",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": false,
+        "htmlDocuments": 0,
+        "stylesheets": 0,
+        "scripts": 0,
+        "dataFiles": 1,
+        "images": 139,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "Four animated 32x32 combat characters with idle, movement, attack, hurt, and death-style rows, plus FX sheets, weapon icons, tiles, and UI combat icons"
+        },
+        {
+          "path": "metadata/manifest.json",
+          "proves": "Spritesheet manifest with frame sizes, animation rows, anchors, and direction notes for every actor and FX sheet"
+        },
+        {
+          "path": "LICENSE.txt",
+          "proves": "Practical Asset License: free and commercial game use granted; reselling the pack as a standalone asset pack prohibited"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "pack-license-file",
+        "locator": "LICENSE.txt"
+      },
+      "licenseFacts": {
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "Practical Asset License grants use in free and commercial games, prototypes, and jams and bars reselling the pack as a standalone asset pack; silent on attribution (UIREF-001 interpretation)."
+      },
+      "shippingPosture": "derived-technique-only",
+      "testFixture": {
+        "classification": "private-test-only-non-ranking",
+        "reason": "Private, test-only fixture: supplies animated actors, hurt and death states, weapons, and impact targets for feel-testing combat impact, timing, shake, hit-stop, and readability without building throwaway fixtures. Catalogued so the one-for-one audit has a record; not a framework candidate and never ranked."
+      },
+      "capabilityIds": [],
+      "overlapGroupIds": [],
+      "bestGameConsumers": [],
+      "disposition": "defer"
     },
     {
       "id": "equipment-compare-ui-pack",
@@ -259,12 +397,12 @@
         "locator": "README.md"
       },
       "licenseFacts": {
-        "finishedProductUse": "unclear",
-        "sourceRedistribution": "unclear",
-        "attribution": "unclear",
-        "note": "The README licence section defers all terms to the product's itch.io purchase page and states the archive adds nothing; the terms themselves are not in the pack."
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "The README defers all terms to the itch.io purchase page; the operator resolution of 2026-08-16 (UIREF-002) holds those vendor terms externally and clears the pack for derived-technique use under the never-copy rule."
       },
-      "shippingPosture": "license-review-required",
+      "shippingPosture": "derived-technique-only",
       "capabilityIds": [
         "CAP-008",
         "CAP-010",
@@ -278,7 +416,7 @@
           "fit": "Rogue Cellar's loot decisions need the compare columns, stat-delta rows, and rarity slots this pack composes."
         }
       ],
-      "disposition": "license-review-required"
+      "disposition": "game-driven-candidate"
     },
     {
       "id": "explorer-map-ui-pack",
@@ -334,12 +472,12 @@
         "locator": "README.md"
       },
       "licenseFacts": {
-        "finishedProductUse": "unclear",
-        "sourceRedistribution": "unclear",
-        "attribution": "unclear",
-        "note": "No terms text exists in the pack; the README scope and folder layout cannot substitute for the purchase-page terms."
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "The README defers all terms to the itch.io purchase page; the operator resolution of 2026-08-16 (UIREF-002) holds those vendor terms externally and clears the pack for derived-technique use under the never-copy rule."
       },
-      "shippingPosture": "license-review-required",
+      "shippingPosture": "derived-technique-only",
       "capabilityIds": [
         "CAP-007"
       ],
@@ -350,7 +488,7 @@
           "fit": "Rogue Cellar's dungeon overlay needs minimap frames, markers, and a legend drawer without world-data coupling."
         }
       ],
-      "disposition": "license-review-required"
+      "disposition": "game-driven-candidate"
     },
     {
       "id": "gilded-grove-alchemy-card-pack",
@@ -512,13 +650,91 @@
         "CAP-006",
         "CAP-013"
       ],
-      "overlapGroupIds": [],
+      "overlapGroupIds": [
+        "OVL-010"
+      ],
       "bestGameConsumers": [
         {
           "candidateId": "GC-001",
           "fit": "Vector Vortex Spec 03 names this bundle as read-only timing-vocabulary evidence for combat polish."
         }
       ],
+      "disposition": "reference-lab-candidate"
+    },
+    {
+      "id": "impact-signal-combat-feedback-pack",
+      "displayName": "Impact Signal Combat Feedback Pack",
+      "snapshot": {
+        "fileCount": 44,
+        "totalBytes": 373609,
+        "extensionCounts": {
+          ".cs": 1,
+          ".csv": 1,
+          ".gd": 1,
+          ".html": 1,
+          ".json": 1,
+          ".md": 3,
+          ".png": 12,
+          ".svg": 12,
+          ".wav": 12
+        },
+        "digest": "sha256:601ced25e83c053d747604ae44e5fd9f2b35aa999c37e013e5a820d141189aa7"
+      },
+      "sourceKinds": [
+        "interactive-code",
+        "data-recipe",
+        "audio-source",
+        "visual-source",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 0,
+        "scripts": 0,
+        "dataFiles": 1,
+        "images": 24,
+        "audioFiles": 12,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "20 feedback presets across core hits, defense, combat states, damage-over-time, and readability categories, with Unity, Godot, and Unreal integration notes"
+        },
+        {
+          "path": "combat_feedback_presets.json",
+          "proves": "Per-event recipes pairing hit stop, camera shake, screen flash, floating text, SFX, and haptics, with an accessibility block (low-motion multiplier, minimum text lifetime, avoid-color-only)"
+        },
+        {
+          "path": "asset-manifest.md",
+          "proves": "Icon and stinger inventory across 12 status and callout concepts in SVG, PNG, and WAV"
+        },
+        {
+          "path": "web-preview/index.html",
+          "proves": "Interactive browser preview of the feedback vocabulary"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "readme-external-terms",
+        "locator": "README.md"
+      },
+      "licenseFacts": {
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "The README carries the licence inline as marketplace copy: royalty-free use in commercial and non-commercial games, no reselling or redistributing the raw pack as a competing asset pack; silent on attribution (UIREF-001 interpretation)."
+      },
+      "shippingPosture": "derived-technique-only",
+      "capabilityIds": [
+        "CAP-005",
+        "CAP-006",
+        "CAP-013"
+      ],
+      "overlapGroupIds": [
+        "OVL-010"
+      ],
+      "bestGameConsumers": [],
       "disposition": "reference-lab-candidate"
     },
     {
@@ -576,12 +792,12 @@
         "locator": null
       },
       "licenseFacts": {
-        "finishedProductUse": "unclear",
-        "sourceRedistribution": "unclear",
-        "attribution": "unclear",
-        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "No terms file ships in the archive; the operator resolution of 2026-08-16 (UIREF-002) holds the vendor terms externally and clears every corpus pack for derived-technique use under the never-copy rule. The missing file records absence, not a restriction."
       },
-      "shippingPosture": "license-review-required",
+      "shippingPosture": "derived-technique-only",
       "capabilityIds": [
         "CAP-010"
       ],
@@ -594,7 +810,7 @@
           "fit": "Rogue Cellar's beginner-tier inventory grid with drag, drop, and stacking behavior."
         }
       ],
-      "disposition": "license-review-required"
+      "disposition": "game-driven-candidate"
     },
     {
       "id": "inventory-loot-and-legend-inventory-pro",
@@ -650,12 +866,12 @@
         "locator": null
       },
       "licenseFacts": {
-        "finishedProductUse": "unclear",
-        "sourceRedistribution": "unclear",
-        "attribution": "unclear",
-        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "No terms file ships in the archive; the operator resolution of 2026-08-16 (UIREF-002) holds the vendor terms externally and clears every corpus pack for derived-technique use under the never-copy rule. The missing file records absence, not a restriction."
       },
-      "shippingPosture": "license-review-required",
+      "shippingPosture": "derived-technique-only",
       "capabilityIds": [
         "CAP-010",
         "CAP-011",
@@ -670,7 +886,7 @@
           "fit": "The full-featured counterpart supplies equipment binding and rarity-coded grid behavior for the same consumer."
         }
       ],
-      "disposition": "license-review-required"
+      "disposition": "game-driven-candidate"
     },
     {
       "id": "moonlit-pact-vn-gui-kit-renpy",
@@ -819,12 +1035,12 @@
         "locator": null
       },
       "licenseFacts": {
-        "finishedProductUse": "unclear",
-        "sourceRedistribution": "unclear",
-        "attribution": "unclear",
-        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "No terms file ships in the archive; the operator resolution of 2026-08-16 (UIREF-002) holds the vendor terms externally and clears every corpus pack for derived-technique use under the never-copy rule. The missing file records absence, not a restriction."
       },
-      "shippingPosture": "license-review-required",
+      "shippingPosture": "derived-technique-only",
       "capabilityIds": [
         "CAP-016"
       ],
@@ -837,7 +1053,7 @@
           "fit": "Slot-ready neon icons cover the item categories a roguelike inventory renders."
         }
       ],
-      "disposition": "license-review-required"
+      "disposition": "defer"
     },
     {
       "id": "neon-ui-mega-bundle",
@@ -896,12 +1112,12 @@
         "locator": null
       },
       "licenseFacts": {
-        "finishedProductUse": "unclear",
-        "sourceRedistribution": "unclear",
-        "attribution": "unclear",
-        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "No terms file ships in the archive; the operator resolution of 2026-08-16 (UIREF-002) holds the vendor terms externally and clears every corpus pack for derived-technique use under the never-copy rule. The missing file records absence, not a restriction."
       },
-      "shippingPosture": "license-review-required",
+      "shippingPosture": "derived-technique-only",
       "capabilityIds": [
         "CAP-004",
         "CAP-018",
@@ -920,7 +1136,7 @@
           "fit": "A neon high-score arcade needs exactly these button, panel, and slider primitives."
         }
       ],
-      "disposition": "license-review-required"
+      "disposition": "game-driven-candidate"
     },
     {
       "id": "obsidian-grimoire-ui",
@@ -1009,6 +1225,81 @@
       "disposition": "defer"
     },
     {
+      "id": "pixel-combat-button-ui-pack-v1.0.1",
+      "displayName": "Pixel Combat Button UI Pack v1.0.1 (private feel-test fixture)",
+      "snapshot": {
+        "fileCount": 87,
+        "totalBytes": 280401,
+        "extensionCounts": {
+          ".css": 1,
+          ".html": 1,
+          ".json": 1,
+          ".md": 2,
+          ".png": 80,
+          ".svg": 1,
+          ".txt": 1
+        },
+        "digest": "sha256:82a5bad2405c69ff7130ef1c4b1e863b00326ecb9bbb2393a50b228177fdb49f"
+      },
+      "sourceKinds": [
+        "interactive-code",
+        "visual-source",
+        "data-recipe",
+        "documentation"
+      ],
+      "runtimeEvidence": {
+        "runnableHtmlPresent": true,
+        "htmlDocuments": 1,
+        "stylesheets": 1,
+        "scripts": 0,
+        "dataFiles": 1,
+        "images": 81,
+        "audioFiles": 0,
+        "editableSources": 0
+      },
+      "evidence": [
+        {
+          "path": "README.md",
+          "proves": "Eight action styles across four states (normal, hover, pressed, disabled) in labelled and blank 96x32 button sheets with 16x16 icons"
+        },
+        {
+          "path": "data/buttons.manifest.json",
+          "proves": "Frame coordinates for the action-by-state spritesheet grid"
+        },
+        {
+          "path": "css/pixel-buttons.css",
+          "proves": "Sprite-button CSS technique switching states via classes on one sheet"
+        },
+        {
+          "path": "index.html",
+          "proves": "Runnable preview wiring the sprite-button state classes"
+        },
+        {
+          "path": "LICENSE.txt",
+          "proves": "MIT licence with Template Foundry copyright notice"
+        }
+      ],
+      "licenseEvidence": {
+        "type": "pack-license-file",
+        "locator": "LICENSE.txt"
+      },
+      "licenseFacts": {
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "supported",
+        "attribution": "supported",
+        "note": "MIT licence (Template Foundry): use, edit, sell, and bundle granted, and redistribution permitted while the licence text is retained; the notice-retention clause is an attribution requirement. The fixture classification, not the licence, keeps it out of framework ranking."
+      },
+      "shippingPosture": "derived-technique-only",
+      "testFixture": {
+        "classification": "private-test-only-non-ranking",
+        "reason": "Private, test-only fixture: disposable interaction targets with known normal, hover, pressed, and disabled states for feel-testing impact, timing, shake, and readability. Catalogued so the one-for-one audit has a record; not a framework candidate and never ranked."
+      },
+      "capabilityIds": [],
+      "overlapGroupIds": [],
+      "bestGameConsumers": [],
+      "disposition": "defer"
+    },
+    {
       "id": "pixel-combat-text-status-fx-kit",
       "displayName": "Pixel Combat Text & Status FX Kit",
       "snapshot": {
@@ -1084,7 +1375,9 @@
         "CAP-005",
         "CAP-006"
       ],
-      "overlapGroupIds": [],
+      "overlapGroupIds": [
+        "OVL-010"
+      ],
       "bestGameConsumers": [
         {
           "candidateId": "GC-001",
@@ -1150,12 +1443,12 @@
         "locator": null
       },
       "licenseFacts": {
-        "finishedProductUse": "unclear",
-        "sourceRedistribution": "unclear",
-        "attribution": "unclear",
-        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "No terms file ships in the archive; the operator resolution of 2026-08-16 (UIREF-002) holds the vendor terms externally and clears every corpus pack for derived-technique use under the never-copy rule. The missing file records absence, not a restriction."
       },
-      "shippingPosture": "license-review-required",
+      "shippingPosture": "derived-technique-only",
       "capabilityIds": [
         "CAP-001",
         "CAP-003",
@@ -1174,7 +1467,7 @@
           "fit": "An idle arcade composes these skill trees, upgrade panels, and reward presentations directly."
         }
       ],
-      "disposition": "license-review-required"
+      "disposition": "game-driven-candidate"
     },
     {
       "id": "quest-journal-codex-ui-kit",
@@ -1234,12 +1527,12 @@
         "locator": null
       },
       "licenseFacts": {
-        "finishedProductUse": "unclear",
-        "sourceRedistribution": "unclear",
-        "attribution": "unclear",
-        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "No terms file ships in the archive; the operator resolution of 2026-08-16 (UIREF-002) holds the vendor terms externally and clears every corpus pack for derived-technique use under the never-copy rule. The missing file records absence, not a restriction."
       },
-      "shippingPosture": "license-review-required",
+      "shippingPosture": "derived-technique-only",
       "capabilityIds": [
         "CAP-001",
         "CAP-009",
@@ -1252,7 +1545,7 @@
           "fit": "A roguelike's quest log and bestiary codex map onto the journal and entry layouts."
         }
       ],
-      "disposition": "license-review-required"
+      "disposition": "game-driven-candidate"
     },
     {
       "id": "runic-fantasy-ui-tabs",
@@ -1476,12 +1769,12 @@
         "locator": null
       },
       "licenseFacts": {
-        "finishedProductUse": "unclear",
-        "sourceRedistribution": "unclear",
-        "attribution": "unclear",
-        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "No terms file ships in the archive; the operator resolution of 2026-08-16 (UIREF-002) holds the vendor terms externally and clears every corpus pack for derived-technique use under the never-copy rule. The missing file records absence, not a restriction."
       },
-      "shippingPosture": "license-review-required",
+      "shippingPosture": "derived-technique-only",
       "capabilityIds": [
         "CAP-001",
         "CAP-003",
@@ -1500,7 +1793,7 @@
           "fit": "The newer bundle snapshot supplies the same progression surfaces for an idle arcade."
         }
       ],
-      "disposition": "license-review-required"
+      "disposition": "game-driven-candidate"
     },
     {
       "id": "tiny-save-settings-menu-starter",
@@ -1822,12 +2115,12 @@
         "locator": null
       },
       "licenseFacts": {
-        "finishedProductUse": "unclear",
-        "sourceRedistribution": "unclear",
-        "attribution": "unclear",
-        "note": "No local terms state finished-product use, redistribution limits, or attribution; the pack name and file layout cannot substitute for terms."
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "No terms file ships in the archive; the operator resolution of 2026-08-16 (UIREF-002) holds the vendor terms externally and clears every corpus pack for derived-technique use under the never-copy rule. The missing file records absence, not a restriction."
       },
-      "shippingPosture": "license-review-required",
+      "shippingPosture": "derived-technique-only",
       "capabilityIds": [
         "CAP-011",
         "CAP-012"
@@ -1841,7 +2134,7 @@
           "fit": "Sheet-level button and banner art complements a deckbuilder's card frames."
         }
       ],
-      "disposition": "license-review-required"
+      "disposition": "hold-for-consumer"
     },
     {
       "id": "ui-tabs-fantasy-html5-tabs-pack",
@@ -1893,12 +2186,12 @@
         "locator": null
       },
       "licenseFacts": {
-        "finishedProductUse": "unclear",
-        "sourceRedistribution": "unclear",
-        "attribution": "unclear",
-        "note": "The raw export carries no terms; the cleaned twin runic-fantasy-ui-tabs ships a license that may govern the family."
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "No terms file ships in the archive; the operator resolution of 2026-08-16 (UIREF-002) holds the vendor terms externally and clears every corpus pack for derived-technique use under the never-copy rule. The missing file records absence, not a restriction."
       },
-      "shippingPosture": "license-review-required",
+      "shippingPosture": "derived-technique-only",
       "capabilityIds": [
         "CAP-002"
       ],
@@ -1911,7 +2204,7 @@
           "fit": "Same tab surfaces as its cleaned twin; cited for provenance rather than preference."
         }
       ],
-      "disposition": "license-review-required"
+      "disposition": "standalone-spec-candidate"
     },
     {
       "id": "ui-theme-dark-fantasy",
@@ -1969,12 +2262,12 @@
         "locator": null
       },
       "licenseFacts": {
-        "finishedProductUse": "unclear",
-        "sourceRedistribution": "unclear",
-        "attribution": "unclear",
-        "note": "The raw export carries no terms; the packaged twin obsidian-grimoire-ui ships a license that may govern the family."
+        "finishedProductUse": "supported",
+        "sourceRedistribution": "not-supported",
+        "attribution": "not-supported",
+        "note": "No terms file ships in the archive; the operator resolution of 2026-08-16 (UIREF-002) holds the vendor terms externally and clears every corpus pack for derived-technique use under the never-copy rule. The missing file records absence, not a restriction."
       },
-      "shippingPosture": "license-review-required",
+      "shippingPosture": "derived-technique-only",
       "capabilityIds": [
         "CAP-018",
         "CAP-021"
@@ -1988,7 +2281,7 @@
           "fit": "Same dark-fantasy HUD surfaces as its packaged twin; cited for provenance rather than preference."
         }
       ],
-      "disposition": "license-review-required"
+      "disposition": "defer"
     }
   ],
   "capabilities": [
@@ -2194,6 +2487,10 @@
         {
           "packId": "pixel-combat-text-status-fx-kit",
           "note": "presets/combat_feedback_presets.json maps events to priority, color, motion, and stacking"
+        },
+        {
+          "packId": "impact-signal-combat-feedback-pack",
+          "note": "combat_feedback_presets.json expresses 20 per-event recipes pairing hit stop, camera shake, screen flash, floating text, SFX, and haptics, with an accessibility block"
         }
       ],
       "interactionAccessibility": {
@@ -2234,6 +2531,10 @@
         {
           "packId": "impact-juice-combat-polish-bundle",
           "note": "README.md documents popup text assets and upward-drift spawn behavior"
+        },
+        {
+          "packId": "impact-signal-combat-feedback-pack",
+          "note": "combat_feedback_presets.json floating_text blocks carry per-event style, scale, rise, and lifetime timing beside 12 SVG status and callout icons"
         }
       ],
       "interactionAccessibility": {
@@ -2265,7 +2566,7 @@
         "game-driven"
       ],
       "destination": "module",
-      "readiness": "needs-license-review",
+      "readiness": "ready-to-spec",
       "contributions": [
         {
           "packId": "explorer-map-ui-pack",
@@ -2291,7 +2592,7 @@
       "bestGameConsumers": [
         "GC-002"
       ],
-      "missingEvidence": "The only composited evidence source defers its terms to a purchase page; a second independent source or recorded terms is needed."
+      "missingEvidence": "License posture is resolved by the operator resolution; a consumer must still prove marker density, legend drawer behaviour, and chrome composition against live world data."
     },
     {
       "id": "CAP-008",
@@ -2301,7 +2602,7 @@
         "game-driven"
       ],
       "destination": "module",
-      "readiness": "needs-license-review",
+      "readiness": "ready-to-spec",
       "contributions": [
         {
           "packId": "equipment-compare-ui-pack",
@@ -2325,7 +2626,7 @@
       "bestGameConsumers": [
         "GC-002"
       ],
-      "missingEvidence": "Purchase-page terms for the only deep source, plus one live consumer to prove the layout under real item data."
+      "missingEvidence": "License posture is resolved by the operator resolution; one live consumer must still prove the compare layout under real item data."
     },
     {
       "id": "CAP-009",
@@ -2336,7 +2637,7 @@
         "independent-module"
       ],
       "destination": "module",
-      "readiness": "needs-license-review",
+      "readiness": "ready-to-spec",
       "contributions": [
         {
           "packId": "quest-journal-codex-ui-kit",
@@ -2371,7 +2672,7 @@
         "game-driven"
       ],
       "destination": "module",
-      "readiness": "needs-license-review",
+      "readiness": "ready-to-spec",
       "contributions": [
         {
           "packId": "inventory-grid-grabber-html5",
@@ -2405,7 +2706,7 @@
       "bestGameConsumers": [
         "GC-002"
       ],
-      "missingEvidence": "Every source sits in a license-unclear pack; terms or operator posture must be recorded before the module spec."
+      "missingEvidence": "License posture is resolved by the operator resolution; a live consumer must still prove grid sizing, stacking, and rarity accent presentation under real item data."
     },
     {
       "id": "CAP-011",
@@ -2525,6 +2826,10 @@
         {
           "packId": "moonlit-pact-vn-gui-kit-renpy",
           "note": "README.md documents 12 VN UI SFX with waveform previews"
+        },
+        {
+          "packId": "impact-signal-combat-feedback-pack",
+          "note": "assets/audio/ ships 12 named WAV stingers and every preset pairs its combat event with one"
         }
       ],
       "interactionAccessibility": {
@@ -2667,7 +2972,7 @@
         "independent-module"
       ],
       "destination": "core",
-      "readiness": "needs-license-review",
+      "readiness": "ready-to-spec",
       "contributions": [
         {
           "packId": "equipment-compare-ui-pack",
@@ -2701,7 +3006,7 @@
       "bestGameConsumers": [
         "GC-002"
       ],
-      "missingEvidence": "All three citing sources are license-unclear; terms must be recorded before the primitive spec cites them."
+      "missingEvidence": "License posture is resolved by the operator resolution; the placement, trigger, and delta-row contract is what the core spec must freeze."
     },
     {
       "id": "CAP-018",
@@ -2724,6 +3029,10 @@
         {
           "packId": "neon-ui-mega-bundle",
           "note": "ui-sliders-and-bars/index.html demos health, XP, and progress variants"
+        },
+        {
+          "packId": "8bit-rpg-bars-ui-pack",
+          "note": "README.md and manifest.json document 16 bar and meter shapes — segmented HP and MP, vertical HP and MP, cast, boss, and damage-trail variants — plus pip strips and an 8 px 9-slice modular parts system"
         }
       ],
       "interactionAccessibility": {
@@ -3057,6 +3366,33 @@
       ]
     },
     {
+      "id": "OVL-010",
+      "relationship": "complementary-source",
+      "description": "Three combat-feedback sources converging on event-to-response recipes: a polish bundle carrying data recipes, a pixel text and status FX kit, and a cross-engine preset pack with a browser preview.",
+      "packIds": [
+        "impact-juice-combat-polish-bundle",
+        "impact-signal-combat-feedback-pack",
+        "pixel-combat-text-status-fx-kit"
+      ],
+      "evidence": [
+        {
+          "packId": "impact-signal-combat-feedback-pack",
+          "path": "combat_feedback_presets.json",
+          "proves": "20 cross-engine presets pairing timing, motion, text, audio, and haptics per combat event"
+        },
+        {
+          "packId": "impact-juice-combat-polish-bundle",
+          "path": "data/combat_feedback_recipes.json",
+          "proves": "Independent recipe vocabulary pairing feedback events with responses"
+        },
+        {
+          "packId": "pixel-combat-text-status-fx-kit",
+          "path": "presets/combat_feedback_presets.json",
+          "proves": "A third preset mapping of events to priority, color, motion, and stacking"
+        }
+      ]
+    },
+    {
       "id": "OVL-011",
       "relationship": "complementary-source",
       "description": "Save and settings implementations converging from the starter menu and the save or settings systems carried inside both bundle snapshots.",
@@ -3124,7 +3460,7 @@
         "ui-theme-dark-fantasy"
       ],
       "expectedSpecs": "Two to three specs mirroring the Vector Vortex arc: core playable, shell and UI, then polish",
-      "risk": "Its strongest evidence sits in license-unclear packs, so terms posture gates the module specs"
+      "risk": "Its strongest evidence now carries resolved derived-technique-only posture; the module ladder schedules the inventory, compare, tooltip, and map surfaces when authorized."
     },
     {
       "id": "GC-003",

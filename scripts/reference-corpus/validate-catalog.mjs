@@ -14,6 +14,12 @@
  * destinations. It touches no private source tree, so a public clone can run
  * the same checks the ML01 audit runs.
  *
+ * License facts follow the operator resolution of 2026-08-16 recorded in the
+ * capability map: facts may be grounded in local pack terms or in that
+ * resolution, so evidence type no longer bounds fact clarity; only genuinely
+ * unclear facts still route a pack to license review. Pack ids are the exact
+ * top-level directory names, which may carry version dots.
+ *
  * Usage
  * -----
  *     import { validateCatalog } from "./validate-catalog.mjs";
@@ -218,21 +224,12 @@ function validateLicenseRecord(pack, label, errors) {
     errors.push(`${label}: licenseFacts.note must be a concise evidence-bound note`);
   }
 
-  if (hasUnclear || licenseEvidence.type !== "pack-license-file") {
-    if (licenseEvidence.type !== "pack-license-file" && !hasUnclear) {
-      errors.push(
-        `${label}: license evidence of type ${licenseEvidence.type} cannot support non-unclear facts`,
-      );
+  if (hasUnclear) {
+    if (pack.shippingPosture !== "license-review-required") {
+      errors.push(`${label}: unclear license facts require shippingPosture "license-review-required"`);
     }
-    if (hasUnclear) {
-      if (pack.shippingPosture !== "license-review-required") {
-        errors.push(
-          `${label}: unclear license facts require shippingPosture "license-review-required"`,
-        );
-      }
-      if (pack.disposition !== "license-review-required") {
-        errors.push(`${label}: unclear license facts require disposition "license-review-required"`);
-      }
+    if (pack.disposition !== "license-review-required") {
+      errors.push(`${label}: unclear license facts require disposition "license-review-required"`);
     }
   }
 }
@@ -375,7 +372,7 @@ export function validateCatalog(catalog) {
 
   for (const pack of packs) {
     const label = `pack ${pack.id ?? "(missing id)"}`;
-    if (!isNonEmptyString(pack.id) || !/^[a-z0-9][a-z0-9-]*$/.test(pack.id)) {
+    if (!isNonEmptyString(pack.id) || !/^[a-z0-9][a-z0-9.-]*$/.test(pack.id)) {
       errors.push(`${label}: id must be the exact top-level directory name`);
     }
     if (!isNonEmptyString(pack.displayName)) errors.push(`${label}: displayName is required`);
