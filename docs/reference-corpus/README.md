@@ -3,8 +3,8 @@
 title: "Reference Corpus"
 description: "Catalog and capability map derived from the private UI reference pack corpus"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-16"
-version: "1.0"
+date: "2026-08-17"
+version: "1.1"
 status: "Active"
 tags:
   - type: directory-readme
@@ -57,8 +57,8 @@ docs/reference-corpus/
 
 | File | Description | Status |
 |------|-------------|--------|
-| [ui-pack-inventory.json](ui-pack-inventory.json) | Deterministic catalog: corpus snapshot, 24 pack records, capability, overlap, and game-candidate registers | ✅ Active |
-| [ui-pack-capability-map.md](ui-pack-capability-map.md) | Derived map: license posture, pack matrix, three ranked lanes, game-selection matrix, bounded next queue, `UIREF-*` review questions | 🔄 Under Review |
+| [ui-pack-inventory.json](ui-pack-inventory.json) | Deterministic catalog: corpus snapshot, 28 pack records (two of them private, test-only, non-ranking fixtures), capability, overlap, and game-candidate registers | ✅ Active |
+| [ui-pack-capability-map.md](ui-pack-capability-map.md) | Derived map: license posture, pack matrix, three ranked lanes, game-selection matrix, module ladder with the non-owning lab lane, `UIREF-*` review questions | ✅ Active |
 
 ---
 

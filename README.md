@@ -79,7 +79,7 @@ approval manifest.
 | Repository hydration | ✅ Complete | Public baseline initialized on `main` |
 | Foundations | ✅ Complete | The 83-token semantic vocabulary, cascade contract, state recipes, and four themes are approved |
 | Zero-raster spike | ✅ Complete | Four dark-fantasy techniques render with zero framework raster files; the position holds |
-| Reference corpus | ✅ Complete | Catalog and capability map of the UI pack corpus; license posture resolved and the candidate-coordination rule adopted |
+| Reference corpus | ✅ Complete | Catalog and capability map of the 28-pack UI pack corpus; license posture resolved, coordination rule adopted, and the module ladder recorded |
 | Harness | 🔄 Under Review | Harness hardening and preview publication are complete; five approval questions remain with the operator |
 | Core primitives | 🔄 Proof Set | Button, panel, input, and meter exist only to verify foundations |
 | Modules | ⬜ Planned | Composed from core; no module-to-module dependency |

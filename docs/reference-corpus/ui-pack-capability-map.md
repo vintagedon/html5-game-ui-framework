@@ -237,17 +237,24 @@ Labs study technique and vocabulary without claiming runtime module ownership.
 
 **Vector Vortex's current role.** Vector Vortex is in flight (Specs 02 and 03 in the central queue). It consumes the current published GameUI foundations and Core primitives by vendoring, produces game-local wireframe shell and feedback candidates under `vv-` ownership, and hands those candidates to a later, separately approved backport spec. It does not repin mid-spec, and no framework module may claim ownership of a surface Vector Vortex is actively proving: notification, settings, tab, and feedback candidates wait for its backport reconciliation unless the operator overrides in UIREF-005.
 
-## 7. Proposed Next Queue (Bounded)
+## 7. Module Ladder (Agreed)
 
-This queue is a recommendation for the operator's next choices only. Nothing here dispatches automatically, and no downstream spec is authored by this inventory.
+The earlier proposed next queue is replaced by the agreed module ladder, recorded here from operator decision. The ladder is the standing build order for the framework's module work; it still authorizes nothing by itself, and each rung is a separately dispatched spec. No ladder item is added, removed, or reordered except by operator decision.
 
-| Order | Item | Basis | Gate |
+| Order | Rung | Shape | Basis |
 |---|---|---|---|
-| 1 | Combat feedback lab spec: one reference lab covering CAP-005 and CAP-006 | Top reference-lab rank (19 and 18), both clear-license sources, parallel-safe under the coordination rule | Operator answers UIREF-006 |
-| 2 | Foundations tier vocabulary spec: freeze the rarity tier family (CAP-011) | Five independent sources now exceed the charter's three-source gate; no Vector Vortex collision; bounded | Operator answers UIREF-005 |
-| 3 | Core tabs spec (CAP-002) after Vector Vortex backport reconciliation | Best-evidenced interactive component; waits so the backport map can reconcile traversal choices | UIREF-005 plus backport decision |
-| 4 | Save/settings module spec (CAP-003 with CAP-004 inputs) after reconciliation | Charter calls save/settings the best-evidenced module; waits for the same reason | UIREF-005 plus backport decision |
-| 5 | Operator records license posture for the 13 unclear packs | Unblocks CAP-007, CAP-008, CAP-009, CAP-010, and CAP-017 evidence chains | UIREF-001 and UIREF-002 |
+| 1 | Meter and status family (CAP-018) | Core extension of the existing `.gc-meter` | Strengthened rung: three prior sources plus `8bit-rpg-bars-ui-pack` bar-shape evidence; no Vector Vortex collision; the meter primitive already exists |
+| 2 | Inventory grid and character sheet (CAP-010) | Module | Two inventory systems plus the compare pack's rarity slots; grid semantics proven at two depths |
+| 3 | Tooltip and stat deltas (CAP-017) | Core | Three citing sources; the placement, trigger, and delta-row contract is what the core spec freezes |
+| 4 | Equipment compare (module) (CAP-008) | Module | Composed comparison screen with delta rows; consumes the tooltip core and the inventory's item surfaces |
+| 5 | Map and minimap chrome (CAP-007) | Module | 16-marker set and 9-slice chrome surfaces; consumer world data plugs in at a fixed boundary |
+| 6 | Cards plus rarity (CAP-011, CAP-012) | Foundations through module; the flagship, likely several specs | Three independent card sources (OVL-009) clear the three-source gate; two theme renderings of one card component on one slot contract (see §4.1) |
+
+**Rarity freezes inside cards.** The rarity tier vocabulary freezes inside the cards module (rung 6), after the inventory and equipment rungs have supplied real item pressure. Because frozen token names are API, the early item modules (rungs 2 and 4) therefore take a neutral tier label plus a consumer-supplied accent marker rather than publishing a provisional rarity token. A provisional vocabulary that later renames would be a major-version break; the ladder waits for real pressure instead.
+
+**Non-owning combat-feedback lab (parallel lane).** Separate from the ladder, the combat-feedback lab (CAP-005 and CAP-006) proceeds as a parallel reference-lab lane that claims no runtime module. It studies event vocabulary, timing, and presentation with the OVL-010 sources and the two private feel-test fixtures, and any runtime outcome is a later proposal, not a rung.
+
+Holdfast's card implementation is strong evidence for rung 6 but is not a backport here: the game is unfinished, so under the coordination rule its actual backport waits until it is done. The three corpus card sources are sufficient to design the card module now without it.
 
 ## 8. Review Findings and Questions
 
