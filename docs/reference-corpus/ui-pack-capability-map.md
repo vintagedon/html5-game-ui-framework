@@ -265,12 +265,14 @@ Each finding carries its statement, the exact evidence it rests on, a recommenda
 **Statement.** Five packs ship complete local licenses that state use and redistribution terms but never mention attribution (evidence: `gilded-grove-alchemy-card-pack/LICENSE.txt`, `impact-juice-combat-polish-bundle/LICENSE.txt`, `moonlit-pact-vn-gui-kit-renpy/LICENSE.txt`, `obsidian-grimoire-ui/LICENSE.txt`, `runic-relic-rpg-icons-144/LICENSE.txt`).
 **Recommendation.** Keep recording these as `attribution: not-supported` with the note that no requirement appears in local terms.
 **Question.** Confirm this interpretation, or require `unclear` plus license review for licenses silent on attribution? (confirm / require-unclear)
+**Resolved.** Confirmed; recorded `attribution: not-supported`. See the Operator Resolutions block above.
 
 ### UIREF-002 — Purchase-page terms not held locally
 
 **Statement.** `equipment-compare-ui-pack/README.md` and `explorer-map-ui-pack/README.md` defer all terms to the itch.io purchase page and state the archive adds nothing; no terms text exists in either pack.
 **Recommendation.** The operator records the purchase-page terms with purchase records (outside this repository), after which the catalog re-audits and the packs leave licence review.
 **Question.** Approve recording those terms as the unlock path for CAP-007 and CAP-008 evidence? (yes / no)
+**Resolved.** Superseded by the operator resolution: under derived-technique-only and the never-copy rule, a missing local terms file does not gate derived work, so these packs are cleared for framework derived use without recording purchase-page terms. Those terms would matter only if raw assets were ever shipped, which the framework never does. CAP-007 and CAP-008 evidence is unblocked.
 
 ### UIREF-003 — Raw-export twins and family terms
 
@@ -289,6 +291,7 @@ Each finding carries its statement, the exact evidence it rests on, a recommenda
 **Statement.** The independent lane's top ranks are CAP-001 (20), CAP-002 (18), CAP-003 (18), and CAP-004 (18), but Vector Vortex is actively proving notification, settings, and tab surfaces game-locally under the coordination rule, so those wait for backport reconciliation; CAP-011 (15) is the highest-ranked queueable-now item.
 **Recommendation.** Queue CAP-011 first, hold CAP-002 and CAP-003 for the backport decision, and let CAP-001 follow the same gate.
 **Question.** Accept this ordering, or pull any of CAP-001, CAP-002, or CAP-003 ahead of the gate now? (accept / pull-notification / pull-tabs / pull-settings)
+**Resolved.** Superseded by the section 7 module ladder: meter (CAP-018) is rung 1 and rarity (CAP-011) folds into cards at rung 6, so CAP-011 is not queued standalone. Notification, tabs, and settings (CAP-001, CAP-002, CAP-003) still wait for the Vector Vortex backport under the coordination rule.
 
 ### UIREF-006 — First reference lab scope
 
@@ -301,12 +304,14 @@ Each finding carries its statement, the exact evidence it rests on, a recommenda
 **Statement.** GC-002 (Rogue Cellar Crawl) carries the broadest GameUI pressure and matches the charter's first-consumer plan, but its strongest evidence sits in license-unclear packs; GC-003 (Alchemy Deck Run) has clear-license evidence but needs the tier vocabulary frozen first.
 **Recommendation.** Confirm Rogue Cellar Crawl as the next game dispatch, contingent on UIREF-001 and UIREF-002 answers.
 **Question.** Confirm Rogue Cellar Crawl, choose Alchemy Deck Run instead, or defer the choice? (rogue-cellar / alchemy-deck / defer)
+**Resolved in part.** The license contingency is cleared: GC-002's evidence carries resolved derived-technique posture and no longer sits in license-unclear packs. The next-game choice itself remains the operator's open decision.
 
 ### UIREF-008 — Coordination rule adoption
 
 **Statement.** The four-bullet coordination rule at the top of this document governed this inventory's lane gates — it held CAP-001, CAP-002, and CAP-003 behind the Vector Vortex backport window in §5.2 and the queue order in §7 — and would govern all later framework and game scheduling.
 **Recommendation.** Adopt it as standing policy for framework and game scheduling.
 **Question.** Adopt as standing policy? (yes / no)
+**Resolved.** Adopted as standing policy and codified in `AGENTS.md` in its two-way, pin-and-ride form. See the Operator Resolutions block above.
 
 ### UIREF-009 — Audio stays consumer-side
 
