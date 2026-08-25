@@ -187,7 +187,7 @@ test("every UIREF finding carries a statement, evidence, recommendation, and a c
     assert.ok(body.includes("**Statement.**"));
     assert.ok(body.includes("**Recommendation.**"));
     assert.ok(body.includes("**Question.**"));
-    const questionLine = body.split("**Question.**")[1].trim();
+    const questionLine = body.split("**Question.**")[1].split("\n")[0].trim();
     assert.ok(
       /\([a-z0-9-]+( \/ [a-z0-9-]+)+\)\s*$/.test(questionLine),
       `${id} must close with a yes-or-no or choose-one question in parentheses`,

@@ -15,6 +15,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { specimenRoot } from "../app/render.js";
+import { SPECIMEN_TYPES } from "../app/specimens.js";
 import { registry } from "../registry/scenarios.js";
 import { validateRegistry } from "../registry/schema.js";
 
@@ -151,12 +152,21 @@ test("all registered scenarios declare a nonempty initialState", () => {
   }
 });
 
-test("the renderer throws on an unknown specimen", () => {
+test("the renderer throws on an unknown specimen and enumerates the supported types", () => {
   const restoreDocument = installDocumentStandIn();
   try {
     assert.throws(
       () => specimenRoot({ specimen: "not-a-specimen", config: {} }),
-      /Unknown specimen "not-a-specimen"/,
+      (error) => {
+        assert.match(error.message, /Unknown specimen "not-a-specimen"/);
+        for (const type of SPECIMEN_TYPES) {
+          assert.ok(
+            error.message.includes(type),
+            `the error message must enumerate "${type}"`,
+          );
+        }
+        return true;
+      },
     );
   } finally {
     restoreDocument();

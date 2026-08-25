@@ -70,82 +70,108 @@ function inputSample({ label, variant, placeholder, value, disabled }) {
   return [lab, input];
 }
 
+/** Token-grid specimen: palette and semantic swatch rows. */
+function tokenGridSample(s) {
+  const c = s.config || {};
+  return el("div", [["class", "gc-specimen token-grid"]], (c.swatches || []).map(swatch));
+}
+
+function panelSample(s) {
+  const c = s.config || {};
+  return el("article", [["class", "gc-specimen gc-panel"]], [
+    el("h3", [], [c.heading || s.title]),
+    el("p", [["class", "section-copy"]], [c.copy || ""]),
+  ]);
+}
+
+function buttonSampleCard(s) {
+  const c = s.config || {};
+  return el("article", [["class", "gc-specimen gc-panel proof-card"]], [
+    el("h3", [], [s.title]),
+    el("div", [["class", "proof-row"]], (c.samples || []).map(buttonSample)),
+  ]);
+}
+
+function inputSampleCard(s) {
+  const c = s.config || {};
+  return el("article", [["class", "gc-specimen gc-panel proof-card"]], [
+    el("h3", [], [s.title]),
+    ...((c.samples || []).flatMap(inputSample)),
+  ]);
+}
+
+function meterSampleCard(s) {
+  const c = s.config || {};
+  return el("article", [["class", "gc-specimen gc-panel proof-card"]], [
+    el("h3", [], [s.title]),
+    ...((c.samples || []).map((m) => {
+      const head = el("div", [["class", "meter-label"]], [
+        el("span", [], [m.label]),
+        el("span", [["data-meter-display", ""]], [m.display]),
+      ]);
+      const fill = el("div", [
+        ["class", "gc-meter__fill"],
+        ["style", `--gc-meter-value: ${m.value}%`],
+      ]);
+      const meter = el(
+        "div",
+        [
+          ["class", "gc-meter"],
+          ["data-variant", m.variant],
+          ["role", "meter"],
+          ["aria-label", m.label],
+          ["aria-valuemin", "0"],
+          ["aria-valuemax", "100"],
+          ["aria-valuenow", String(m.value)],
+        ],
+        [fill],
+      );
+      return el("div", [], [head, meter]);
+    })),
+  ]);
+}
+
+function spikeSample(s) {
+  const c = s.config || {};
+  return el(
+    "article",
+    [["class", "gc-specimen gc-panel gc-spike"]],
+    [
+      el("span", [["class", "gc-spike__ornament"], ["aria-hidden", "true"]]),
+      el("h3", [["class", "spike-heading"]], [c.heading || s.title]),
+      el("p", [["class", "spike-copy"]], [c.copy || ""]),
+      el(
+        "ul",
+        [["class", "spike-evidence"]],
+        (c.evidence || []).map((e) => el("li", [], [e])),
+      ),
+    ],
+  );
+}
+
+/**
+ * The specimen dispatch table. Adding a specimen type is a registration here
+ * plus an entry in SPECIMEN_TYPES, never a new branch in the renderer.
+ */
+const SPECIMEN_BUILDERS = Object.freeze({
+  palette: tokenGridSample,
+  semantic: tokenGridSample,
+  panel: panelSample,
+  button: buttonSampleCard,
+  input: inputSampleCard,
+  meter: meterSampleCard,
+  spike: spikeSample,
+});
+
 /** Build the specimen root element for one scenario. */
 export function specimenRoot(s) {
-  const c = s.config || {};
-  switch (s.specimen) {
-    case "palette":
-    case "semantic":
-      return el("div", [["class", "gc-specimen token-grid"]], (c.swatches || []).map(swatch));
-
-    case "panel":
-      return el("article", [["class", "gc-specimen gc-panel"]], [
-        el("h3", [], [c.heading || s.title]),
-        el("p", [["class", "section-copy"]], [c.copy || ""]),
-      ]);
-
-    case "button":
-      return el("article", [["class", "gc-specimen gc-panel proof-card"]], [
-        el("h3", [], [s.title]),
-        el("div", [["class", "proof-row"]], (c.samples || []).map(buttonSample)),
-      ]);
-
-    case "input":
-      return el("article", [["class", "gc-specimen gc-panel proof-card"]], [
-        el("h3", [], [s.title]),
-        ...((c.samples || []).flatMap(inputSample)),
-      ]);
-
-    case "meter":
-      return el("article", [["class", "gc-specimen gc-panel proof-card"]], [
-        el("h3", [], [s.title]),
-        ...(c.samples || []).map((m) => {
-          const head = el("div", [["class", "meter-label"]], [
-            el("span", [], [m.label]),
-            el("span", [["data-meter-display", ""]], [m.display]),
-          ]);
-          const fill = el("div", [
-            ["class", "gc-meter__fill"],
-            ["style", `--gc-meter-value: ${m.value}%`],
-          ]);
-          const meter = el(
-            "div",
-            [
-              ["class", "gc-meter"],
-              ["data-variant", m.variant],
-              ["role", "meter"],
-              ["aria-label", m.label],
-              ["aria-valuemin", "0"],
-              ["aria-valuemax", "100"],
-              ["aria-valuenow", String(m.value)],
-            ],
-            [fill],
-          );
-          return el("div", [], [head, meter]);
-        }),
-      ]);
-
-    case "spike":
-      return el(
-        "article",
-        [["class", "gc-specimen gc-panel gc-spike"]],
-        [
-          el("span", [["class", "gc-spike__ornament"], ["aria-hidden", "true"]]),
-          el("h3", [["class", "spike-heading"]], [c.heading || s.title]),
-          el("p", [["class", "spike-copy"]], [c.copy || ""]),
-          el(
-            "ul",
-            [["class", "spike-evidence"]],
-            (c.evidence || []).map((e) => el("li", [], [e])),
-          ),
-        ],
-      );
-
-    default:
-      throw new TypeError(
-        `Unknown specimen "${s.specimen}". Expected one of: ${SPECIMEN_TYPES.join(", ")}`,
-      );
+  const build = SPECIMEN_BUILDERS[s.specimen];
+  if (!build) {
+    throw new TypeError(
+      `Unknown specimen "${s.specimen}". Expected one of: ${SPECIMEN_TYPES.join(", ")}`,
+    );
   }
+  return build(s);
 }
 
 /** Build a full scenario section (header + specimen root) for the page. */
