@@ -13,12 +13,11 @@
  * mutation test relies on that: changing a scenario's theme coverage in the
  * registry changes both the rendered page and this runner's executed matrix.
  *
- * Modes:
- *   GC_CAPTURE=1  write candidate captures; do not fail on a missing/diffing
- *                 approved baseline (first-run candidate generation).
- *   (default)     compare each candidate against the approved baseline; fail on
- *                 a diff. A missing baseline is reported, not fatal, until the
- *                 operator approves goldens (agents never write the approved path).
+ * Golden model: a case with no recorded baseline establishes one (the only
+ * write a run performs); a case whose capture disagrees with its baseline
+ * fails and surfaces its diff. No code path here rewrites or deletes an
+ * existing baseline PNG or manifest entry. `GC_CAPTURE=1` behaves the same;
+ * every run captures, compares, and establishes what is missing.
  */
 
 import { expect, test } from "@playwright/test";
@@ -26,8 +25,14 @@ import { randomUUID } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { PNG } from "pngjs";
 import { registry } from "../registry/scenarios.js";
-import { compareCapture, readApprovalManifest } from "./compare.js";
+import {
+  compareCapture,
+  establishBaseline,
+  readApprovalManifest,
+  writeManifestEntries,
+} from "./compare.js";
 import {
   buildCases,
   captureIdentity,
@@ -44,7 +49,6 @@ import {
 } from "./membership.js";
 import { applyMeterValue, applyTogglePressed } from "./interactions.js";
 
-const CAPTURE = !!process.env.GC_CAPTURE;
 const BASE = process.env.GC_BASE_URL || "http://127.0.0.1:8123";
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const CANDIDATES = join(ROOT, "goldens/candidates");
@@ -53,6 +57,9 @@ const PAGE = `${BASE}/reference/`;
 const RUN_ID = randomUUID();
 const RUN_STATE = join(ROOT, "runner/playwright-run.json");
 const approvalManifest = readApprovalManifest();
+// Baselines established during this run, merged once in afterAll. A run
+// performs no other write into the approved tree or the manifest.
+const establishedEntries = [];
 
 // One case per scenario x theme x viewport x checkpoint, all registry-sourced.
 const cases = buildCases(registry);
@@ -127,7 +134,7 @@ async function runInteraction(page, id, it) {
 // The manifest records every scenario, theme, viewport, and checkpoint case,
 // so the single-declaration mutation test can observe the matrix directly.
 const manifest = [];
-const goldenCounts = { pass: 0, awaiting: 0, failure: 0 };
+const goldenCounts = { pass: 0, established: 0, failure: 0 };
 
 test.beforeAll(() => {
   writeFileSync(
@@ -186,34 +193,36 @@ for (const c of cases) {
         .screenshot({ type: "png", animations: "disabled" });
       writeFileSync(candidatePath, png);
 
-      if (CAPTURE) {
-        manifest.push({
-          id: c.id,
-          theme: c.theme,
-          viewport: c.viewport.name,
-          checkpoint: c.checkpoint.name,
-          capture: rel,
-          golden: "captured",
-        });
-        return;
-      }
-
       const result = compareCapture(png, {
         approvedPath,
         caseId: rel,
         manifest: approvalManifest,
       });
-      goldenCounts[result.status]++;
+
+      if (result.status === "unrecorded") {
+        // The one write a run performs: establish an absent baseline.
+        establishedEntries.push(
+          establishBaseline({ approvedPath, caseId: rel, candidatePng: png, manifest: approvalManifest }),
+        );
+      }
+
+      goldenCounts[result.status === "unrecorded" ? "established" : result.status]++;
       manifest.push({
         id: c.id,
         theme: c.theme,
         viewport: c.viewport.name,
         checkpoint: c.checkpoint.name,
         capture: rel,
-        golden: result.status,
+        golden: result.status === "unrecorded" ? "established" : result.status,
         reason: result.reason,
       });
       if (result.status === "failure") {
+        if (result.diffPng) {
+          writeFileSync(
+            join(CANDIDATES, `${rel.replace(/\.png$/, "")}.diff.png`),
+            PNG.sync.write(result.diffPng),
+          );
+        }
         const pixelDetail = result.diffPixels >= 0
           ? `: ${result.diffPixels}/${result.total} pixels (${(result.ratio * 100).toFixed(2)}%)`
           : "";
@@ -561,11 +570,13 @@ test.afterAll(async () => {
   console.log(
     `\nmembership: ${coverage.designedPairIdentities} designed identities; ${coverage.distinctObservedIdentities} distinct observed; ${coverage.totalObservations} total observations; ${Object.values(coverage.exclusionsByReason).reduce((sum, count) => sum + count, 0)} exclusions; ${coverage.unclassifiedObservations} unclassified`,
   );
-  if (!CAPTURE) {
-    console.log(
-      `\ngoldens: ${goldenCounts.pass} approved pass, ${goldenCounts.awaiting} awaiting operator approval, ${goldenCounts.failure} failure`,
-    );
+  if (establishedEntries.length) {
+    const written = writeManifestEntries({ entries: establishedEntries });
+    console.log(`goldens: recorded ${written.written} new baseline(s); manifest now holds ${written.totalEntries} entr(ies)`);
   }
+  console.log(
+    `\ngoldens: ${goldenCounts.pass} pass, ${goldenCounts.established} established, ${goldenCounts.failure} failure`,
+  );
   if (membershipReport.failures.length) {
     throw new Error(
       `membership: ${membershipReport.failures.length} unclassified observation(s):\n  ` +
