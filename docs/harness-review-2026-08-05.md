@@ -4,8 +4,8 @@ title: "Harness Review 2026-08-05"
 description: "Operator decisions for the Phase 2 conformance harness, candidate goldens, metric definitions, and viewport roster"
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-08-05"
-version: "1.0"
-status: "Under Review"
+version: "1.1"
+status: "Active"
 tags:
   - type: report
   - domain: harness
@@ -20,20 +20,24 @@ related_documents:
 # Harness Review 2026-08-05
 
 This is the operator decision surface for the Phase 2 conformance harness.
-H-005 is settled by the published-preview smoke test. H-001, H-002, H-003,
-H-004, and H-006 present complete evidence without an executor decision. The
-approval manifest has zero entries, so no candidate is approved by this work.
+H-005 was settled by the published-preview smoke test. The remaining decisions
+were recorded on 2026-08-18: H-001 and H-004 are superseded by the
+recorded-baseline model in [AGENTS.md](../AGENTS.md), H-002 and H-003 are
+resolved as stated, and H-006 adds the second viewport scoped to the status
+family. The approval manifest's zero-entry state is no longer an unfulfilled
+prerequisite; the manifest survives as an integrity record that the harness
+itself records baselines into.
 
 ## Decision Summary
 
 | ID | Subject | Status |
 |----|---------|--------|
-| [H-001](#h-001) | Candidate golden baseline | Pending operator decision |
-| [H-002](#h-002) | Registry schema freeze | Pending operator decision |
-| [H-003](#h-003) | Metric definitions | Pending operator decision |
-| [H-004](#h-004) | Golden blessing process | Pending operator decision |
+| [H-001](#h-001) | Candidate golden baseline | Superseded |
+| [H-002](#h-002) | Registry schema freeze | Not frozen |
+| [H-003](#h-003) | Metric definitions | Approved as defined |
+| [H-004](#h-004) | Golden blessing process | Superseded |
 | [H-005](#h-005) | Published preview | Yes, evidence-settled |
-| [H-006](#h-006) | Second viewport | Pending operator decision |
+| [H-006](#h-006) | Second viewport | Yes, status family only |
 
 <a id="h-001"></a>
 
@@ -56,7 +60,7 @@ Evidence:
 
 Question: Approve the 53 regenerated candidate captures as the golden baseline, yes or no?
 
-Decision: Pending operator decision
+Decision: Superseded. The 53-candidate hand-approval does not happen. Baselines are recorded automatically by gate 4.0.6, after the render reaches its final form in this spec. Rationale: hand-approving 53 PNGs before the harness could detect a single regression bought no protection that automatic recording does not.
 
 <a id="h-002"></a>
 
@@ -78,7 +82,7 @@ Evidence:
 
 Question: Approve this registry schema, including the seven-value specimen vocabulary and required `initialState`, as frozen for Phase 3, yes or no?
 
-Decision: Pending operator decision
+Decision: Not frozen. The specimen vocabulary stays open and harness-internal. This rung adds no specimen type; `initialState` and the structural validations stay because they catch real registry defects.
 
 <a id="h-003"></a>
 
@@ -101,7 +105,7 @@ Evidence:
 
 Question: Approve these metric definitions and the five coverage measures, yes or no?
 
-Decision: Pending operator decision
+Decision: Approved as defined.
 
 <a id="h-004"></a>
 
@@ -122,7 +126,7 @@ Evidence:
 
 Question: Approve the manifest-backed, operator-only golden blessing process, yes or no?
 
-Decision: Pending operator decision
+Decision: Superseded by the recorded-baseline model in [AGENTS.md](../AGENTS.md). The manifest survives as an integrity record, not as an approval ceremony. Rationale: the ceremony required an operator to hand-bless every capture before the suite could fail, and that cost was never paid.
 
 <a id="h-005"></a>
 
@@ -164,7 +168,4 @@ Evidence:
 
 Question: Add a second viewport and regenerate candidates before H-001 is answered, yes or no?
 
-Decision: Pending operator decision
-
-If the answer is no, the roster stays at one viewport and the question returns
-in Phase 3. Capture identity already carries the dimension in either case.
+Decision: Yes, add a second viewport, scoped to the status-family scenarios only. Viewports are per scenario, and a second capture of a palette swatch grid buys nothing. Capture identity already carries the viewport name, so the roster extension is additive.

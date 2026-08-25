@@ -46,7 +46,7 @@ The charter is authoritative. Where the one-pager and the charter disagree, the 
 
 These are non-negotiable. Each exists because violating it breaks something an agent cannot see from inside a single task.
 
-- **Never regenerate golden images.** Golden approval is an operator action, with the same posture as pushes and merges. An agent that breaks a golden and regenerates it has deleted a failing test, and a regenerated capture looks like work product rather than like a deletion. When a golden fails, stop and surface the diff.
+- **Baselines record automatically; agents never rewrite them.** A capture case with no recorded baseline records one automatically. An agent never modifies or deletes a baseline that exists: a capture that disagrees with its baseline is a failure to surface, never a file to refresh, because a regenerated capture looks like work product rather than like a deletion. Accepting a changed render is an operator action performed by deleting the baseline PNG and its manifest entry, which appears in the diff as a deletion. When a comparison fails, stop and surface the diff.
 - **No raster assets in the framework or its themes.** Texture, ornament, and frames are produced with CSS and inline SVG. The framework raster count is a published metric and its correct value is zero.
 - **No module may depend on another module.** Modules compose core primitives. A primitive that two modules both need is promoted to core, never shared sideways.
 - **Frozen token names are API.** Renaming a semantic token is a major version. Values stay tunable until v1.0; the vocabulary does not. No hue-named tokens (`pink`), no domain-named tokens (`mana`, `hp`, `xp`).
