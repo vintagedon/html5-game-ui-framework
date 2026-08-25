@@ -48,11 +48,16 @@ test("the case matrix is scenario by theme by viewport by checkpoint", async () 
   );
 });
 
-test("the real registry produces 53 viewport-qualified cases", async () => {
+test("the real registry produces the full viewport-qualified case matrix", async () => {
   const { buildCases, captureIdentity } = await runnerCases();
   const cases = buildCases(registry);
+  // Hand-computed expansion: scenario count x themes x viewports x checkpoints.
+  // palette 1 theme, semantic 4, panel 4, button 16, input 16, spike 4,
+  // meter family desktop: core-meter 8, segmented 16, pips 16, vertical 8,
+  // damage 12.
+  const expected = 1 + 4 + 4 + 16 + 16 + 4 + 8 + 16 + 16 + 8 + 12;
+  assert.equal(cases.length, expected);
 
-  assert.equal(cases.length, 53);
   assert.equal(
     captureIdentity(cases[0]),
     "foundations-palette/modern/desktop/resting.png",
@@ -62,7 +67,7 @@ test("the real registry produces 53 viewport-qualified cases", async () => {
 });
 
 test("the viewport roster remains one entry per scenario", () => {
-  assert.equal(registry.scenarios.length, 7);
+  assert.equal(registry.scenarios.length, 11);
   for (const scenario of registry.scenarios) {
     assert.equal(scenario.viewports.length, 1, scenario.id);
   }

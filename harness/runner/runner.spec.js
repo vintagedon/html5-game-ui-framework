@@ -21,7 +21,7 @@
  *                 operator approves goldens (agents never write the approved path).
  */
 
-import { test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -55,6 +55,19 @@ const approvalManifest = readApprovalManifest();
 
 // One case per scenario x theme x viewport x checkpoint, all registry-sourced.
 const cases = buildCases(registry);
+const METER_SCENARIOS = registry.scenarios.filter((s) => s.specimen === "meter");
+const QUANTIZED_SAMPLES = METER_SCENARIOS.flatMap((s) =>
+  (s.config.samples || [])
+    .filter((m) => m.shape === "segmented" || m.shape === "pips")
+    .map((m) => ({ scenarioId: s.id, variant: m.variant, shape: m.shape })),
+);
+const TRAIL_SAMPLES = METER_SCENARIOS.flatMap((s) =>
+  (s.config.samples || [])
+    .filter((m) => m.trail != null)
+    .map((m) => ({ scenarioId: s.id, variant: m.variant })),
+);
+const SETTLE_STYLE =
+  ":where(*, *::before, *::after) { transition: none !important; animation: none !important; }";
 const SEMANTIC_DECLARATIONS = semanticDeclarations();
 const DESIGNED_KEYS = new Set(
   designedPairs().map(([foreground, background]) =>
@@ -131,9 +144,7 @@ for (const c of cases) {
       });
       await page.goto(PAGE, { waitUntil: "networkidle" });
       await page.locator(`[data-scenario="${c.id}"]`).waitFor({ state: "visible" });
-      await page.addStyleTag({
-        content: ":where(*, *::before, *::after) { transition: none !important; animation: none !important; }",
-      });
+      await page.addStyleTag({ content: SETTLE_STYLE });
 
       // Set this case's theme on the root, then let transitions settle.
       await page.evaluate((t) => {
@@ -205,6 +216,235 @@ for (const c of cases) {
     },
   );
 }
+
+// Meter family synchronization. These run where a drift would otherwise fail
+// silently: in the browser, against computed geometry, for every registered
+// shape and orientation. Targets derive from the registry, never a fixed list.
+test("meter fill geometry, visible text, and accessible value agree across the family", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto(PAGE, { waitUntil: "networkidle" });
+  await page.addStyleTag({ content: SETTLE_STYLE });
+  for (const scenario of METER_SCENARIOS) {
+    await page.locator(`[data-scenario="${scenario.id}"]`).waitFor({ state: "visible" });
+  }
+
+  const observations = await page.evaluate(() => {
+    // Pips clip their paint rather than their box, so a pip fill's honest
+    // geometry is how many unit centers it still hit-tests over; segmented
+    // and continuous fills size their box directly.
+    const filledUnits = (meter, fill, vertical, count) => {
+      const box = meter.getBoundingClientRect();
+      const style = getComputedStyle(meter);
+      // Probes resolve against the fill's box, which is the meter's content
+      // box: the border belongs to the track, not to any unit.
+      const innerW = box.width - Number.parseFloat(style.borderLeftWidth) - Number.parseFloat(style.borderRightWidth);
+      const innerH = box.height - Number.parseFloat(style.borderTopWidth) - Number.parseFloat(style.borderBottomWidth);
+      let filled = 0;
+      for (let i = 0; i < count; i += 1) {
+        const x = vertical ? box.x + box.width / 2 : box.x + Number.parseFloat(style.borderLeftWidth) + ((i + 0.5) * innerW) / count;
+        const y = vertical
+          ? box.y + box.height - Number.parseFloat(style.borderBottomWidth) - ((i + 0.5) * innerH) / count
+          : box.y + box.height / 2;
+        const hit = document.elementFromPoint(x, y);
+        if (hit && (hit === fill || fill.contains(hit))) filled += 1;
+      }
+      return filled;
+    };
+    const fillFraction = (meter, fill, vertical) => {
+      const box = meter.getBoundingClientRect();
+      const style = getComputedStyle(meter);
+      const inner = vertical
+        ? box.height - Number.parseFloat(style.borderTopWidth) - Number.parseFloat(style.borderBottomWidth)
+        : box.width - Number.parseFloat(style.borderLeftWidth) - Number.parseFloat(style.borderRightWidth);
+      const fillBox = fill.getBoundingClientRect();
+      return vertical ? fillBox.height / inner : fillBox.width / inner;
+    };
+    const out = [];
+    for (const section of document.querySelectorAll("[data-scenario]")) {
+      for (const meter of section.querySelectorAll(".gc-meter")) {
+        meter.scrollIntoView({ block: "center", inline: "center" });
+        const fill = meter.querySelector(".gc-meter__fill");
+        const display = meter.parentElement?.querySelector("[data-meter-display]");
+        const shape = meter.dataset.shape || "continuous";
+        const vertical = meter.dataset.orientation === "vertical";
+        const countRaw = getComputedStyle(meter).getPropertyValue("--gc-meter-count").trim();
+        const count = countRaw ? Number(countRaw) : null;
+        const fraction = shape === "pips"
+          ? filledUnits(meter, fill, vertical, count) / count
+          : fillFraction(meter, fill, vertical);
+        out.push({
+          scenario: section.dataset.scenario,
+          variant: meter.dataset.variant,
+          shape,
+          orientation: meter.dataset.orientation || "horizontal",
+          aria: Number(meter.getAttribute("aria-valuenow")),
+          displayText: display ? display.textContent : null,
+          fraction,
+          count,
+        });
+      }
+    }
+    return out;
+  });
+
+  expect(observations.length).toBeGreaterThan(0);
+  const seen = new Set();
+  for (const o of observations) {
+    const where = `${o.scenario}/${o.variant} (${o.shape}/${o.orientation})`;
+    expect(o.displayText, `${where} display text`).toBe(`${o.aria}%`);
+    const expectedFraction = o.count
+      ? Math.round((o.count * o.aria) / 100) / o.count
+      : o.aria / 100;
+    expect(
+      Math.abs(o.fraction - expectedFraction),
+      `${where} fill geometry vs accessible value`,
+    ).toBeLessThan(0.01);
+    seen.add(`${o.shape}/${o.orientation}`);
+  }
+  for (const coverage of [
+    "continuous/horizontal",
+    "segmented/horizontal",
+    "pips/horizontal",
+    "continuous/vertical",
+    "segmented/vertical",
+    "pips/vertical",
+  ]) {
+    expect(seen.has(coverage), `geometry must be observed for ${coverage}`).toBe(true);
+  }
+});
+
+test("segmented and pip fills land on whole units at empty, partial, and full values", async ({ page }) => {
+  expect(QUANTIZED_SAMPLES.length).toBeGreaterThan(0);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto(PAGE, { waitUntil: "networkidle" });
+  await page.addStyleTag({ content: SETTLE_STYLE });
+
+  for (const value of [0, 43, 100]) {
+    for (const target of QUANTIZED_SAMPLES) {
+      await page
+        .locator(`[data-scenario="${target.scenarioId}"] .gc-meter[data-variant="${target.variant}"]`)
+        .evaluate(applyMeterValue, String(value));
+    }
+    const readings = await page.evaluate((targets) => {
+      const filledUnits = (meter, fill, vertical, count) => {
+        const box = meter.getBoundingClientRect();
+        const style = getComputedStyle(meter);
+        const innerW = box.width - Number.parseFloat(style.borderLeftWidth) - Number.parseFloat(style.borderRightWidth);
+        const innerH = box.height - Number.parseFloat(style.borderTopWidth) - Number.parseFloat(style.borderBottomWidth);
+        let filled = 0;
+        for (let i = 0; i < count; i += 1) {
+          const x = vertical ? box.x + box.width / 2 : box.x + Number.parseFloat(style.borderLeftWidth) + ((i + 0.5) * innerW) / count;
+          const y = vertical
+            ? box.y + box.height - Number.parseFloat(style.borderBottomWidth) - ((i + 0.5) * innerH) / count
+            : box.y + box.height / 2;
+          const hit = document.elementFromPoint(x, y);
+          if (hit && (hit === fill || fill.contains(hit))) filled += 1;
+        }
+        return filled;
+      };
+      const out = [];
+      for (const target of targets) {
+        const meter = document.querySelector(
+          `[data-scenario="${target.scenarioId}"] .gc-meter[data-variant="${target.variant}"]`,
+        );
+        meter.scrollIntoView({ block: "center", inline: "center" });
+        const fill = meter.querySelector(".gc-meter__fill");
+        const shape = meter.dataset.shape || "continuous";
+        const vertical = meter.dataset.orientation === "vertical";
+        const count = Number(getComputedStyle(meter).getPropertyValue("--gc-meter-count").trim());
+        let fraction;
+        let units;
+        if (shape === "pips") {
+          units = filledUnits(meter, fill, vertical, count);
+          fraction = units / count;
+        } else {
+          const box = meter.getBoundingClientRect();
+          const style = getComputedStyle(meter);
+          const fillBox = fill.getBoundingClientRect();
+          fraction = vertical
+            ? fillBox.height / (box.height - Number.parseFloat(style.borderTopWidth) - Number.parseFloat(style.borderBottomWidth))
+            : fillBox.width / (box.width - Number.parseFloat(style.borderLeftWidth) - Number.parseFloat(style.borderRightWidth));
+          units = fraction * count;
+        }
+        out.push({
+          ...target,
+          shape,
+          value: Number(meter.getAttribute("aria-valuenow")),
+          count,
+          fraction,
+          units,
+        });
+      }
+      return out;
+    }, QUANTIZED_SAMPLES);
+
+    for (const r of readings) {
+      const where = `${r.scenarioId}/${r.variant} (${r.shape}) at ${r.value}%`;
+      const expectedUnits = Math.round((r.count * r.value) / 100);
+      if (r.shape === "pips") {
+        expect(r.units, `${where} filled pip count`).toBe(expectedUnits);
+      } else {
+        expect(Math.abs(r.units - expectedUnits), `${where} filled segment count`).toBeLessThan(0.05);
+      }
+      if (r.value === 0) {
+        expect(r.units, `${where} must show no partial artifact when empty`).toBe(0);
+      }
+      if (r.value === 100) {
+        expect(r.units, `${where} must fill every unit without an end artifact`).toBe(r.count);
+      }
+    }
+  }
+});
+
+test("the damage trail keeps the previous value's geometry while the fill moves", async ({ page }) => {
+  expect(TRAIL_SAMPLES.length).toBeGreaterThan(0);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto(PAGE, { waitUntil: "networkidle" });
+  await page.addStyleTag({ content: SETTLE_STYLE });
+
+  const before = await page.evaluate((targets) => targets.map((target) => {
+    const meter = document.querySelector(
+      `[data-scenario="${target.scenarioId}"] .gc-meter[data-variant="${target.variant}"]`,
+    );
+    return { ...target, previous: Number(meter.getAttribute("aria-valuenow")) };
+  }), TRAIL_SAMPLES);
+
+  for (const target of before) {
+    await page
+      .locator(`[data-scenario="${target.scenarioId}"] .gc-meter[data-variant="${target.variant}"]`)
+      .evaluate(applyMeterValue, "38");
+  }
+
+  const readings = await page.evaluate((targets) => {
+    const out = [];
+    for (const target of targets) {
+      const meter = document.querySelector(
+        `[data-scenario="${target.scenarioId}"] .gc-meter[data-variant="${target.variant}"]`,
+      );
+      const fill = meter.querySelector(".gc-meter__fill");
+      const trail = meter.querySelector(".gc-meter__trail");
+      const trackBox = meter.getBoundingClientRect();
+      out.push({
+        ...target,
+        aria: Number(meter.getAttribute("aria-valuenow")),
+        fillFraction: fill.getBoundingClientRect().width / trackBox.width,
+        trailFraction: trail.getBoundingClientRect().width / trackBox.width,
+      });
+    }
+    return out;
+  }, TRAIL_SAMPLES);
+
+  for (const r of readings) {
+    const target = before.find((b) => b.scenarioId === r.scenarioId && b.variant === r.variant);
+    const where = `${r.scenarioId}/${r.variant}`;
+    expect(r.aria, `${where} accessible value`).toBe(38);
+    expect(Math.abs(r.fillFraction - 0.38), `${where} fill geometry`).toBeLessThan(0.01);
+    expect(
+      Math.abs(r.trailFraction - target.previous / 100),
+      `${where} trail holds the previous value`,
+    ).toBeLessThan(0.01);
+  }
+});
 
 // After the run, persist the executed matrix for inspection/mutation tests.
 test.afterAll(async () => {

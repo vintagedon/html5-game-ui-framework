@@ -232,6 +232,168 @@ export const registry = {
     },
 
     {
+      id: "core-meter-segmented",
+      layer: "core",
+      title: "Segmented meter",
+      summary:
+        "The fill quantizes to whole segments; the gaps are painted by the track, never emitted as markup.",
+      specimen: "meter",
+      initialState:
+        "The segmented meter displays 63 percent with five of eight segments filled.",
+      tokens: [
+        "--gc-meter-track",
+        "--gc-meter-fill",
+        "--gc-meter-text",
+        "--gc-meter-segments",
+      ],
+      themes: ALL_THEMES,
+      viewports: [DESKTOP],
+      config: {
+        samples: [
+          {
+            label: "Shield",
+            variant: "shield",
+            value: 63,
+            display: "63%",
+            shape: "segmented",
+            count: "var(--gc-meter-segments)",
+          },
+        ],
+      },
+      interactions: [
+        { name: "drain", action: "set-value", target: '.gc-meter[data-variant="shield"]', value: "25" },
+        { name: "empty", action: "set-value", target: '.gc-meter[data-variant="shield"]', value: "0" },
+        { name: "fill", action: "set-value", target: '.gc-meter[data-variant="shield"]', value: "100" },
+      ],
+      checkpoints: [
+        { name: "resting", after: [] },
+        { name: "drained", after: ["drain"] },
+        { name: "emptied", after: ["empty"] },
+        { name: "filled", after: ["fill"] },
+      ],
+      dependsOn: [],
+    },
+
+    {
+      id: "core-meter-pips",
+      layer: "core",
+      title: "Pip meter",
+      summary:
+        "Discrete units each read filled or empty; the pip count flows from a token through one custom property.",
+      specimen: "meter",
+      initialState: "The pip meter displays 70 percent with seven of ten pips filled.",
+      tokens: [
+        "--gc-meter-track",
+        "--gc-meter-fill",
+        "--gc-meter-text",
+        "--gc-meter-pips",
+      ],
+      themes: ALL_THEMES,
+      viewports: [DESKTOP],
+      config: {
+        samples: [
+          {
+            label: "Charges",
+            variant: "charges",
+            value: 70,
+            display: "70%",
+            shape: "pips",
+            count: "var(--gc-meter-pips)",
+          },
+        ],
+      },
+      interactions: [
+        { name: "drain", action: "set-value", target: '.gc-meter[data-variant="charges"]', value: "30" },
+        { name: "empty", action: "set-value", target: '.gc-meter[data-variant="charges"]', value: "0" },
+        { name: "fill", action: "set-value", target: '.gc-meter[data-variant="charges"]', value: "100" },
+      ],
+      checkpoints: [
+        { name: "resting", after: [] },
+        { name: "drained", after: ["drain"] },
+        { name: "emptied", after: ["empty"] },
+        { name: "filled", after: ["fill"] },
+      ],
+      dependsOn: [],
+    },
+
+    {
+      id: "core-meter-vertical",
+      layer: "core",
+      title: "Vertical meters",
+      summary:
+        "The same shapes render bottom-anchored in vertical orientation from unchanged value channels.",
+      specimen: "meter",
+      initialState:
+        "Vertical meters display velocity 64, heat 50, and cells 40 percent at rest.",
+      tokens: [
+        "--gc-meter-track",
+        "--gc-meter-fill",
+        "--gc-meter-text",
+        "--gc-meter-segments",
+        "--gc-meter-pips",
+      ],
+      themes: ALL_THEMES,
+      viewports: [DESKTOP],
+      config: {
+        samples: [
+          { label: "Velocity", variant: "velocity", value: 64, display: "64%", orientation: "vertical" },
+          {
+            label: "Heat",
+            variant: "heat",
+            value: 50,
+            display: "50%",
+            orientation: "vertical",
+            shape: "segmented",
+            count: "var(--gc-meter-segments)",
+          },
+          {
+            label: "Cells",
+            variant: "cells",
+            value: 40,
+            display: "40%",
+            orientation: "vertical",
+            shape: "pips",
+            count: "var(--gc-meter-pips)",
+          },
+        ],
+      },
+      interactions: [
+        { name: "drain", action: "set-value", target: '.gc-meter[data-variant="velocity"]', value: "22" },
+      ],
+      checkpoints: [
+        { name: "resting", after: [] },
+        { name: "drained", after: ["drain"] },
+      ],
+      dependsOn: [],
+    },
+
+    {
+      id: "core-meter-damage",
+      layer: "core",
+      title: "Damage trail",
+      summary:
+        "A secondary band holds the previous value behind the fill, reading as recent loss while the fill moves first.",
+      specimen: "meter",
+      initialState: "The hull meter reads 80 percent with no damage trail visible.",
+      tokens: ["--gc-meter-track", "--gc-meter-fill", "--gc-meter-text", "--gc-meter-trail"],
+      themes: ALL_THEMES,
+      viewports: [DESKTOP],
+      config: {
+        samples: [{ label: "Hull", variant: "hull", value: 80, display: "80%", trail: 80 }],
+      },
+      interactions: [
+        { name: "hit", action: "set-value", target: '.gc-meter[data-variant="hull"]', value: "38" },
+        { name: "repair", action: "set-value", target: '.gc-meter[data-variant="hull"]', value: "91" },
+      ],
+      checkpoints: [
+        { name: "resting", after: [] },
+        { name: "damaged", after: ["hit"] },
+        { name: "repaired", after: ["repair"] },
+      ],
+      dependsOn: [],
+    },
+
+    {
       id: "core-spike",
       layer: "core",
       title: "Dark-fantasy zero-raster spike",

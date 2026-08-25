@@ -145,10 +145,18 @@ test("initialState is required", () => {
 });
 
 test("all registered scenarios declare a nonempty initialState", () => {
-  assert.equal(registry.scenarios.length, 7);
+  assert.equal(registry.scenarios.length, 11);
   for (const scenario of registry.scenarios) {
     assert.equal(typeof scenario.initialState, "string", scenario.id);
     assert.match(scenario.initialState, /\S/, scenario.id);
+  }
+});
+
+test("every scenario declares a specimen inside the seven-value vocabulary", () => {
+  assert.equal(SPECIMEN_TYPES.length, 7);
+  const vocabulary = new Set(SPECIMEN_TYPES);
+  for (const scenario of registry.scenarios) {
+    assert.ok(vocabulary.has(scenario.specimen), `${scenario.id} names "${scenario.specimen}"`);
   }
 });
 

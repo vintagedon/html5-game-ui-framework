@@ -125,6 +125,20 @@
     color: var(--gc-meter-text);
   }
 
+  /* Vertical meter samples read side by side; horizontal samples keep the
+     stacked default. The selector keys off the rendered orientation, so no
+     scenario id or sample list lives here. */
+  .proof-card:has(.gc-meter[data-orientation="vertical"]) {
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    align-items: start;
+  }
+
+  .proof-card:has(.gc-meter[data-orientation="vertical"]) > div {
+    display: grid;
+    gap: var(--gc-space-3);
+    justify-items: start;
+  }
+
   .metrics-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));

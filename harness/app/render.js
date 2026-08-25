@@ -100,6 +100,7 @@ function inputSampleCard(s) {
   ]);
 }
 
+/** Meter specimen: continuous, segmented, and pip shapes in either orientation. */
 function meterSampleCard(s) {
   const c = s.config || {};
   return el("article", [["class", "gc-specimen gc-panel proof-card"]], [
@@ -109,10 +110,17 @@ function meterSampleCard(s) {
         el("span", [], [m.label]),
         el("span", [["data-meter-display", ""]], [m.display]),
       ]);
+      // The value drives the fill; the count and trail value are element-level
+      // channels so quantized geometry and the lagging trail stay in CSS, and
+      // counts stay token-valued rather than baked in as markup.
       const fill = el("div", [
         ["class", "gc-meter__fill"],
         ["style", `--gc-meter-value: ${m.value}%`],
       ]);
+      const meterStyle = [
+        ...(m.count ? [`--gc-meter-count: ${m.count}`] : []),
+        ...(m.trail != null ? [`--gc-meter-trail-value: ${m.trail}%`] : []),
+      ].join("; ");
       const meter = el(
         "div",
         [
@@ -123,8 +131,14 @@ function meterSampleCard(s) {
           ["aria-valuemin", "0"],
           ["aria-valuemax", "100"],
           ["aria-valuenow", String(m.value)],
+          ...(meterStyle ? [["style", meterStyle]] : []),
+          ...(m.shape ? [["data-shape", m.shape]] : []),
+          ...(m.orientation ? [["data-orientation", m.orientation]] : []),
         ],
-        [fill],
+        [
+          ...(m.trail != null ? [el("div", [["class", "gc-meter__trail"]])] : []),
+          fill,
+        ],
       );
       return el("div", [], [head, meter]);
     })),

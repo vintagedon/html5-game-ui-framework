@@ -120,6 +120,7 @@
 
   :where(.gc-meter) {
     position: relative;
+    isolation: isolate;
     overflow: hidden;
     block-size: 1rem;
     border: var(--gc-border-width) solid var(--gc-border-default);
@@ -128,11 +129,165 @@
     box-shadow: var(--gc-elevation-low);
   }
 
+  /* Shapes share one value channel: applyMeterValue writes --gc-meter-value
+   * raw, and quantized geometry is derived here so segmented and pip fills
+   * always land on whole-unit boundaries. round(nearest, count * value, step)
+   * yields the fill as a percentage already snapped to unit multiples. */
   :where(.gc-meter__fill) {
+    --gc-meter-quantized: calc(round(nearest, calc(var(--gc-meter-count, 1) * var(--gc-meter-value, 50%)), 100%) / var(--gc-meter-count, 1));
     block-size: 100%;
     inline-size: var(--gc-meter-value, 50%);
     border-radius: inherit;
     background-color: var(--gc-meter-fill);
-    transition: inline-size var(--gc-motion-slow) var(--gc-easing-standard);
+    transition:
+      inline-size var(--gc-motion-slow) var(--gc-easing-standard),
+      block-size var(--gc-motion-slow) var(--gc-easing-standard);
+  }
+
+  /* The damage trail sits behind the fill (negative z-index inside the
+   * meter's isolated context) and settles on a slower clock so it reads as
+   * lagging loss while the fill moves first. */
+  :where(.gc-meter__trail) {
+    --gc-meter-trail-quantized: calc(round(nearest, calc(var(--gc-meter-count, 1) * var(--gc-meter-trail-value, var(--gc-meter-value, 50%))), 100%) / var(--gc-meter-count, 1));
+    position: absolute;
+    z-index: -1;
+    inset-block: 0;
+    inset-inline-start: 0;
+    block-size: 100%;
+    inline-size: var(--gc-meter-trail-value, var(--gc-meter-value, 50%));
+    border-radius: inherit;
+    background-color: var(--gc-meter-trail);
+    transition:
+      inline-size calc(var(--gc-motion-slow) * 4) var(--gc-motion-base) var(--gc-easing-standard),
+      block-size calc(var(--gc-motion-slow) * 4) var(--gc-motion-base) var(--gc-easing-standard);
+  }
+
+  :where(.gc-meter[data-orientation="vertical"]) {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    inline-size: 1.25rem;
+    block-size: 12rem;
+  }
+
+  :where(.gc-meter[data-orientation="vertical"] > .gc-meter__fill) {
+    inline-size: 100%;
+    block-size: var(--gc-meter-value, 50%);
+  }
+
+  :where(.gc-meter[data-orientation="vertical"] > .gc-meter__trail) {
+    inset-inline: 0;
+    inset-block: auto 0;
+    inline-size: 100%;
+    block-size: var(--gc-meter-trail-value, var(--gc-meter-value, 50%));
+  }
+
+  :where(.gc-meter[data-shape="segmented"] > .gc-meter__fill) {
+    inline-size: var(--gc-meter-quantized);
+  }
+
+  :where(.gc-meter[data-shape="segmented"] > .gc-meter__trail) {
+    inline-size: var(--gc-meter-trail-quantized);
+  }
+
+  /* Segment gaps are painted over track and fill alike, so the same notch
+   * reads on both; the count arrives token-valued through --gc-meter-count. */
+  :where(.gc-meter[data-shape="segmented"])::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to right,
+      transparent 0,
+      transparent calc(100% / var(--gc-meter-count, 1) - 0.25rem),
+      var(--gc-meter-track) calc(100% / var(--gc-meter-count, 1) - 0.25rem),
+      var(--gc-meter-track) calc(100% / var(--gc-meter-count, 1))
+    );
+  }
+
+  :where(.gc-meter[data-orientation="vertical"][data-shape="segmented"] > .gc-meter__fill) {
+    block-size: var(--gc-meter-quantized);
+  }
+
+  :where(.gc-meter[data-orientation="vertical"][data-shape="segmented"] > .gc-meter__trail) {
+    block-size: var(--gc-meter-trail-quantized);
+  }
+
+  :where(.gc-meter[data-orientation="vertical"][data-shape="segmented"])::after {
+    background-image: repeating-linear-gradient(
+      to top,
+      transparent 0,
+      transparent calc(100% / var(--gc-meter-count, 1) - 0.25rem),
+      var(--gc-meter-track) calc(100% / var(--gc-meter-count, 1) - 0.25rem),
+      var(--gc-meter-track) calc(100% / var(--gc-meter-count, 1))
+    );
+  }
+
+  /* Pips are one painted dot per unit: the track draws the empty dots, the
+   * fill and trail draw their own dot rows clipped to whole units. */
+  :where(.gc-meter[data-shape="pips"]) {
+    --gc-meter-pip-tile: calc(100% / var(--gc-meter-count, 1));
+    block-size: 1.25rem;
+    background-color: transparent;
+    background-image: radial-gradient(
+      circle closest-side at 50% 50%,
+      color-mix(in oklch, var(--gc-meter-track) 62%, var(--gc-meter-fill)) 84%,
+      transparent 86%
+    );
+    background-size: var(--gc-meter-pip-tile) 100%;
+    background-repeat: repeat-x;
+    background-position: 0 50%;
+  }
+
+  :where(.gc-meter[data-shape="pips"] > .gc-meter__fill) {
+    inline-size: 100%;
+    background-color: transparent;
+    background-image: radial-gradient(
+      circle closest-side at 50% 50%,
+      var(--gc-meter-fill) 84%,
+      transparent 86%
+    );
+    background-size: var(--gc-meter-pip-tile) 100%;
+    background-repeat: repeat-x;
+    background-position: 0 50%;
+    clip-path: inset(0 calc(100% - var(--gc-meter-quantized)) 0 0);
+  }
+
+  :where(.gc-meter[data-shape="pips"] > .gc-meter__trail) {
+    inline-size: 100%;
+    background-color: transparent;
+    background-image: radial-gradient(
+      circle closest-side at 50% 50%,
+      var(--gc-meter-trail) 84%,
+      transparent 86%
+    );
+    background-size: var(--gc-meter-pip-tile) 100%;
+    background-repeat: repeat-x;
+    background-position: 0 50%;
+    clip-path: inset(0 calc(100% - var(--gc-meter-trail-quantized)) 0 0);
+  }
+
+  :where(.gc-meter[data-orientation="vertical"][data-shape="pips"]) {
+    /* Re-asserted after the pip strip height so the cascade keeps the tall
+     * vertical track instead of collapsing to the horizontal strip height. */
+    block-size: 12rem;
+    background-size: 100% var(--gc-meter-pip-tile);
+    background-repeat: repeat-y;
+  }
+
+  :where(.gc-meter[data-orientation="vertical"][data-shape="pips"] > .gc-meter__fill) {
+    block-size: 100%;
+    background-size: 100% var(--gc-meter-pip-tile);
+    background-repeat: repeat-y;
+    clip-path: inset(calc(100% - var(--gc-meter-quantized)) 0 0 0);
+  }
+
+  :where(.gc-meter[data-orientation="vertical"][data-shape="pips"] > .gc-meter__trail) {
+    block-size: 100%;
+    background-size: 100% var(--gc-meter-pip-tile);
+    background-repeat: repeat-y;
+    clip-path: inset(calc(100% - var(--gc-meter-trail-quantized)) 0 0 0);
   }
 }
