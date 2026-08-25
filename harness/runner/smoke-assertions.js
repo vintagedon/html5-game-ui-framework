@@ -1,14 +1,16 @@
 /**
  * Script Name : smoke-assertions.js
- * Description : Build separate published-preview smoke-test assertions.
+ * Description : Build published-preview smoke assertions for the section walk.
  * Repository  : html5-game-ui-framework
  * Author      : VintageDon (https://github.com/vintagedon/)
  * Created     : 2026-08-05
  * Link        : https://github.com/vintagedon/html5-game-ui-framework
  *
  * Pure verdict construction keeps the smoke test's acceptance contract under
- * Node unit coverage. The browser collector supplies observations, while this
- * module decides which claims pass and formats actionable failure details.
+ * Node unit coverage. The browser collector supplies per-view observations
+ * for the landing view and every section view; this module decides which
+ * claims pass and formats actionable failure details. Expected values come
+ * from the registry walk the caller passes in, never from a fixed list.
  */
 
 function assertion(id, label, expected, observed, pass, detail) {
@@ -25,6 +27,10 @@ function failureDetail(items) {
       return `${item.url || "unknown URL"}${status}${reason}`;
     })
     .join("; ");
+}
+
+function sortedList(items) {
+  return [...items].sort();
 }
 
 /**
@@ -53,88 +59,132 @@ export function moduleResponseFailure(response) {
 }
 
 /**
- * Build one result row for every published-preview acceptance assertion.
- * @param {object} observed
- * @param {{expectedScenarios: number, expectedThemes: number}} expected
+ * Build the per-view assertion rows for a completed walk.
+ *
+ * @param {Array<{view: string, kind: "landing"|"section", scenarioIds: string[], themeControlCount: number, themeSwitched: boolean, consoleErrors: Array, moduleFailures: Array, offOriginRequests: Array, navSectionIds?: string[], sectionCounts?: Record<string, number>, metricsVisible?: boolean, metricCardCount?: number, auditorVisible?: boolean, auditorViolationCount?: number, auditorSummary?: string}>} views
+ * @param {{sections: Array<{id: string, scenarioIds: string[]}>, themes: number, scenarioCount: number}} expected
  * @returns {{id: string, label: string, expected: unknown, observed: unknown, pass: boolean, detail: string}[]}
  */
-export function buildSmokeAssertions(observed, expected) {
-  const consoleErrors = observed.consoleErrors || [];
-  const moduleFailures = observed.moduleFailures || [];
-  const offOriginRequests = observed.offOriginRequests || [];
+export function buildSmokeAssertions(views, expected) {
+  const expectedBySection = new Map(expected.sections.map((s) => [s.id, s.scenarioIds]));
+  const assertions = [];
 
-  return [
-    assertion(
-      "scenarios-render",
-      "Seven scenarios render",
-      expected.expectedScenarios,
-      observed.scenarioCount,
-      observed.scenarioCount === expected.expectedScenarios,
-      `${observed.scenarioCount} rendered scenario(s)`,
-    ),
-    assertion(
-      "theme-controls",
-      "Four theme controls are present",
-      expected.expectedThemes,
-      observed.themeControlCount,
-      observed.themeControlCount === expected.expectedThemes,
-      `${observed.themeControlCount} theme control(s)`,
-    ),
-    assertion(
-      "metrics-visible",
-      "Metrics block is visible",
-      true,
-      observed.metricsVisible,
-      observed.metricsVisible === true,
-      `visible=${observed.metricsVisible}`,
-    ),
-    assertion(
-      "metric-cards",
-      "Metrics block has cards",
-      "greater than 0",
-      observed.metricCardCount,
-      observed.metricCardCount > 0,
-      `${observed.metricCardCount} metric card(s)`,
-    ),
-    assertion(
-      "auditor-visible",
-      "Dependency auditor block is visible",
-      true,
-      observed.auditorVisible,
-      observed.auditorVisible === true,
-      `visible=${observed.auditorVisible}`,
-    ),
-    assertion(
-      "auditor-clean",
-      "Dependency auditor reports zero violations",
-      0,
-      observed.auditorViolationCount,
-      observed.auditorViolationCount === 0,
-      observed.auditorSummary || `${observed.auditorViolationCount} violation(s)`,
-    ),
-    assertion(
-      "console-errors",
-      "Console errors are zero",
-      0,
-      consoleErrors.length,
-      consoleErrors.length === 0,
-      failureDetail(consoleErrors),
-    ),
-    assertion(
-      "module-load-failures",
-      "Module load failures are zero",
-      0,
-      moduleFailures.length,
-      moduleFailures.length === 0,
-      failureDetail(moduleFailures),
-    ),
-    assertion(
-      "off-origin-requests",
-      "Runtime off-origin requests are zero",
-      0,
-      offOriginRequests.length,
-      offOriginRequests.length === 0,
-      failureDetail(offOriginRequests),
-    ),
-  ];
+  for (const view of views) {
+    const where = view.kind === "landing" ? "landing" : `section ${view.view}`;
+    const expectedScenarios = view.kind === "landing"
+      ? []
+      : sortedList(expectedBySection.get(view.view) || []);
+
+    assertions.push(
+      assertion(
+        `${view.view}:scenarios-render`,
+        `${where} renders exactly the scenarios the registry files under it`,
+        expectedScenarios,
+        sortedList(view.scenarioIds || []),
+        JSON.stringify(sortedList(view.scenarioIds || [])) === JSON.stringify(expectedScenarios),
+        `${(view.scenarioIds || []).length} rendered: ${sortedList(view.scenarioIds || []).join(", ") || "none"}`,
+      ),
+      assertion(
+        `${view.view}:theme-controls`,
+        `${where} presents the theme toolbar`,
+        expected.themes,
+        view.themeControlCount,
+        view.themeControlCount === expected.themes,
+        `${view.themeControlCount} theme control(s)`,
+      ),
+      assertion(
+        `${view.view}:theme-switch`,
+        `${where} switches themes in place`,
+        true,
+        view.themeSwitched,
+        view.themeSwitched === true,
+        `switched=${view.themeSwitched}`,
+      ),
+      assertion(
+        `${view.view}:console-errors`,
+        `${where} console errors are zero`,
+        0,
+        (view.consoleErrors || []).length,
+        (view.consoleErrors || []).length === 0,
+        failureDetail(view.consoleErrors || []),
+      ),
+      assertion(
+        `${view.view}:module-load-failures`,
+        `${where} module load failures are zero`,
+        0,
+        (view.moduleFailures || []).length,
+        (view.moduleFailures || []).length === 0,
+        failureDetail(view.moduleFailures || []),
+      ),
+      assertion(
+        `${view.view}:off-origin-requests`,
+        `${where} runtime off-origin requests are zero`,
+        0,
+        (view.offOriginRequests || []).length,
+        (view.offOriginRequests || []).length === 0,
+        failureDetail(view.offOriginRequests || []),
+      ),
+    );
+
+    if (view.kind === "landing") {
+      const rosterIds = sortedList(expected.sections.map((s) => s.id));
+      const navIds = sortedList(view.navSectionIds || []);
+      assertions.push(
+        assertion(
+          "landing:section-links",
+          "Landing view links every roster section",
+          rosterIds,
+          navIds,
+          JSON.stringify(navIds) === JSON.stringify(rosterIds),
+          `${navIds.join(", ") || "none"}`,
+        ),
+        assertion(
+          "landing:section-counts",
+          "Landing view specimen counts match the registry",
+          expected.sections.map((s) => `${s.id}=${s.scenarioIds.length}`).join(" "),
+          expected.sections.map((s) => `${s.id}=${(view.sectionCounts || {})[s.id]}`).join(" "),
+          expected.sections.every(
+            (s) => (view.sectionCounts || {})[s.id] === s.scenarioIds.length,
+          ),
+          expected.sections
+            .map((s) => `${s.id}: observed ${(view.sectionCounts || {})[s.id]}, expected ${s.scenarioIds.length}`)
+            .join("; "),
+        ),
+        assertion(
+          "landing:metrics-visible",
+          "Metrics block is visible on the landing view",
+          true,
+          view.metricsVisible,
+          view.metricsVisible === true,
+          `visible=${view.metricsVisible}`,
+        ),
+        assertion(
+          "landing:metric-cards",
+          "Metrics block has cards",
+          "greater than 0",
+          view.metricCardCount,
+          view.metricCardCount > 0,
+          `${view.metricCardCount} metric card(s)`,
+        ),
+        assertion(
+          "landing:auditor-visible",
+          "Dependency auditor block is visible on the landing view",
+          true,
+          view.auditorVisible,
+          view.auditorVisible === true,
+          `visible=${view.auditorVisible}`,
+        ),
+        assertion(
+          "landing:auditor-clean",
+          "Dependency auditor reports zero violations",
+          0,
+          view.auditorViolationCount,
+          view.auditorViolationCount === 0,
+          view.auditorSummary || `${view.auditorViolationCount} violation(s)`,
+        ),
+      );
+    }
+  }
+
+  return assertions;
 }

@@ -25,7 +25,7 @@ const undeclaredThemeFiles = contract.themes.filter((t) => !registry.themes.incl
 
 const errors = validateRegistry(registry, contract);
 
-console.log(`registry: ${registry.scenarios.length} scenario(s), ${registry.themes.length} theme(s)`);
+console.log(`registry: ${registry.scenarios.length} scenario(s), ${registry.themes.length} theme(s), ${registry.sections.length} section(s)`);
 console.log(`contract: ${contract.tokens.length} tokens, ${contract.themes.length} themes derived from src/`);
 console.log(`layers:   ${LAYERS.join(", ")}`);
 

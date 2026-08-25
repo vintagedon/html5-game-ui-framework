@@ -1,17 +1,20 @@
 /**
  * Script Name : reference.js
- * Description : Build the registry-driven reference page and switch themes by root attribute.
+ * Description : Build the registry-driven reference views and switch themes by root attribute.
  * Repository  : html5-game-ui-framework
  * Author      : VintageDon (https://github.com/vintagedon/)
  * Created     : 2026-08-03
  * Link        : https://github.com/vintagedon/html5-game-ui-framework
  *
- * The page carries no per-scenario markup. This module imports the single
- * registry declaration and the shared renderer, builds a section per scenario,
- * generates the theme toolbar from the registry's theme roster, and switches
- * themes by setting data-gc-theme on <html> with no reload. It also surfaces the
- * computed metrics block (generated at build time) and the dependency-audit
- * result, both of which read the same registry.
+ * The page carries no per-scenario and no per-section markup. This module
+ * imports the single registry declaration and the shared renderer, builds the
+ * navigation tree from the registry's section roster, routes hash locations
+ * (`#/` for the landing view, `#/<section-id>` for a section view) with no
+ * build step, renders each view's scenarios from the declaration, generates
+ * the theme toolbar from the registry's theme roster, and switches themes by
+ * setting data-gc-theme on <html> with no reload. The landing view also
+ * surfaces the computed metrics block (generated at build time) and the
+ * dependency-audit result, both of which read the same registry.
  */
 
 import { registry } from "../harness/registry/scenarios.js";
@@ -19,6 +22,17 @@ import { scenarioSection } from "../harness/app/render.js";
 import { audit } from "../harness/auditor/auditor.js";
 
 const root = document.documentElement;
+let pendingScenarioScroll = null;
+
+function scenariosInSection(sectionId) {
+  return registry.scenarios.filter((s) => s.section === sectionId);
+}
+
+/** The routed section id, or "" for the landing view. Unknown hashes land. */
+function activeSectionId() {
+  const route = decodeURIComponent(location.hash.replace(/^#\/?/, "")).replace(/\/+$/, "");
+  return registry.sections.some((s) => s.id === route) ? route : "";
+}
 
 function buildThemeToolbar() {
   const toolbar = document.getElementById("theme-toolbar");
@@ -48,10 +62,134 @@ function buildThemeToolbar() {
   selectTheme(root.dataset.gcTheme || registry.themes[0]);
 }
 
-function buildScenarios() {
-  const host = document.getElementById("scenarios");
-  for (const scenario of registry.scenarios) {
-    host.append(scenarioSection(scenario));
+/** The persistent indented nav tree: roster sections, active one expanded. */
+function buildNav() {
+  const nav = document.getElementById("reference-nav");
+  const home = document.createElement("a");
+  home.className = "reference-nav__home";
+  home.href = "#/";
+  home.textContent = "Overview";
+  nav.append(home);
+
+  for (const section of registry.sections) {
+    const branch = document.createElement("div");
+    branch.className = "reference-nav__branch";
+    branch.dataset.navBranch = section.id;
+
+    const link = document.createElement("a");
+    link.className = "reference-nav__section-link";
+    link.href = `#/${section.id}`;
+    link.dataset.navSection = section.id;
+    link.textContent = section.title;
+    branch.append(link);
+
+    const items = document.createElement("ul");
+    items.className = "reference-nav__items";
+    for (const scenario of scenariosInSection(section.id)) {
+      const item = document.createElement("li");
+      const itemLink = document.createElement("a");
+      itemLink.className = "reference-nav__item-link";
+      itemLink.href = `#/${section.id}`;
+      itemLink.dataset.scenarioNav = scenario.id;
+      itemLink.textContent = scenario.title;
+      item.append(itemLink);
+      items.append(item);
+    }
+    branch.append(items);
+    nav.append(branch);
+  }
+
+  // A second-level click keeps the hash but scrolls to its scenario.
+  nav.addEventListener("click", (event) => {
+    const target = event.target.closest("[data-scenario-nav]");
+    if (target) pendingScenarioScroll = target.dataset.scenarioNav;
+  });
+}
+
+/** The landing view's section cards, each with its registry-derived count. */
+function buildLanding() {
+  const grid = document.getElementById("section-index-grid");
+  for (const section of registry.sections) {
+    const card = document.createElement("article");
+    card.className = "section-card";
+    card.dataset.navSection = section.id;
+
+    const heading = document.createElement("h3");
+    heading.textContent = section.title;
+
+    const summary = document.createElement("p");
+    summary.className = "section-copy";
+    summary.textContent = section.summary;
+
+    const count = document.createElement("span");
+    count.className = "section-card-count";
+    count.dataset.sectionCount = section.id;
+    count.textContent = `${scenariosInSection(section.id).length} specimen(s)`;
+
+    const link = document.createElement("a");
+    link.className = "section-card-link";
+    link.href = `#/${section.id}`;
+    link.dataset.navSection = section.id;
+    link.textContent = `Open ${section.title}`;
+
+    card.append(heading, summary, count, link);
+    grid.append(card);
+  }
+  document.getElementById("section-index").hidden = false;
+}
+
+function updateNavState(sectionId) {
+  for (const branch of document.querySelectorAll("[data-nav-branch]")) {
+    const active = branch.dataset.navBranch === sectionId;
+    branch.dataset.active = String(active);
+    const link = branch.querySelector(".reference-nav__section-link");
+    if (active) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  }
+  const home = document.querySelector(".reference-nav__home");
+  if (sectionId) home.removeAttribute("aria-current");
+  else home.setAttribute("aria-current", "page");
+}
+
+function renderSectionHead(sectionId) {
+  const head = document.getElementById("section-view-head");
+  head.replaceChildren();
+  const section = registry.sections.find((s) => s.id === sectionId);
+  if (!section) return;
+  const heading = document.createElement("h2");
+  heading.className = "section-heading";
+  heading.textContent = section.title;
+  const summary = document.createElement("p");
+  summary.className = "section-copy";
+  summary.textContent = section.summary;
+  head.append(heading, summary);
+}
+
+/** Hash routing: one shell, landing or one section view, no reload. */
+function renderView() {
+  const sectionId = activeSectionId();
+  const landing = document.getElementById("view-landing");
+  const sectionView = document.getElementById("view-section");
+
+  if (sectionId) {
+    landing.hidden = true;
+    const host = document.getElementById("scenarios");
+    host.replaceChildren();
+    for (const scenario of scenariosInSection(sectionId)) {
+      host.append(scenarioSection(scenario));
+    }
+    renderSectionHead(sectionId);
+    sectionView.hidden = false;
+  } else {
+    sectionView.hidden = true;
+    landing.hidden = false;
+  }
+  updateNavState(sectionId);
+
+  if (pendingScenarioScroll) {
+    const target = document.querySelector(`[data-scenario="${pendingScenarioScroll}"]`);
+    pendingScenarioScroll = null;
+    if (target) target.scrollIntoView({ block: "start" });
   }
 }
 
@@ -120,6 +258,9 @@ function buildAuditor() {
 }
 
 buildThemeToolbar();
-buildScenarios();
+buildNav();
+buildLanding();
 buildAuditor();
 buildMetrics();
+renderView();
+window.addEventListener("hashchange", renderView);

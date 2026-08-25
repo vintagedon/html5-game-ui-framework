@@ -30,6 +30,7 @@ function validScenario(id) {
     id,
     layer: "core",
     title: `Scenario ${id}`,
+    section: "core",
     specimen: "panel",
     initialState: "A panel is visible in its resting state.",
     tokens: ["--gc-test-token"],
@@ -42,7 +43,14 @@ function validScenario(id) {
 }
 
 function validRegistry(scenarios = [validScenario("one")]) {
-  return { themes: ["modern"], scenarios };
+  return {
+    themes: ["modern"],
+    sections: [
+      { id: "core", title: "Core", summary: "Core primitives." },
+      { id: "extra", title: "Extra", summary: "Another section." },
+    ],
+    scenarios,
+  };
 }
 
 function installDocumentStandIn() {
@@ -124,6 +132,45 @@ test("an unknown specimen produces a validation error", () => {
   const errors = validateRegistry(validRegistry([scenario]), CONTRACT);
 
   assert.match(errors.join("\n"), /unknown specimen "not-a-specimen"/);
+});
+
+test("a scenario naming a section off the roster is rejected", () => {
+  const scenario = { ...validScenario("stray-section"), section: "not-a-section" };
+  const errors = validateRegistry(validRegistry([scenario]), CONTRACT);
+
+  assert.match(errors.join("\n"), /names unknown section "not-a-section"/);
+});
+
+test("a scenario missing its section is rejected", () => {
+  const scenario = validScenario("missing-section");
+  delete scenario.section;
+  const errors = validateRegistry(validRegistry([scenario]), CONTRACT);
+
+  assert.match(errors.join("\n"), /missing section/);
+});
+
+test("a roster section with no scenarios is rejected", () => {
+  const registryFixture = validRegistry([validScenario("one")]);
+  const extra = registryFixture.sections.find((s) => s.id === "extra");
+  assert.ok(extra, "fixture carries an unused roster section");
+  const errors = validateRegistry(registryFixture, CONTRACT);
+
+  assert.match(errors.join("\n"), /section "extra" has no scenarios/);
+});
+
+test("the real registry files every scenario under a nonempty roster section", () => {
+  const errors = validateRegistry(registry, {
+    tokens: registry.scenarios.flatMap((s) => s.tokens),
+    themes: registry.themes,
+    layers: ["foundations", "core", "modules", "consumers"],
+  });
+  assert.deepEqual(errors.filter((e) => e.includes("section")), []);
+
+  const counts = new Map();
+  for (const s of registry.scenarios) counts.set(s.section, (counts.get(s.section) || 0) + 1);
+  for (const section of registry.sections) {
+    assert.ok(counts.get(section.id) > 0, `section ${section.id} must not be empty`);
+  }
 });
 
 test("a checkpoint after value must be an array", () => {

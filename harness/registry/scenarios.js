@@ -28,13 +28,46 @@ const DESKTOP = { name: "desktop", width: 1280, height: 800 };
 // specimens do not (H-006: viewports are per scenario).
 const COMPACT = { name: "compact", width: 480, height: 900 };
 
+// The section roster drives the reference application's navigation. A nav
+// tree, routing table, or page list written anywhere outside this file is a
+// second source of truth and a defect. Section membership is navigation, not
+// identity: it never enters a capture identity, so sections can be rearranged
+// without invalidating a single baseline.
+const SECTIONS = [
+  {
+    id: "foundations",
+    title: "Foundations",
+    summary: "Primitive palette scales and the semantic roles every layer consumes.",
+  },
+  {
+    id: "core",
+    title: "Core",
+    summary: "Domain-neutral primitives a consumer uses without translating game concepts.",
+  },
+  {
+    id: "status",
+    title: "Status",
+    summary: "The meter family: continuous, segmented, and pip shapes in both orientations, with a lagging damage trail.",
+  },
+  {
+    id: "technique",
+    title: "Technique",
+    summary: "Zero-raster technique proofs: generated surfaces, ornament, and displaced geometry from text assets.",
+  },
+];
+
 export const registry = {
   // The full theme roster. The validator cross-checks this against src/themes/*.
   themes: ALL_THEMES,
 
+  // The navigation roster. The validator requires every scenario to file
+  // under one of these and no roster section to be empty.
+  sections: SECTIONS,
+
   scenarios: [
     {
       id: "foundations-palette",
+      section: "foundations",
       layer: "foundations",
       title: "Primitive palette scales",
       summary:
@@ -73,6 +106,7 @@ export const registry = {
 
     {
       id: "foundations-semantic",
+      section: "foundations",
       layer: "foundations",
       title: "Semantic roles",
       summary: "These swatches change in place when the root theme attribute changes.",
@@ -109,6 +143,7 @@ export const registry = {
 
     {
       id: "core-panel",
+      section: "core",
       layer: "core",
       title: "Panel levels",
       summary:
@@ -136,6 +171,7 @@ export const registry = {
 
     {
       id: "core-button",
+      section: "core",
       layer: "core",
       title: "Button states",
       summary:
@@ -177,6 +213,7 @@ export const registry = {
 
     {
       id: "core-input",
+      section: "core",
       layer: "core",
       title: "Text input",
       summary: "Hover, focus, typed, and disabled inputs share one recipe set across themes.",
@@ -214,6 +251,7 @@ export const registry = {
 
     {
       id: "core-meter",
+      section: "status",
       layer: "core",
       title: "Meter",
       summary: "A track and fill whose value transitions on change, themed through semantic tokens.",
@@ -237,6 +275,7 @@ export const registry = {
 
     {
       id: "core-meter-segmented",
+      section: "status",
       layer: "core",
       title: "Segmented meter",
       summary:
@@ -280,6 +319,7 @@ export const registry = {
 
     {
       id: "core-meter-pips",
+      section: "status",
       layer: "core",
       title: "Pip meter",
       summary:
@@ -322,6 +362,7 @@ export const registry = {
 
     {
       id: "core-meter-vertical",
+      section: "status",
       layer: "core",
       title: "Vertical meters",
       summary:
@@ -373,6 +414,7 @@ export const registry = {
 
     {
       id: "core-meter-damage",
+      section: "status",
       layer: "core",
       title: "Damage trail",
       summary:
@@ -399,6 +441,7 @@ export const registry = {
 
     {
       id: "core-spike",
+      section: "technique",
       layer: "core",
       title: "Dark-fantasy zero-raster spike",
       summary:

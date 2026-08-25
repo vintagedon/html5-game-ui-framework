@@ -8,11 +8,13 @@
  *
  * Pure: no file system, no console. validateRegistry(registry, contract) returns
  * a list of human-readable error strings. An empty list means the registry is
- * internally consistent and names only tokens, themes, and layers that the
- * contract says exist. The contract (tokens, themes) is read from src/ by
- * source.js; layers come from layers.js. The validator is therefore the gate
- * that stops a scenario from naming a token or theme that does not exist, which
- * would otherwise produce a green run of a broken specimen.
+ * internally consistent and names only tokens, themes, layers, and sections
+ * that the contract says exist. The contract (tokens, themes) is read from
+ * src/ by source.js; layers come from layers.js; the section roster rides the
+ * registry itself and must be nonempty and fully used. The validator is
+ * therefore the gate that stops a scenario from naming a token, theme, or
+ * section that does not exist, which would otherwise produce a green run of a
+ * broken specimen.
  */
 
 import { SPECIMEN_TYPES } from "../app/specimens.js";
@@ -64,12 +66,36 @@ export function validateRegistry(registry, contract) {
     if (!themeSet.has(t)) push(errors, "registry.themes", `unknown theme "${t}"`);
   }
 
+  const sections = Array.isArray(registry.sections) ? registry.sections : [];
+  if (sections.length === 0) {
+    push(errors, "registry", "declares no section roster");
+  }
+  const sectionIds = new Set();
+  for (const sec of sections) {
+    if (!sec || typeof sec !== "object" || typeof sec.id !== "string" || !sec.id) {
+      push(errors, "registry.sections", "entry missing stable id");
+      continue;
+    }
+    if (sectionIds.has(sec.id)) {
+      push(errors, "registry.sections", `duplicate section id "${sec.id}"`);
+      continue;
+    }
+    sectionIds.add(sec.id);
+    if (typeof sec.title !== "string" || !sec.title) {
+      push(errors, `section "${sec.id}"`, "missing title");
+    }
+    if (typeof sec.summary !== "string" || !sec.summary) {
+      push(errors, `section "${sec.id}"`, "missing summary");
+    }
+  }
+
   const scenarios = Array.isArray(registry.scenarios) ? registry.scenarios : [];
   if (scenarios.length === 0) {
     push(errors, "registry", "declares no scenarios");
   }
 
   const ids = new Set();
+  const usedSections = new Set();
   for (const s of scenarios) {
     const where = `scenario "${s && s.id ? s.id : "<no id>"}"`;
 
@@ -86,6 +112,13 @@ export function validateRegistry(registry, contract) {
 
     if (!layerSet.has(s.layer)) push(errors, where, `undeclared layer "${s.layer}"`);
     if (typeof s.title !== "string" || !s.title) push(errors, where, "missing title");
+    if (typeof s.section !== "string" || !s.section) {
+      push(errors, where, "missing section");
+    } else if (sectionIds.size > 0 && !sectionIds.has(s.section)) {
+      push(errors, where, `names unknown section "${s.section}"`);
+    } else {
+      usedSections.add(s.section);
+    }
     if (typeof s.specimen !== "string" || !s.specimen) {
       push(errors, where, "missing specimen");
     } else if (!specimenSet.has(s.specimen)) {
@@ -172,6 +205,12 @@ export function validateRegistry(registry, contract) {
 
     if (!Array.isArray(s.dependsOn)) {
       push(errors, where, "dependsOn must be an array");
+    }
+  }
+
+  for (const id of sectionIds) {
+    if (!usedSections.has(id)) {
+      push(errors, "registry.sections", `section "${id}" has no scenarios`);
     }
   }
 
