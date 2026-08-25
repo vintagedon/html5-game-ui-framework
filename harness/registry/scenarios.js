@@ -24,6 +24,10 @@ const ALL_THEMES = ["modern", "arcade", "sci-fi", "fantasy"];
 
 const DESKTOP = { name: "desktop", width: 1280, height: 800 };
 
+// Status-family chrome gets a portrait second viewport; swatch and spike
+// specimens do not (H-006: viewports are per scenario).
+const COMPACT = { name: "compact", width: 480, height: 900 };
+
 export const registry = {
   // The full theme roster. The validator cross-checks this against src/themes/*.
   themes: ALL_THEMES,
@@ -217,7 +221,7 @@ export const registry = {
       initialState: "The charge meter displays and exposes a value of 72 percent.",
       tokens: ["--gc-meter-track", "--gc-meter-fill", "--gc-meter-text"],
       themes: ALL_THEMES,
-      viewports: [DESKTOP],
+      viewports: [DESKTOP, COMPACT],
       config: {
         samples: [{ label: "Charge", variant: "charge", value: 72, display: "72%" }],
       },
@@ -247,7 +251,7 @@ export const registry = {
         "--gc-meter-segments",
       ],
       themes: ALL_THEMES,
-      viewports: [DESKTOP],
+      viewports: [DESKTOP, COMPACT],
       config: {
         samples: [
           {
@@ -289,7 +293,7 @@ export const registry = {
         "--gc-meter-pips",
       ],
       themes: ALL_THEMES,
-      viewports: [DESKTOP],
+      viewports: [DESKTOP, COMPACT],
       config: {
         samples: [
           {
@@ -333,7 +337,7 @@ export const registry = {
         "--gc-meter-pips",
       ],
       themes: ALL_THEMES,
-      viewports: [DESKTOP],
+      viewports: [DESKTOP, COMPACT],
       config: {
         samples: [
           { label: "Velocity", variant: "velocity", value: 64, display: "64%", orientation: "vertical" },
@@ -377,7 +381,7 @@ export const registry = {
       initialState: "The hull meter reads 80 percent with no damage trail visible.",
       tokens: ["--gc-meter-track", "--gc-meter-fill", "--gc-meter-text", "--gc-meter-trail"],
       themes: ALL_THEMES,
-      viewports: [DESKTOP],
+      viewports: [DESKTOP, COMPACT],
       config: {
         samples: [{ label: "Hull", variant: "hull", value: 80, display: "80%", trail: 80 }],
       },

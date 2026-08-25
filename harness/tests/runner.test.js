@@ -52,24 +52,104 @@ test("the real registry produces the full viewport-qualified case matrix", async
   const { buildCases, captureIdentity } = await runnerCases();
   const cases = buildCases(registry);
   // Hand-computed expansion: scenario count x themes x viewports x checkpoints.
-  // palette 1 theme, semantic 4, panel 4, button 16, input 16, spike 4,
-  // meter family desktop: core-meter 8, segmented 16, pips 16, vertical 8,
-  // damage 12.
-  const expected = 1 + 4 + 4 + 16 + 16 + 4 + 8 + 16 + 16 + 8 + 12;
+  // Desktop-only: palette 1 theme, semantic 4, panel 4, button 16, input 16,
+  // spike 4 (45). Status family on desktop plus compact (8 cp-sets of 4
+  // themes each): core-meter 2x4x2=16, segmented 4x4x2=32, pips 4x4x2=32,
+  // vertical 2x4x2=16, damage 3x4x2=24 (120).
+  const expected = 45 + 16 + 32 + 32 + 16 + 24;
   assert.equal(cases.length, expected);
 
   assert.equal(
     captureIdentity(cases[0]),
     "foundations-palette/modern/desktop/resting.png",
   );
-  assert.ok(cases.every((entry) => entry.viewport.width === 1280));
-  assert.ok(cases.every((entry) => entry.viewport.height === 800));
 });
 
-test("the viewport roster remains one entry per scenario", () => {
+test("the viewport roster stays desktop-only off the family and desktop plus compact on it", () => {
   assert.equal(registry.scenarios.length, 11);
   for (const scenario of registry.scenarios) {
-    assert.equal(scenario.viewports.length, 1, scenario.id);
+    const names = scenario.viewports.map((v) => v.name);
+    const family =
+      scenario.id === "core-meter" || scenario.id.startsWith("core-meter-");
+    if (family) {
+      assert.deepEqual(names, ["desktop", "compact"], scenario.id);
+      const compact = scenario.viewports.find((v) => v.name === "compact");
+      assert.deepEqual(
+        [compact.width, compact.height],
+        [480, 900],
+        scenario.id,
+      );
+    } else {
+      assert.deepEqual(names, ["desktop"], scenario.id);
+    }
+  }
+});
+
+// Recorded before the compact viewport existed (work-logs/evidence/
+// 2026-08-25-h5gameui-04/gate-4.0.2-matrix-pre-refactor.json). Every identity
+// must keep appearing unchanged so established baselines survive roster edits.
+const PRE_COMPACT_IDENTITIES = [
+  "core-button/arcade/desktop/focus.png",
+  "core-button/arcade/desktop/hover.png",
+  "core-button/arcade/desktop/resting.png",
+  "core-button/arcade/desktop/selected.png",
+  "core-button/fantasy/desktop/focus.png",
+  "core-button/fantasy/desktop/hover.png",
+  "core-button/fantasy/desktop/resting.png",
+  "core-button/fantasy/desktop/selected.png",
+  "core-button/modern/desktop/focus.png",
+  "core-button/modern/desktop/hover.png",
+  "core-button/modern/desktop/resting.png",
+  "core-button/modern/desktop/selected.png",
+  "core-button/sci-fi/desktop/focus.png",
+  "core-button/sci-fi/desktop/hover.png",
+  "core-button/sci-fi/desktop/resting.png",
+  "core-button/sci-fi/desktop/selected.png",
+  "core-input/arcade/desktop/focused.png",
+  "core-input/arcade/desktop/hover.png",
+  "core-input/arcade/desktop/resting.png",
+  "core-input/arcade/desktop/typed.png",
+  "core-input/fantasy/desktop/focused.png",
+  "core-input/fantasy/desktop/hover.png",
+  "core-input/fantasy/desktop/resting.png",
+  "core-input/fantasy/desktop/typed.png",
+  "core-input/modern/desktop/focused.png",
+  "core-input/modern/desktop/hover.png",
+  "core-input/modern/desktop/resting.png",
+  "core-input/modern/desktop/typed.png",
+  "core-input/sci-fi/desktop/focused.png",
+  "core-input/sci-fi/desktop/hover.png",
+  "core-input/sci-fi/desktop/resting.png",
+  "core-input/sci-fi/desktop/typed.png",
+  "core-meter/arcade/desktop/drained.png",
+  "core-meter/arcade/desktop/resting.png",
+  "core-meter/fantasy/desktop/drained.png",
+  "core-meter/fantasy/desktop/resting.png",
+  "core-meter/modern/desktop/drained.png",
+  "core-meter/modern/desktop/resting.png",
+  "core-meter/sci-fi/desktop/drained.png",
+  "core-meter/sci-fi/desktop/resting.png",
+  "core-panel/arcade/desktop/resting.png",
+  "core-panel/fantasy/desktop/resting.png",
+  "core-panel/modern/desktop/resting.png",
+  "core-panel/sci-fi/desktop/resting.png",
+  "core-spike/arcade/desktop/resting.png",
+  "core-spike/fantasy/desktop/resting.png",
+  "core-spike/modern/desktop/resting.png",
+  "core-spike/sci-fi/desktop/resting.png",
+  "foundations-palette/modern/desktop/resting.png",
+  "foundations-semantic/arcade/desktop/resting.png",
+  "foundations-semantic/fantasy/desktop/resting.png",
+  "foundations-semantic/modern/desktop/resting.png",
+  "foundations-semantic/sci-fi/desktop/resting.png",
+];
+
+test("every pre-compact capture identity still appears unchanged", async () => {
+  const { buildCases, captureIdentity } = await runnerCases();
+  const identities = new Set(buildCases(registry).map(captureIdentity));
+  assert.equal(PRE_COMPACT_IDENTITIES.length, 53);
+  for (const identity of PRE_COMPACT_IDENTITIES) {
+    assert.ok(identities.has(identity), `missing pre-existing identity ${identity}`);
   }
 });
 
