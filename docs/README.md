@@ -3,8 +3,8 @@
 title: "Documentation"
 description: "Project documentation, standards, and reference materials"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-05"
-version: "1.5"
+date: "2026-08-25"
+version: "1.6"
 status: "Active"
 tags:
   - type: directory-readme
@@ -45,12 +45,13 @@ docs/
 │   └── README.md
 ├── cascade-and-overrides.md         # Layer precedence and consumer override contract
 ├── foundations-review-2026-08-02.md  # Closed Phase 1 decisions
-├── harness-review-2026-08-05.md     # H-001 through H-006 decisions
+├── harness-review-2026-08-05.md     # Recorded H-001 through H-006 decisions
 ├── project-charter.md              # Frozen scope, architecture, acceptance criteria
 ├── reference-corpus/               # UI pack catalog and capability map (public-derived)
 │   ├── ui-pack-inventory.json
 │   ├── ui-pack-capability-map.md
 │   └── README.md
+├── status-family-review-2026-08-18.md # Rung 1 review surface: meter family, navigation, baselines
 ├── token-reference.md              # Frozen semantic vocabulary and tier boundaries
 └── README.md                       # This file
 ```
@@ -63,8 +64,9 @@ docs/
 |------|-------------|--------|
 | [cascade-and-overrides.md](cascade-and-overrides.md) | Cascade order, zero-specificity defaults, and important-layer reversal | Active |
 | [foundations-review-2026-08-02.md](foundations-review-2026-08-02.md) | Closed approval questions for Phase 1 foundations and the spike | Approved |
-| [harness-review-2026-08-05.md](harness-review-2026-08-05.md) | Evidence and yes-or-no questions for the harness operator review | Under Review |
+| [harness-review-2026-08-05.md](harness-review-2026-08-05.md) | Recorded operator decisions for the Phase 2 harness | Active |
 | [project-charter.md](project-charter.md) | Frozen scope, architecture, roadmap, and acceptance criteria | Active |
+| [status-family-review-2026-08-18.md](status-family-review-2026-08-18.md) | Operator review surface for ladder rung 1 | Under Review |
 | [token-reference.md](token-reference.md) | Three-tier contract and frozen semantic vocabulary | Active |
 
 ---

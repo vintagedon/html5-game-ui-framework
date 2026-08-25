@@ -3,8 +3,8 @@
 title: "Playwright Runner"
 description: "Chromium-only Playwright configuration and the registry-driven conformance runner"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-05"
-version: "1.6"
+date: "2026-08-25"
+version: "1.7"
 status: "Active"
 tags:
   - type: directory-readme
@@ -39,13 +39,13 @@ runner/
 ├── cases.js              # Viewport-qualified case identity and interaction lookup
 ├── runner.spec.js        # Registry-driven capture and comparison
 ├── interactions.js       # Serializable toggle and meter state changes
-├── compare.js            # Manifest integrity and pixel comparator
+├── compare.js            # Recorded-baseline integrity, comparison, and establishment
 ├── amendment4-evidence.js # Pure historical PNG evidence comparison
 ├── capture-amendment4.js # Styled capture from an isolated revision
 ├── compare-amendment4.js # Historical pair report and hard gate
 ├── check-auditor-page.js # Visible dependency-auditor browser check
-├── smoke-assertions.js  # Pure published-preview assertion verdicts
-├── smoke-published.js   # Published-URL Chromium smoke test
+├── smoke-assertions.js  # Pure per-view smoke assertion verdicts
+├── smoke-published.js   # Published-URL registry-walk smoke test
 ├── membership.js         # Browser inspection and pure coverage accounting
 ├── membership.json       # Generated current-run membership evidence
 ├── playwright-run.json   # Generated current-run identity and start time
@@ -60,15 +60,15 @@ runner/
 |------|-------------|--------|
 | [playwright.config.js](playwright.config.js) | Chromium project, local file server, and list plus JSON reporters | Active |
 | [cases.js](cases.js) | Builds scenario by theme by viewport by checkpoint cases and capture identities | Active |
-| [runner.spec.js](runner.spec.js) | Sets each declared viewport, drives interactions, and captures checkpoints | Active |
+| [runner.spec.js](runner.spec.js) | Navigates each scenario's section view, sets each declared viewport, drives interactions, captures checkpoints, and records absent baselines | Active |
 | [interactions.js](interactions.js) | Applies synchronous toggle and meter changes in browser and unit tests | Active |
-| [compare.js](compare.js) | Approval-manifest integrity and approved/candidate pixel comparison | Active |
+| [compare.js](compare.js) | Baseline-manifest integrity, pixel comparison with surfaced diffs, and establishment | Active |
 | [amendment4-evidence.js](amendment4-evidence.js) | Computes SHA-256 and exact pixel differences for historical evidence | Active |
 | [capture-amendment4.js](capture-amendment4.js) | Serves and captures one isolated revision after a stylesheet guard | Active |
 | [compare-amendment4.js](compare-amendment4.js) | Rejects identical or zero-difference historical capture pairs | Active |
 | [check-auditor-page.js](check-auditor-page.js) | Confirms dependency findings are visible and fails on any rendered violation | Active |
-| [smoke-assertions.js](smoke-assertions.js) | Builds separately reported published-preview verdicts | Active |
-| [smoke-published.js](smoke-published.js) | Checks the live nginx URL, browser errors, module failures, and runtime requests | Active |
+| [smoke-assertions.js](smoke-assertions.js) | Builds separately reported per-view smoke verdicts | Active |
+| [smoke-published.js](smoke-published.js) | Walks the published URL across the landing and every section view | Active |
 | [membership.js](membership.js) | Inspects computed rendered channels and aggregates designed-pair membership | Active |
 
 Each capture identity is
@@ -98,4 +98,4 @@ can drift away from the photographed states.
 |----------|--------------|
 | [Conformance Harness](../README.md) | Parent directory |
 | [Scenario Registry](../registry/README.md) | The single declaration the runner reads |
-| [Golden Captures](../goldens/README.md) | Approved baseline and candidate capture trees |
+| [Golden Captures](../goldens/README.md) | Recorded baseline and candidate capture trees |

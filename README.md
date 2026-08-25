@@ -61,11 +61,13 @@ The rule covers what the framework and its themes ship to a running game. Reposi
 
 **The documentation is the test suite.** Every component declares its dependency level, required tokens, theme and viewport coverage, initial state, scripted interactions, and named capture checkpoints. The reference application renders from that declaration, and Playwright reads the same declaration to drive the interactions and compare captures against approved goldens. A module that reaches for another module renders as a visible failure on the page rather than only as a red test run. The metrics header is computed from the repository, so the headline claims are either true at build time or visibly false.
 
-The registry-driven reference application now renders seven scenarios across
-four themes. The same registry drives Chromium captures, dependency auditing,
-computed metrics, and browser inspection of rendered token pairings. Candidate
-goldens remain unapproved until the operator records them in the checked-in
-approval manifest.
+The registry-driven reference application is a navigable multi-section site:
+eleven scenarios across four sections, rendered and routed entirely from one
+declaration, with a recorded visual baseline over every registered capture
+case. The same registry drives Chromium captures, dependency auditing,
+computed metrics, and browser inspection of rendered token pairings. A case
+with no recorded baseline records one automatically; a capture that disagrees
+with its baseline fails and surfaces its diff.
 
 **Requirements come from artifacts that exist.** The predecessor framework contributes thirteen shipped component families, several commercial template packs contribute requirement lists and technique, and real games supply the integration pressure. Nothing enters the core because it seemed like a good idea.
 
@@ -80,8 +82,8 @@ approval manifest.
 | Foundations | ✅ Complete | The 83-token semantic vocabulary, cascade contract, state recipes, and four themes are approved |
 | Zero-raster spike | ✅ Complete | Four dark-fantasy techniques render with zero framework raster files; the position holds |
 | Reference corpus | ✅ Complete | Catalog and capability map of the 28-pack UI pack corpus; license posture resolved, coordination rule adopted, and the module ladder recorded |
-| Harness | 🔄 Under Review | Harness hardening and preview publication are complete; five approval questions remain with the operator |
-| Core primitives | 🔄 Proof Set | Button, panel, input, and meter exist only to verify foundations |
+| Harness | ✅ Complete | Recorded-baseline regression suite over every case; decisions recorded in the harness review |
+| Core primitives | 🔄 Under Review | Button, panel, input, and the meter family (continuous, segmented, pips, vertical, damage trail) await rung 1 review |
 | Modules | ⬜ Planned | Composed from core; no module-to-module dependency |
 | First consumer | ⬜ Planned | Rogue Cellar integration, UI layer only |
 | Published demo | ⬜ Planned | One original game, after the framework is proven |
@@ -113,9 +115,10 @@ html5-game-ui-framework/
 │   ├── documentation-standards/  # Template library and guidelines
 │   ├── cascade-and-overrides.md   # Layer and specificity contract
 │   ├── foundations-review-2026-08-02.md  # Approved foundation decisions
-│   ├── harness-review-2026-08-05.md  # Harness approval questions
+│   ├── harness-review-2026-08-05.md  # Recorded harness decisions
 │   ├── project-charter.md     # Frozen scope and architecture
 │   ├── reference-corpus/      # Catalog and capability map derived from the UI pack corpus
+│   ├── status-family-review-2026-08-18.md  # Rung 1 review surface
 │   └── token-reference.md     # Frozen semantic vocabulary
 ├── harness/                   # Registry, app, tests, runner, goldens, metrics, auditor
 ├── reference/                 # Registry-driven reference application
@@ -183,4 +186,4 @@ Third-party reference material held locally under `reference-files-*` is license
 
 ---
 
-Last Updated: August 16, 2026 | Status: Harness Review
+Last Updated: August 25, 2026 | Status: Rung 1 Under Review

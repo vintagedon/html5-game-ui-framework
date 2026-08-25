@@ -3,8 +3,8 @@
 title: "Scenario Registry"
 description: "The single scenario declaration, its schema, and the validator"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-05"
-version: "1.1"
+date: "2026-08-25"
+version: "1.2"
 status: "Active"
 tags:
   - type: directory-readme
@@ -19,12 +19,15 @@ related_documents:
 # Scenario Registry
 
 One machine-readable declaration per specimen: stable ID, layer membership,
-required tokens, theme and viewport coverage, initial state, scripted
+section, required tokens, theme and viewport coverage, initial state, scripted
 interactions, and named capture checkpoints. Four consumers read this
 declaration and no other source: the reference application, the Playwright
 runner, the dependency auditor, and the metrics block. The token vocabulary and
 theme roster the validator checks against are derived from `src/`, not redeclared
-here, so a renamed token or theme surfaces as a validation failure.
+here, so a renamed token or theme surfaces as a validation failure. The section
+roster rides this file and drives the reference application's navigation; a
+nav tree or page list written anywhere else is a second source of truth and a
+defect.
 
 ---
 
@@ -32,7 +35,7 @@ here, so a renamed token or theme surfaces as a validation failure.
 
 ```text
 registry/
-├── scenarios.js   # THE single declaration: theme roster + scenario array
+├── scenarios.js   # THE single declaration: theme + section rosters, scenario array
 ├── layers.js      # Frozen four-layer architecture (foundations→consumers)
 ├── source.js      # Node reader: derives tokens + themes from src/
 ├── schema.js      # Pure validator + the shared interaction-action vocabulary
@@ -60,6 +63,7 @@ registry/
 |-------|---------|
 | `id` | Stable, unique specimen identifier |
 | `layer` | One of `foundations`, `core`, `modules`, `consumers` |
+| `section` | Navigation filing on the registry's section roster (never part of capture identity) |
 | `tokens` | Required tokens; each must exist in `src/tokens/` |
 | `themes` | Theme coverage; each must exist in `src/themes/` |
 | `initialState` | Nonempty description of the specimen state before interactions |
