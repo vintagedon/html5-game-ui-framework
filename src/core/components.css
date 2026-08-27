@@ -131,10 +131,10 @@
 
   /* Shapes share one value channel: applyMeterValue writes --gc-meter-value
    * raw, and quantized geometry is derived here so segmented and pip fills
-   * always land on whole-unit boundaries. round(nearest, count * value, step)
-   * yields the fill as a percentage already snapped to unit multiples. */
+   * always land on whole-unit boundaries. round(down, count * value, step)
+   * yields the fill as a percentage snapped to the last completed unit. */
   :where(.gc-meter__fill) {
-    --gc-meter-quantized: calc(round(nearest, calc(var(--gc-meter-count, 1) * var(--gc-meter-value, 50%)), 100%) / var(--gc-meter-count, 1));
+    --gc-meter-quantized: calc(round(down, calc(var(--gc-meter-count, 1) * var(--gc-meter-value, 50%)), 100%) / var(--gc-meter-count, 1));
     block-size: 100%;
     inline-size: var(--gc-meter-value, 50%);
     border-radius: inherit;
@@ -148,7 +148,7 @@
    * meter's isolated context) and settles on a slower clock so it reads as
    * lagging loss while the fill moves first. */
   :where(.gc-meter__trail) {
-    --gc-meter-trail-quantized: calc(round(nearest, calc(var(--gc-meter-count, 1) * var(--gc-meter-trail-value, var(--gc-meter-value, 50%))), 100%) / var(--gc-meter-count, 1));
+    --gc-meter-trail-quantized: calc(round(down, calc(var(--gc-meter-count, 1) * var(--gc-meter-trail-value, var(--gc-meter-value, 50%))), 100%) / var(--gc-meter-count, 1));
     position: absolute;
     z-index: -1;
     inset-block: 0;

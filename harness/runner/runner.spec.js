@@ -315,7 +315,7 @@ test("meter fill geometry, visible text, and accessible value agree across the f
     const where = `${o.scenario}/${o.variant} (${o.shape}/${o.orientation})`;
     expect(o.displayText, `${where} display text`).toBe(`${o.aria}%`);
     const expectedFraction = o.count
-      ? Math.round((o.count * o.aria) / 100) / o.count
+      ? Math.floor((o.count * o.aria) / 100) / o.count
       : o.aria / 100;
     expect(
       Math.abs(o.fraction - expectedFraction),
@@ -539,7 +539,7 @@ test("segmented and pip fills land on whole units at empty, partial, and full va
     await page.goto(sectionUrl(sectionId), { waitUntil: "networkidle" });
     await page.addStyleTag({ content: SETTLE_STYLE });
 
-    for (const value of [0, 43, 100]) {
+    for (const value of [0, 43, 94, 99, 100]) {
       for (const target of targets) {
         await page
           .locator(`[data-scenario="${target.scenarioId}"] .gc-meter[data-variant="${target.variant}"]`)
@@ -600,7 +600,7 @@ test("segmented and pip fills land on whole units at empty, partial, and full va
 
       for (const r of readings) {
         const where = `${r.scenarioId}/${r.variant} (${r.shape}) at ${r.value}%`;
-        const expectedUnits = Math.round((r.count * r.value) / 100);
+        const expectedUnits = Math.floor((r.count * r.value) / 100);
         if (r.shape === "pips") {
           expect(r.units, `${where} filled pip count`).toBe(expectedUnits);
         } else {
