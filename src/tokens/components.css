@@ -27,7 +27,5 @@
     --gc-meter-fill: var(--gc-accent);
     --gc-meter-text: var(--gc-text-primary);
     --gc-meter-trail: var(--gc-status-danger);
-    --gc-meter-segments: 8;
-    --gc-meter-pips: 10;
   }
 }

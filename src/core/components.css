@@ -119,6 +119,8 @@
   }
 
   :where(.gc-meter) {
+    --gc-meter-segments: 8;
+    --gc-meter-pips: 10;
     position: relative;
     isolation: isolate;
     overflow: hidden;

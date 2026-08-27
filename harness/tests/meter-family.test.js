@@ -268,10 +268,24 @@ test("every --gc-meter-* component token is registered on a scenario and the set
     }
   }
   assert.deepEqual([...referenced].sort(), [...defined].sort());
-  assert.ok(defined.size >= 6, "the family defines track, fill, text, trail, segments, and pips");
+  assert.ok(defined.size >= 4, "the family defines track, fill, text, and trail tokens");
+  assert.equal(defined.has("--gc-meter-segments"), false, "segment counts are instance data, not tokens");
+  assert.equal(defined.has("--gc-meter-pips"), false, "pip counts are instance data, not tokens");
 });
 
-test("segment and pip counts ride the token-valued count channel, never sample markup", () => {
+test("segment and pip counts use element-level channels with core defaults, never sample markup", () => {
+  const tokenText = readFileSync(
+    new URL("../../src/tokens/components.css", import.meta.url),
+    "utf8",
+  );
+  const coreText = readFileSync(
+    new URL("../../src/core/components.css", import.meta.url),
+    "utf8",
+  );
+  assert.doesNotMatch(tokenText, /--gc-meter-(?:segments|pips)\s*:/);
+  assert.match(coreText, /--gc-meter-segments:\s*8\s*;/);
+  assert.match(coreText, /--gc-meter-pips:\s*10\s*;/);
+
   const restore = installDocumentStandIn();
   try {
     for (const scenario of meterScenarios()) {
