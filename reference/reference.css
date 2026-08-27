@@ -241,6 +241,7 @@
 
   .meter-label {
     display: flex;
+    gap: var(--gc-space-2);
     justify-content: space-between;
     color: var(--gc-meter-text);
   }

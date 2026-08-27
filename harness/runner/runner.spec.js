@@ -335,6 +335,74 @@ test("meter fill geometry, visible text, and accessible value agree across the f
   }
 });
 
+test("meter labels and values remain compositionally separated", async ({ page }) => {
+  const verticalScenario = METER_SCENARIOS.find((s) =>
+    (s.config.samples || []).some((sample) => sample.orientation === "vertical"),
+  );
+  expect(verticalScenario, "a vertical meter scenario must be registered").toBeTruthy();
+
+  const seen = new Set();
+  for (const viewport of verticalScenario.viewports) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await page.goto(sectionUrl(verticalScenario.section), { waitUntil: "networkidle" });
+    await page.addStyleTag({ content: SETTLE_STYLE });
+
+    for (const theme of verticalScenario.themes) {
+      await page.evaluate((nextTheme) => {
+        document.documentElement.dataset.gcTheme = nextTheme;
+      }, theme);
+
+      const readings = await page.evaluate(() =>
+        [...document.querySelectorAll(".gc-meter")].map((meter) => {
+          const labelRegion = meter.parentElement?.querySelector(".meter-label");
+          const label = labelRegion?.querySelector("span:not([data-meter-display])");
+          const value = labelRegion?.querySelector("[data-meter-display]");
+          const labelBox = label?.getBoundingClientRect();
+          const valueBox = value?.getBoundingClientRect();
+          const inlineGap = labelBox && valueBox
+            ? Math.max(valueBox.left - labelBox.right, labelBox.left - valueBox.right)
+            : 0;
+          const blockGap = labelBox && valueBox
+            ? Math.max(valueBox.top - labelBox.bottom, labelBox.top - valueBox.bottom)
+            : 0;
+          const labelText = label?.textContent || "";
+          const valueText = value?.textContent || "";
+
+          return {
+            variant: meter.dataset.variant,
+            orientation: meter.dataset.orientation || "horizontal",
+            distinctNodes: Boolean(label && value && label !== value),
+            separation: Math.max(inlineGap, blockGap),
+            abuttedText: labelRegion?.textContent === `${labelText}${valueText}`,
+          };
+        }),
+      );
+
+      for (const reading of readings) {
+        const where = `${theme}/${viewport.name}/${reading.variant}/${reading.orientation}`;
+        expect.soft(reading.distinctNodes, `${where}: label and value nodes`).toBe(true);
+        expect.soft(reading.separation, `${where}: rendered label/value separation`).toBeGreaterThan(0);
+        expect.soft(
+          reading.abuttedText && reading.separation <= 0,
+          `${where}: text must not read as <name><digits>% without whitespace or a box gap`,
+        ).toBe(false);
+        seen.add(`${theme}/${viewport.name}/${reading.orientation}`);
+      }
+    }
+  }
+
+  for (const theme of verticalScenario.themes) {
+    for (const viewport of verticalScenario.viewports) {
+      for (const orientation of ["horizontal", "vertical"]) {
+        expect(
+          seen.has(`${theme}/${viewport.name}/${orientation}`),
+          `composition must cover ${theme}/${viewport.name}/${orientation}`,
+        ).toBe(true);
+      }
+    }
+  }
+});
+
 test("segmented and pip fills land on whole units at empty, partial, and full values", async ({ page }) => {
   expect(QUANTIZED_SAMPLES.length).toBeGreaterThan(0);
   await page.setViewportSize({ width: 1280, height: 800 });
