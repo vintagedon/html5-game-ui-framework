@@ -403,6 +403,128 @@ test("meter labels and values remain compositionally separated", async ({ page }
   }
 });
 
+test("meter fills remain contiguous and anchored at the orientation origin", async ({ page }) => {
+  const targets = METER_SCENARIOS.flatMap((scenario) =>
+    (scenario.config.samples || []).map((sample) => ({
+      scenarioId: scenario.id,
+      variant: sample.variant,
+    })),
+  );
+  expect(targets.length).toBeGreaterThan(0);
+
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const sections = [...new Set(
+    targets.map((target) =>
+      registry.scenarios.find((scenario) => scenario.id === target.scenarioId).section,
+    ),
+  )];
+  const seen = new Set();
+
+  for (const sectionId of sections) {
+    const sectionTargets = targets.filter(
+      (target) =>
+        registry.scenarios.find((scenario) => scenario.id === target.scenarioId).section === sectionId,
+    );
+    await page.goto(sectionUrl(sectionId), { waitUntil: "networkidle" });
+    await page.addStyleTag({ content: SETTLE_STYLE });
+
+    for (const value of [0, 43, 100]) {
+      for (const target of sectionTargets) {
+        await page
+          .locator(`[data-scenario="${target.scenarioId}"] .gc-meter[data-variant="${target.variant}"]`)
+          .evaluate(applyMeterValue, String(value));
+      }
+
+      const readings = await page.evaluate(({ targets, value }) => {
+        const out = [];
+        for (const target of targets) {
+          const meter = document.querySelector(
+            `[data-scenario="${target.scenarioId}"] .gc-meter[data-variant="${target.variant}"]`,
+          );
+          meter.scrollIntoView({ block: "center", inline: "center" });
+          const fill = meter.querySelector(".gc-meter__fill");
+          const shape = meter.dataset.shape || "continuous";
+          const orientation = meter.dataset.orientation || "horizontal";
+          const vertical = orientation === "vertical";
+          const style = getComputedStyle(meter);
+          const declaredCount = Number(style.getPropertyValue("--gc-meter-count").trim());
+          const probeCount = declaredCount || 10;
+          const box = meter.getBoundingClientRect();
+          const borderInlineStart = Number.parseFloat(style.borderLeftWidth);
+          const borderInlineEnd = Number.parseFloat(style.borderRightWidth);
+          const borderBlockStart = Number.parseFloat(style.borderTopWidth);
+          const borderBlockEnd = Number.parseFloat(style.borderBottomWidth);
+          const innerWidth = box.width - borderInlineStart - borderInlineEnd;
+          const innerHeight = box.height - borderBlockStart - borderBlockEnd;
+          const fillBox = fill.getBoundingClientRect();
+          const filledFromOrigin = [];
+
+          for (let index = 0; index < probeCount; index += 1) {
+            const x = vertical
+              ? (shape === "pips" ? box.x + box.width / 2 : fillBox.x + fillBox.width / 2)
+              : box.x + borderInlineStart + ((index + 0.5) * innerWidth) / probeCount;
+            const y = vertical
+              ? box.y + box.height - borderBlockEnd - ((index + 0.5) * innerHeight) / probeCount
+              : (shape === "pips" ? box.y + box.height / 2 : fillBox.y + fillBox.height / 2);
+            if (shape === "pips") {
+              // Pip paint is clipped inside a full-size fill box, so its
+              // visible run must be sampled through browser hit-testing.
+              const hit = document.elementFromPoint(x, y);
+              filledFromOrigin.push(Boolean(hit && (hit === fill || fill.contains(hit))));
+            } else {
+              filledFromOrigin.push(
+                x >= fillBox.left && x <= fillBox.right &&
+                y >= fillBox.top && y <= fillBox.bottom,
+              );
+            }
+          }
+
+          out.push({
+            ...target,
+            value,
+            shape,
+            orientation,
+            filledFromOrigin,
+          });
+        }
+        return out;
+      }, { targets: sectionTargets, value });
+
+      for (const reading of readings) {
+        const where = `${reading.scenarioId}/${reading.variant} (${reading.shape}/${reading.orientation}) at ${value}%`;
+        const firstEmpty = reading.filledFromOrigin.indexOf(false);
+        const contiguous = firstEmpty === -1 ||
+          reading.filledFromOrigin.slice(firstEmpty).every((filled) => !filled);
+        const filledCount = reading.filledFromOrigin.filter(Boolean).length;
+
+        expect(contiguous, `${where}: filled units must form one origin-anchored run`).toBe(true);
+        if (value === 0) {
+          expect(filledCount, `${where}: empty state`).toBe(0);
+        } else if (value === 100) {
+          expect(filledCount, `${where}: full state`).toBe(reading.filledFromOrigin.length);
+        } else {
+          expect(filledCount, `${where}: intermediate state starts at the origin`).toBeGreaterThan(0);
+          expect(filledCount, `${where}: intermediate state leaves empty units`).toBeLessThan(
+            reading.filledFromOrigin.length,
+          );
+        }
+        seen.add(`${reading.shape}/${reading.orientation}`);
+      }
+    }
+  }
+
+  for (const coverage of [
+    "continuous/horizontal",
+    "segmented/horizontal",
+    "pips/horizontal",
+    "continuous/vertical",
+    "segmented/vertical",
+    "pips/vertical",
+  ]) {
+    expect(seen.has(coverage), `origin anchoring must be observed for ${coverage}`).toBe(true);
+  }
+});
+
 test("segmented and pip fills land on whole units at empty, partial, and full values", async ({ page }) => {
   expect(QUANTIZED_SAMPLES.length).toBeGreaterThan(0);
   await page.setViewportSize({ width: 1280, height: 800 });
