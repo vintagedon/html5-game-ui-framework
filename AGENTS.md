@@ -3,8 +3,8 @@
 title: "Agent Instructions"
 description: "Repository identity, architectural constraints, documentation conventions, and spec execution pattern for html5-game-ui-framework"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-02"
-version: "1.2"
+date: "2026-08-27"
+version: "1.3"
 status: "Active"
 tags:
   - type: reference

@@ -3,8 +3,8 @@
 title: "Conformance Harness"
 description: "The scenario registry and its four consumers: reference app, Playwright runner, dependency auditor, and computed metrics"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-25"
-version: "1.2"
+date: "2026-08-27"
+version: "1.3"
 status: "Active"
 tags:
   - type: directory-readme
@@ -65,6 +65,9 @@ harness/
 | `npm run playwright` | Run the self-contained Chromium harness and write membership evidence |
 | `npm run test` | Run Node tests, validation, Playwright, then metrics in artifact order |
 | `npm run capture` | Run the same order, capturing, comparing, and recording absent baselines |
+
+A behavior-preserving refactor is verified against two pre-refactor capture
+runs, not one.
 
 ---
 

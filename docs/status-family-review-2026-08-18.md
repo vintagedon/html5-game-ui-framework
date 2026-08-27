@@ -3,9 +3,9 @@
 title: "Status Family Review 2026-08-18"
 description: "Operator review surface for ladder rung 1: the meter and status family, reference navigation, and the recorded baseline model"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-25"
-version: "1.0"
-status: "Under Review"
+date: "2026-08-27"
+version: "1.1"
+status: "Active"
 tags:
   - type: report
   - domain: [core, harness]
@@ -22,8 +22,8 @@ related_documents:
 
 This is the operator review surface for ladder rung 1. Every finding below
 carries an ID, a statement, evidence as a file and line or a named results
-file under `work-logs/evidence/2026-08-25-h5gameui-04/`, and one closed
-question. The published preview at
+file under `work-logs/evidence/2026-08-25-h5gameui-04/`, one closed question,
+and the operator's recorded disposition. The published preview at
 [gameui.donfather.site/reference/](https://gameui.donfather.site/reference/)
 is the rendered artifact these findings measure.
 
@@ -56,6 +56,8 @@ carry the rendered states.
 five segments, not four). Keep nearest, or switch to floor so a meter never
 overstates its value? (nearest / floor)
 
+**Disposition.** Floor. Implemented in amendment A1.3.
+
 ### MTR-002: The damage trail reads through a theme-constant red that predates the arcade palette pass
 
 **Statement.** The trail renders at `oklch(0.5 0.22 27)` under every theme,
@@ -75,6 +77,9 @@ rather than a new defect.
 **Question.** Does the trail read as intentional under arcade as-is, or does
 this rung force the arcade palette pass earlier than planned? (reads-fine /
 force-palette-pass)
+
+**Disposition.** Reads fine. The arcade palette is changing on its own
+schedule, and this rung does not pull it forward.
 
 ### MTR-003: The pip strip exposes one meter value, and its accessible name is the only semantic carrying the count
 
@@ -96,6 +101,9 @@ drive `set-value` on every shape; the render contract is
 **Question.** Keep `role="meter"` for pips, or revisit as a discrete-state
 list when a consumer game exercises it? (keep-meter / revisit-on-consumer)
 
+**Disposition.** Keep `role="meter"`. Revisit when a consumer game exercises
+discrete charges.
+
 ### MTR-004: The nav tree is two levels deep and carries four sections now, with room for six rungs only if sections stay flat
 
 **Statement.** The rendered navigation is a persistent tree with sections at
@@ -112,6 +120,9 @@ the roster is [harness/registry/scenarios.js](../harness/registry/scenarios.js)
 
 **Question.** Is the flat two-level tree the right shape through rung 3, or
 should the roster gain rung grouping before the second rung lands? (flat-through-rung-3 / group-by-rung-now)
+
+**Disposition.** Keep the flat two-level tree through rung 3. When grouping is
+needed, group by function, not by rung; build order means nothing to a visitor.
 
 ### MTR-005: The compact viewport holds the status family with no horizontal overflow anywhere
 
@@ -133,6 +144,8 @@ is the pre-family comparison); viewport scoping is asserted in
 keep it family-scoped until a consumer needs portrait chrome elsewhere?
 (extend-all / keep-family-scoped)
 
+**Disposition.** Keep the compact viewport family-scoped.
+
 ### MTR-006: The renderer was deterministic before the dispatch refactor
 
 **Statement.** Two consecutive pre-refactor capture runs produced 53 of 53
@@ -146,6 +159,9 @@ stable render and no nondeterminism source was found.
 **Question.** Accept single-run determinism checks as sufficient for future
 behavior-preserving refactors, or always require two pre-refactor runs?
 (single-run-sufficient / always-two-runs)
+
+**Disposition.** Always require two pre-refactor capture runs, scoped to
+behavior-preserving refactors.
 
 ### MTR-007: The comparator absorbs a subtle surface-tone shift that a strong accent shift catches
 
@@ -167,6 +183,11 @@ thresholds are [harness/runner/compare.js](../harness/runner/compare.js)
 **Question.** Tighten the comparator (for example a mean-delta check beside
 the area ratio) in a follow-up spec, or accept the current sensitivity as
 the approved metric definition? (tighten-in-followup / accept-current)
+
+**Disposition.** Tighten in a follow-up spec queued after rung 2. Add a
+mean-delta or per-case max-channel-delta check beside the area ratio.
+Tightening later only makes existing baselines stricter, and drift it surfaces
+is a finding worth having.
 
 ## Verification index
 
