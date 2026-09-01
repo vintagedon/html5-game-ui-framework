@@ -782,7 +782,7 @@ test("the damage trail keeps the previous value's geometry while the fill moves"
 // scenario link), the theme toolbar must switch themes in every view, and the
 // walk itself must stay clean of console errors, module failures, and
 // off-origin requests.
-test("every scenario is reachable from the landing view in at most two clicks", async ({ page }) => {
+test("every second-level link scrolls its scrolled-away scenario into view", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   const consoleErrors = [];
   const moduleFailures = [];
@@ -808,6 +808,9 @@ test("every scenario is reachable from the landing view in at most two clicks", 
   });
 
   await page.goto(PAGE, { waitUntil: "networkidle" });
+  // The added space makes the last scenario scrollable away in a one-scenario
+  // section too. The test observes the page's real target geometry, not visibility.
+  await page.addStyleTag({ content: "body { padding-block-end: 200vh !important; }" });
 
   // The landing view carries no scenario sections; it lists the roster.
   const landingScenarioCount = await page.locator("#scenarios [data-scenario]").count();
@@ -825,6 +828,7 @@ test("every scenario is reachable from the landing view in at most two clicks", 
   }
 
   await switchThemeAndBack("landing");
+  const scrollFailures = [];
 
   for (const section of registry.sections) {
     // Click one: the section link in the nav tree.
@@ -838,18 +842,108 @@ test("every scenario is reachable from the landing view in at most two clicks", 
     const observedCount = await page.locator("#scenarios [data-scenario]").count();
     expect(observedCount, `section ${section.id} renders exactly its roster`).toBe(expected.length);
 
-    // Click two: the scenario link in the expanded branch scrolls to it.
-    if (expected.length) {
-      await page.locator(`.reference-nav__item-link[data-scenario-nav="${expected[0].id}"]`).click();
-      await page.locator(`[data-scenario="${expected[0].id}"]`).waitFor({ state: "visible" });
+    // Click two: every scenario link must move its deliberately scrolled-away
+    // target. In-page activation avoids Playwright locator auto-scrolling the
+    // sticky navigation link and becoming the movement this assertion observes.
+    for (const scenario of expected) {
+      const target = page.locator(`[data-scenario="${scenario.id}"]`);
+      const before = await target.evaluate((element) => {
+        window.scrollBy(0, element.getBoundingClientRect().top + window.innerHeight);
+        return {
+          scrollY: window.scrollY,
+          top: element.getBoundingClientRect().top,
+        };
+      });
+      expect(before.top, `${scenario.id} begins outside the viewport`).toBeLessThan(-1);
+
+      await page
+        .locator(`.reference-nav__item-link[data-scenario-nav="${scenario.id}"]`)
+        .evaluate((link) => link.click());
+      const after = await target.evaluate((element) => ({
+        scrollY: window.scrollY,
+        top: element.getBoundingClientRect().top,
+      }));
+      if (after.scrollY === before.scrollY || after.top <= before.top + 100) {
+        scrollFailures.push({ scenario: scenario.id, before, after });
+      }
     }
 
     await switchThemeAndBack(`section ${section.id}`);
   }
 
+  expect(scrollFailures, "every scenario link scrolls its own target").toEqual([]);
+
   expect(consoleErrors, "console errors across the walk").toEqual([]);
   expect(moduleFailures, "module load failures across the walk").toEqual([]);
   expect(offOriginRequests, "off-origin requests across the walk").toEqual([]);
+});
+
+test("second-level links preserve nonordinary and cancelled anchor activations", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const section = registry.sections.find((entry) =>
+    registry.scenarios.some((scenario) => scenario.section === entry.id),
+  );
+  const scenario = registry.scenarios.find((entry) => entry.section === section.id);
+  await page.goto(sectionUrl(section.id), { waitUntil: "networkidle" });
+  await page.addStyleTag({ content: "body { padding-block-end: 200vh !important; }" });
+
+  const link = page.locator(`.reference-nav__item-link[data-scenario-nav="${scenario.id}"]`);
+  const target = page.locator(`[data-scenario="${scenario.id}"]`);
+  const activations = [
+    { label: "Ctrl", ctrlKey: true },
+    { label: "Meta", metaKey: true },
+    { label: "Shift", shiftKey: true },
+    { label: "Alt", altKey: true },
+    { label: "non-primary", button: 1 },
+  ];
+
+  for (const activation of activations) {
+    const before = await target.evaluate((element) => {
+      window.scrollBy(0, element.getBoundingClientRect().top + window.innerHeight);
+      return { scrollY: window.scrollY, top: element.getBoundingClientRect().top };
+    });
+    const after = await link.evaluate((element, init) => {
+      const event = new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+        button: init.button ?? 0,
+        ctrlKey: init.ctrlKey,
+        metaKey: init.metaKey,
+        shiftKey: init.shiftKey,
+        altKey: init.altKey,
+      });
+      const defaultAllowed = element.dispatchEvent(event);
+      const target = document.querySelector(`[data-scenario="${element.dataset.scenarioNav}"]`);
+      return {
+        defaultAllowed,
+        scrollY: window.scrollY,
+        top: target.getBoundingClientRect().top,
+      };
+    }, activation);
+    expect(after.defaultAllowed, `${activation.label} link activation remains an anchor default`).toBe(true);
+    expect(after.scrollY, `${activation.label} link activation does not scroll`).toBe(before.scrollY);
+    expect(after.top, `${activation.label} target geometry stays put`).toBe(before.top);
+  }
+
+  const beforeCancelled = await target.evaluate((element) => {
+    window.scrollBy(0, element.getBoundingClientRect().top + window.innerHeight);
+    return { scrollY: window.scrollY, top: element.getBoundingClientRect().top };
+  });
+  const afterCancelled = await link.evaluate((element) => {
+    const nav = element.closest("#reference-nav");
+    nav.addEventListener("click", (event) => event.preventDefault(), { capture: true, once: true });
+    const event = new MouseEvent("click", { bubbles: true, cancelable: true, button: 0 });
+    const defaultAllowed = element.dispatchEvent(event);
+    const target = document.querySelector(`[data-scenario="${element.dataset.scenarioNav}"]`);
+    return {
+      defaultAllowed,
+      scrollY: window.scrollY,
+      top: target.getBoundingClientRect().top,
+    };
+  });
+  expect(afterCancelled.defaultAllowed, "cancelled activation keeps its cancellation").toBe(false);
+  expect(afterCancelled.scrollY, "cancelled activation does not scroll").toBe(beforeCancelled.scrollY);
+  expect(afterCancelled.top, "cancelled target geometry stays put").toBe(beforeCancelled.top);
 });
 
 // After the run, persist the executed matrix for inspection/mutation tests.

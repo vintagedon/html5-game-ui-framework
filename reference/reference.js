@@ -22,7 +22,6 @@ import { scenarioSection } from "../harness/app/render.js";
 import { audit } from "../harness/auditor/auditor.js";
 
 const root = document.documentElement;
-let pendingScenarioScroll = null;
 
 function scenariosInSection(sectionId) {
   return registry.scenarios.filter((s) => s.section === sectionId);
@@ -99,10 +98,22 @@ function buildNav() {
     nav.append(branch);
   }
 
-  // A second-level click keeps the hash but scrolls to its scenario.
+  // A second-level click keeps the section route and scrolls to its scenario.
   nav.addEventListener("click", (event) => {
-    const target = event.target.closest("[data-scenario-nav]");
-    if (target) pendingScenarioScroll = target.dataset.scenarioNav;
+    const link = event.target.closest("[data-scenario-nav]");
+    if (!link) return;
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey ||
+      event.altKey
+    ) return;
+    const target = document.querySelector(`[data-scenario="${link.dataset.scenarioNav}"]`);
+    if (!target) return;
+    event.preventDefault();
+    target.scrollIntoView({ block: "start" });
   });
 }
 
@@ -186,11 +197,6 @@ function renderView() {
   }
   updateNavState(sectionId);
 
-  if (pendingScenarioScroll) {
-    const target = document.querySelector(`[data-scenario="${pendingScenarioScroll}"]`);
-    pendingScenarioScroll = null;
-    if (target) target.scrollIntoView({ block: "start" });
-  }
 }
 
 function metricCard({ label, value, scope }) {
