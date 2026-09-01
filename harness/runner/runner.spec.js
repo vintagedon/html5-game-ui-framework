@@ -782,6 +782,34 @@ test("the damage trail keeps the previous value's geometry while the fill moves"
 // scenario link), the theme toolbar must switch themes in every view, and the
 // walk itself must stay clean of console errors, module failures, and
 // off-origin requests.
+test("malformed hashes fall back without disabling later hash routing", async ({ page }) => {
+  const pageErrors = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+
+  await page.goto(`${PAGE}#/%`, { waitUntil: "networkidle" });
+  await expect(page.locator("#view-landing")).toBeVisible();
+  expect.soft(pageErrors, "the malformed route must not raise a URIError").toEqual([]);
+
+  await page.evaluate(() => {
+    location.hash = "#/core";
+  });
+  await expect(page.locator("#view-section")).toBeVisible();
+  expect(await page.locator("#scenarios [data-scenario]").count()).toBeGreaterThan(0);
+});
+
+test("the landing route removes scenario nodes rendered by a section visit", async ({ page }) => {
+  const section = registry.sections.find((entry) =>
+    registry.scenarios.some((scenario) => scenario.section === entry.id),
+  );
+  await page.goto(sectionUrl(section.id), { waitUntil: "networkidle" });
+  expect(await page.locator("#scenarios [data-scenario]").count()).toBeGreaterThan(0);
+
+  await page.locator(".reference-nav__home").click();
+  await page.waitForURL("**#/");
+  await expect(page.locator("#view-landing")).toBeVisible();
+  expect(await page.locator("[data-scenario]").count()).toBe(0);
+});
+
 test("every second-level link scrolls its scrolled-away scenario into view", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   const consoleErrors = [];

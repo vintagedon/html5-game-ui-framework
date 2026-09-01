@@ -29,7 +29,12 @@ function scenariosInSection(sectionId) {
 
 /** The routed section id, or "" for the landing view. Unknown hashes land. */
 function activeSectionId() {
-  const route = decodeURIComponent(location.hash.replace(/^#\/?/, "")).replace(/\/+$/, "");
+  let route;
+  try {
+    route = decodeURIComponent(location.hash.replace(/^#\/?/, "")).replace(/\/+$/, "");
+  } catch {
+    return "";
+  }
   return registry.sections.some((s) => s.id === route) ? route : "";
 }
 
@@ -192,6 +197,7 @@ function renderView() {
     renderSectionHead(sectionId);
     sectionView.hidden = false;
   } else {
+    document.getElementById("scenarios").replaceChildren();
     sectionView.hidden = true;
     landing.hidden = false;
   }

@@ -203,6 +203,8 @@ try {
     page.off("response", offResponse);
     page.off("requestfailed", offRequestFailed);
 
+    network.moduleFailures.push(...moduleFailures);
+    network.offOriginRequests.push(...offOriginRequests);
     collectedViews.push({
       view: view.view,
       kind: view.kind,
