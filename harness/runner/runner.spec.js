@@ -617,6 +617,96 @@ test("segmented and pip fills land on whole units at empty, partial, and full va
   }
 });
 
+test("vertical pip layers paint declared units without clipped edge pips", async ({ page }) => {
+  const verticalPipScenario = METER_SCENARIOS.find((scenario) =>
+    (scenario.config.samples || []).some(
+      (sample) => sample.shape === "pips" && sample.orientation === "vertical",
+    ),
+  );
+  expect(verticalPipScenario, "a vertical pip scenario must be registered").toBeTruthy();
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto(sectionUrl(verticalPipScenario.section), { waitUntil: "networkidle" });
+  await page.addStyleTag({
+    content: `${SETTLE_STYLE} html, body { background: transparent !important; } body > :not(#vertical-pip-phase-fixture) { visibility: hidden; }`,
+  });
+
+  const pipRuns = async (selector) => {
+    const locator = page.locator(selector);
+    const box = await locator.boundingBox();
+    expect(box, `${selector} must have a rendered box`).toBeTruthy();
+    expect(box.width, `${selector} width`).toBeGreaterThan(0);
+    expect(box.height, `${selector} height`).toBeGreaterThan(0);
+    const png = PNG.sync.read(await page.screenshot({ clip: box, omitBackground: true }));
+    const x = Math.floor(png.width / 2);
+    const painted = [...Array(png.height)].map((_, y) =>
+      png.data[(y * png.width + x) * 4 + 3] > 64,
+    );
+    const runs = [];
+    for (let y = 0; y < painted.length; y += 1) {
+      if (!painted[y] || painted[y - 1]) continue;
+      let end = y;
+      while (painted[end + 1]) end += 1;
+      runs.push([y, end]);
+    }
+    return { runs, touchesStart: painted[0], touchesEnd: painted.at(-1) };
+  };
+
+  for (const theme of ["modern", "arcade", "sci-fi", "fantasy"]) {
+    await page.evaluate((nextTheme) => {
+      document.documentElement.dataset.gcTheme = nextTheme;
+    }, theme);
+
+    for (const value of [0, 43, 100]) {
+      await page.evaluate((nextValue) => {
+        document.querySelector("#vertical-pip-phase-fixture")?.remove();
+        const fixture = document.createElement("div");
+        fixture.id = "vertical-pip-phase-fixture";
+        const meter = (layer) => {
+          const left = layer === "track" ? 24 : layer === "fill-parent" ? 64 : 104;
+          const element = document.createElement("div");
+          element.className = "gc-meter";
+          element.dataset.shape = "pips";
+          element.dataset.orientation = "vertical";
+          element.dataset.layer = layer;
+          element.style.cssText = [
+            "--gc-meter-count: 10",
+            "position: fixed",
+            `inset: 24px auto auto ${left}px`,
+            "z-index: 1",
+            "border-color: transparent",
+            "box-shadow: none",
+          ].join("; ");
+          return element;
+        };
+
+        const track = meter("track");
+        fixture.append(track);
+        for (const layer of ["fill", "trail"]) {
+          const parent = meter(`${layer}-parent`);
+          parent.style.setProperty("background-image", "none");
+          const child = document.createElement("div");
+          child.className = `gc-meter__${layer}`;
+          child.style.setProperty(`--gc-meter-${layer === "fill" ? "value" : "trail-value"}`, `${nextValue}%`);
+          parent.append(child);
+          fixture.append(parent);
+        }
+        document.body.append(fixture);
+      }, value);
+
+      for (const layer of ["track", "fill", "trail"]) {
+        const reading = await pipRuns(
+          `[data-layer="${layer === "track" ? layer : `${layer}-parent`}"]${layer === "track" ? "" : ` > .gc-meter__${layer}`}`,
+        );
+        const expected = layer === "track" ? 10 : Math.floor((10 * value) / 100);
+        const where = `${theme}/${layer} at ${value}%`;
+        expect(reading.runs.length, `${where}: rendered pip count`).toBe(expected);
+        expect(reading.touchesStart, `${where}: no pip may clip at the top edge`).toBe(false);
+        expect(reading.touchesEnd, `${where}: no pip may clip at the bottom edge`).toBe(false);
+      }
+    }
+  }
+});
+
 test("the damage trail keeps the previous value's geometry while the fill moves", async ({ page }) => {
   expect(TRAIL_SAMPLES.length).toBeGreaterThan(0);
   await page.setViewportSize({ width: 1280, height: 800 });
@@ -747,6 +837,10 @@ test("every scenario is reachable from the landing view in at most two clicks", 
 
 // After the run, persist the executed matrix for inspection/mutation tests.
 test.afterAll(async () => {
+  // A focused behavior assertion captures no registry case. Do not overwrite
+  // the full-run matrix or make that assertion inherit a zero-sample failure.
+  if (!manifest.length) return;
+
   mkdirSync(CANDIDATES, { recursive: true });
   writeFileSync(join(CANDIDATES, "matrix.json"), JSON.stringify(manifest, null, 2) + "\n");
   const membershipReport = buildMembershipReport(membershipCollector, {
