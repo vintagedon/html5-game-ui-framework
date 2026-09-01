@@ -83,7 +83,7 @@ with its baseline fails and surfaces its diff.
 | Zero-raster spike | ✅ Complete | Four dark-fantasy techniques render with zero framework raster files; the position holds |
 | Reference corpus | ✅ Complete | Catalog and capability map of the 28-pack UI pack corpus; license posture resolved, coordination rule adopted, and the module ladder recorded |
 | Harness | ✅ Complete | Recorded-baseline regression suite over every case; decisions recorded in the harness review |
-| Core primitives | 🔄 Under Review | Button, panel, input, and the meter family (continuous, segmented, pips, vertical, damage trail) await rung 1 review |
+| Core primitives | ✅ Complete | Rung 1 meter and status family reviewed with all seven dispositions recorded |
 | Modules | ⬜ Planned | Composed from core; no module-to-module dependency |
 | First consumer | ⬜ Planned | Rogue Cellar integration, UI layer only |
 | Published demo | ⬜ Planned | One original game, after the framework is proven |
@@ -186,4 +186,4 @@ Third-party reference material held locally under `reference-files-*` is license
 
 ---
 
-Last Updated: August 25, 2026 | Status: Rung 1 Under Review
+Last Updated: September 1, 2026 | Status: Rung 1 Reviewed

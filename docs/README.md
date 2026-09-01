@@ -3,8 +3,8 @@
 title: "Documentation"
 description: "Project documentation, standards, and reference materials"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-25"
-version: "1.6"
+date: "2026-09-01"
+version: "1.7"
 status: "Active"
 tags:
   - type: directory-readme
@@ -19,9 +19,10 @@ related_documents:
 
 Project documentation. The project charter holds frozen scope, architecture,
 and acceptance criteria. The token and cascade references describe the frozen
-foundations contract. The foundations review records the approved Phase 1
-decisions, and the harness review holds the current operator decision surface.
-The `documentation-standards/` subdirectory governs repository documentation.
+foundations contract. The foundations and harness reviews record their approved
+decisions. The status-family review records all seven dispositions that close
+ladder rung 1. The `documentation-standards/` subdirectory governs repository
+documentation.
 
 ---
 
@@ -51,7 +52,7 @@ docs/
 │   ├── ui-pack-inventory.json
 │   ├── ui-pack-capability-map.md
 │   └── README.md
-├── status-family-review-2026-08-18.md # Rung 1 review surface: meter family, navigation, baselines
+├── status-family-review-2026-08-18.md # Reviewed rung 1: meter family, navigation, baselines
 ├── token-reference.md              # Frozen semantic vocabulary and tier boundaries
 └── README.md                       # This file
 ```
@@ -66,7 +67,7 @@ docs/
 | [foundations-review-2026-08-02.md](foundations-review-2026-08-02.md) | Closed approval questions for Phase 1 foundations and the spike | Approved |
 | [harness-review-2026-08-05.md](harness-review-2026-08-05.md) | Recorded operator decisions for the Phase 2 harness | Active |
 | [project-charter.md](project-charter.md) | Frozen scope, architecture, roadmap, and acceptance criteria | Active |
-| [status-family-review-2026-08-18.md](status-family-review-2026-08-18.md) | Operator review surface for ladder rung 1 | Under Review |
+| [status-family-review-2026-08-18.md](status-family-review-2026-08-18.md) | Reviewed ladder rung 1 with seven recorded dispositions | Active |
 | [token-reference.md](token-reference.md) | Three-tier contract and frozen semantic vocabulary | Active |
 
 ---
