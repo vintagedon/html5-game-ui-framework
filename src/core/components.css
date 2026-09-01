@@ -131,6 +131,14 @@
     box-shadow: var(--gc-elevation-low);
   }
 
+  :where(.gc-meter[data-shape="segmented"]) {
+    --gc-meter-count: var(--gc-meter-segments);
+  }
+
+  :where(.gc-meter[data-shape="pips"]) {
+    --gc-meter-count: var(--gc-meter-pips);
+  }
+
   /* Shapes share one value channel: applyMeterValue writes --gc-meter-value
    * raw, and quantized geometry is derived here so segmented and pip fills
    * always land on whole-unit boundaries. round(down, count * value, step)

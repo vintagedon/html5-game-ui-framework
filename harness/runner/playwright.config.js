@@ -30,7 +30,7 @@ mkdirSync(dirname(JSON_REPORT), { recursive: true });
 
 export default defineConfig({
   testDir: RUNNER_DIR,
-  testMatch: /runner\.spec\.js$/,
+  testMatch: /(?:runner|published-meter-consumption)\.spec\.js$/,
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: 0,
