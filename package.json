@@ -8,9 +8,9 @@
     "validate": "node harness/registry/validate.js",
     "metrics": "node harness/metrics/metrics.js",
     "build": "npm run validate && npm run metrics",
-    "playwright": "playwright test --config harness/runner/playwright.config.js",
+    "playwright": "node harness/runner/playwright.js",
     "test": "node --test harness/tests/*.test.js && npm run validate && npm run playwright && npm run metrics",
-    "capture": "node --test harness/tests/*.test.js && npm run validate && GC_CAPTURE=1 npm run playwright && npm run metrics",
+    "capture": "node --test harness/tests/*.test.js && npm run validate && node harness/runner/capture.js",
     "corpus:test": "node --test harness/tests/reference-corpus.test.js",
     "corpus:audit": "node scripts/reference-corpus/audit-ui-packs.mjs"
   },

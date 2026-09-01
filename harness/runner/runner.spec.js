@@ -13,11 +13,10 @@
  * mutation test relies on that: changing a scenario's theme coverage in the
  * registry changes both the rendered page and this runner's executed matrix.
  *
- * Golden model: a case with no recorded baseline establishes one (the only
- * write a run performs); a case whose capture disagrees with its baseline
- * fails and surfaces its diff. No code path here rewrites or deletes an
- * existing baseline PNG or manifest entry. `GC_CAPTURE=1` behaves the same;
- * every run captures, compares, and establishes what is missing.
+ * Golden model: a case with no recorded baseline stages an in-memory candidate.
+ * Only the canonical capture wrapper can commit it after the complete
+ * Playwright process exits zero. A case whose capture disagrees with its
+ * baseline fails and surfaces its diff.
  */
 
 import { expect, test } from "@playwright/test";
@@ -31,8 +30,11 @@ import {
   compareCapture,
   establishBaseline,
   readApprovalManifest,
-  writeManifestEntries,
 } from "./compare.js";
+import {
+  BASELINE_ATTACHMENT_TYPE,
+  BASELINE_COMPARISON_TYPE,
+} from "./baseline-reporter.js";
 import {
   buildCases,
   captureIdentity,
@@ -57,9 +59,6 @@ const PAGE = `${BASE}/reference/`;
 const RUN_ID = randomUUID();
 const RUN_STATE = join(ROOT, "runner/playwright-run.json");
 const approvalManifest = readApprovalManifest();
-// Baselines established during this run, merged once in afterAll. A run
-// performs no other write into the approved tree or the manifest.
-const establishedEntries = [];
 
 // One case per scenario x theme x viewport x checkpoint, all registry-sourced.
 const cases = buildCases(registry);
@@ -150,7 +149,7 @@ test.beforeAll(() => {
 for (const c of cases) {
   test(
     `${c.id} [${c.theme}] [${c.viewport.name}] ${c.checkpoint.name}`,
-    async ({ page }) => {
+    async ({ page }, testInfo) => {
       await page.setViewportSize({
         width: c.viewport.width,
         height: c.viewport.height,
@@ -198,12 +197,30 @@ for (const c of cases) {
         caseId: rel,
         manifest: approvalManifest,
       });
+      await testInfo.attach(`baseline-comparison:${rel}`, {
+        body: Buffer.from(
+          JSON.stringify({
+            status: result.status,
+            reason: result.reason,
+            caseId: rel,
+          }),
+        ),
+        contentType: BASELINE_COMPARISON_TYPE,
+      });
 
       if (result.status === "unrecorded") {
-        // The one write a run performs: establish an absent baseline.
-        establishedEntries.push(
-          establishBaseline({ approvedPath, caseId: rel, candidatePng: png, manifest: approvalManifest }),
-        );
+        const staged = establishBaseline({
+          approvedPath,
+          caseId: rel,
+          candidatePng: png,
+          manifest: approvalManifest,
+        });
+        // The reporter keeps this body in memory until every Playwright test
+        // and hook has passed. Failed runs discard it without a durable write.
+        await testInfo.attach(`baseline-establishment:${rel}`, {
+          body: staged.candidatePng,
+          contentType: BASELINE_ATTACHMENT_TYPE,
+        });
       }
 
       goldenCounts[result.status === "unrecorded" ? "established" : result.status]++;
@@ -854,10 +871,6 @@ test.afterAll(async () => {
   console.log(
     `\nmembership: ${coverage.designedPairIdentities} designed identities; ${coverage.distinctObservedIdentities} distinct observed; ${coverage.totalObservations} total observations; ${Object.values(coverage.exclusionsByReason).reduce((sum, count) => sum + count, 0)} exclusions; ${coverage.unclassifiedObservations} unclassified`,
   );
-  if (establishedEntries.length) {
-    const written = writeManifestEntries({ entries: establishedEntries });
-    console.log(`goldens: recorded ${written.written} new baseline(s); manifest now holds ${written.totalEntries} entr(ies)`);
-  }
   console.log(
     `\ngoldens: ${goldenCounts.pass} pass, ${goldenCounts.established} established, ${goldenCounts.failure} failure`,
   );

@@ -14,19 +14,62 @@
  */
 import { defineConfig, devices } from "@playwright/test";
 import { mkdirSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { BASELINE_TRANSACTION_PROTOCOL } from "./baseline-reporter.js";
+import {
+  assertSafePlaywrightArguments,
+  assertSafePlaywrightEnvironment,
+  targetTouchesProtected,
+} from "./output-safety.js";
 
 const RUNNER_DIR = fileURLToPath(new URL(".", import.meta.url));
 const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
-const JSON_REPORT =
-  process.env.GC_PLAYWRIGHT_JSON ||
-  join(
+const BASELINE_REPORTER = fileURLToPath(
+  new URL("./baseline-reporter.js", import.meta.url),
+);
+const GOLDENS_ROOT = fileURLToPath(new URL("../goldens/", import.meta.url));
+const DEFAULT_JSON_REPORT = join(
     REPO_ROOT,
     "..",
     "work-logs/evidence/2026-08-05-h5gameui-03/gate-3.3-playwright-results.json",
   );
+const PROTECTED_OUTPUT_ROOTS = [
+  GOLDENS_ROOT,
+  process.env.GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT,
+].filter(Boolean);
+
+export function safeJsonReportPath(
+  requested,
+  { approvedRoot, fallback = DEFAULT_JSON_REPORT } = {},
+) {
+  const protectedRoots = approvedRoot ? [approvedRoot] : PROTECTED_OUTPUT_ROOTS;
+  const fallbackPath = resolve(process.cwd(), fallback);
+  if (targetTouchesProtected(fallbackPath, { protectedRoots })) {
+    throw new Error(
+      `Configured Playwright JSON fallback is not a safe output path: ${fallbackPath}`,
+    );
+  }
+  if (!requested) return fallbackPath;
+  const requestedPath = resolve(process.cwd(), requested);
+  return targetTouchesProtected(requestedPath, { protectedRoots })
+    ? fallbackPath
+    : requestedPath;
+}
+
+assertSafePlaywrightEnvironment(process.env, {
+  protectedRoots: PROTECTED_OUTPUT_ROOTS,
+  cwd: process.cwd(),
+});
+assertSafePlaywrightArguments(process.argv.slice(2), {
+  protectedRoots: PROTECTED_OUTPUT_ROOTS,
+  cwd: process.cwd(),
+  allowConfig: true,
+});
+const JSON_REPORT = safeJsonReportPath(process.env.GC_PLAYWRIGHT_JSON);
 mkdirSync(dirname(JSON_REPORT), { recursive: true });
+const canonicalBaselineProtocol =
+  process.env.GC_BASELINE_PROTOCOL === BASELINE_TRANSACTION_PROTOCOL;
 
 export default defineConfig({
   testDir: RUNNER_DIR,
@@ -35,7 +78,22 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: 0,
   workers: 1,
-  reporter: [["list"], ["json", { outputFile: JSON_REPORT }]],
+  reporter: [
+    ["list"],
+    ["json", { outputFile: JSON_REPORT }],
+    [
+      BASELINE_REPORTER,
+      {
+        transactionFd: canonicalBaselineProtocol ? 3 : undefined,
+        protocol: canonicalBaselineProtocol
+          ? BASELINE_TRANSACTION_PROTOCOL
+          : undefined,
+        authorization: canonicalBaselineProtocol
+          ? process.env.GC_BASELINE_AUTHORIZATION
+          : undefined,
+      },
+    ],
+  ],
   snapshotPathTemplate: "",
   expect: { toHaveScreenshot: { animations: "disabled" } },
 
