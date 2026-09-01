@@ -1777,8 +1777,9 @@ test("establish refuses a case whose manifest entry already exists", () =>
       /refusing to establish .* a manifest entry already exists/,
     );
     assert.equal(
-      comparator.APPROVAL_MANIFEST_PATH.length > 0 && approvedPath.includes("absent"),
-      true,
+      existsSync(approvedPath),
+      false,
+      "a refused establishment must not create its absent baseline PNG",
     );
   }));
 

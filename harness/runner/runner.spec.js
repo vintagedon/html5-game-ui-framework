@@ -382,15 +382,14 @@ test("meter labels and values remain compositionally separated", async ({ page }
           const blockGap = labelBox && valueBox
             ? Math.max(valueBox.top - labelBox.bottom, labelBox.top - valueBox.bottom)
             : 0;
-          const labelText = label?.textContent || "";
-          const valueText = value?.textContent || "";
 
           return {
             variant: meter.dataset.variant,
             orientation: meter.dataset.orientation || "horizontal",
             distinctNodes: Boolean(label && value && label !== value),
             separation: Math.max(inlineGap, blockGap),
-            abuttedText: labelRegion?.textContent === `${labelText}${valueText}`,
+            displayedValue: value?.innerText || "",
+            exposedValue: meter.getAttribute("aria-valuenow") || "",
           };
         }),
       );
@@ -400,9 +399,9 @@ test("meter labels and values remain compositionally separated", async ({ page }
         expect.soft(reading.distinctNodes, `${where}: label and value nodes`).toBe(true);
         expect.soft(reading.separation, `${where}: rendered label/value separation`).toBeGreaterThan(0);
         expect.soft(
-          reading.abuttedText && reading.separation <= 0,
-          `${where}: text must not read as <name><digits>% without whitespace or a box gap`,
-        ).toBe(false);
+          reading.displayedValue,
+          `${where}: rendered meter display must expose its numeric value`,
+        ).toBe(`${reading.exposedValue}%`);
         seen.add(`${theme}/${viewport.name}/${reading.orientation}`);
       }
     }
