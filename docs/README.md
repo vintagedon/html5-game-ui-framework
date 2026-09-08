@@ -3,8 +3,8 @@
 title: "Documentation"
 description: "Project documentation, standards, and reference materials"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-09-01"
-version: "1.7"
+date: "2026-09-07"
+version: "1.8"
 status: "Active"
 tags:
   - type: directory-readme
@@ -21,8 +21,9 @@ Project documentation. The project charter holds frozen scope, architecture,
 and acceptance criteria. The token and cascade references describe the frozen
 foundations contract. The foundations and harness reviews record their approved
 decisions. The status-family review records all seven dispositions that close
-ladder rung 1. The `documentation-standards/` subdirectory governs repository
-documentation.
+ladder rung 1, and the post-amendment review carries the five inherited
+defects that independent verification of the rung 1 amendment surfaced. The
+`documentation-standards/` subdirectory governs repository documentation.
 
 ---
 
@@ -47,6 +48,7 @@ docs/
 ├── cascade-and-overrides.md         # Layer precedence and consumer override contract
 ├── foundations-review-2026-08-02.md  # Closed Phase 1 decisions
 ├── harness-review-2026-08-05.md     # Recorded H-001 through H-006 decisions
+├── post-amendment-review-2026-09-07.md # Five inherited defects surfaced post-A2
 ├── project-charter.md              # Frozen scope, architecture, acceptance criteria
 ├── reference-corpus/               # UI pack catalog and capability map (public-derived)
 │   ├── ui-pack-inventory.json
@@ -66,6 +68,7 @@ docs/
 | [cascade-and-overrides.md](cascade-and-overrides.md) | Cascade order, zero-specificity defaults, and important-layer reversal | Active |
 | [foundations-review-2026-08-02.md](foundations-review-2026-08-02.md) | Closed approval questions for Phase 1 foundations and the spike | Approved |
 | [harness-review-2026-08-05.md](harness-review-2026-08-05.md) | Recorded operator decisions for the Phase 2 harness | Active |
+| [post-amendment-review-2026-09-07.md](post-amendment-review-2026-09-07.md) | Five inherited defects (PA-001 to PA-005) surfaced by independent verification of the rung 1 amendment | Open |
 | [project-charter.md](project-charter.md) | Frozen scope, architecture, roadmap, and acceptance criteria | Active |
 | [status-family-review-2026-08-18.md](status-family-review-2026-08-18.md) | Reviewed ladder rung 1 with seven recorded dispositions | Active |
 | [token-reference.md](token-reference.md) | Three-tier contract and frozen semantic vocabulary | Active |

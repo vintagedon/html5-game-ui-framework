@@ -3,8 +3,8 @@
 title: "html5-game-ui-framework"
 description: "A renderer-agnostic browser game UI framework whose reference application is also its conformance surface"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-05"
-version: "0.5"
+date: "2026-09-07"
+version: "0.6"
 status: "Active"
 tags:
   - type: project-root
@@ -13,6 +13,7 @@ tags:
 related_documents:
   - "[Project Charter](docs/project-charter.md)"
   - "[Agent Instructions](AGENTS.md)"
+  - "[Post-Amendment Review 2026-09-07](docs/post-amendment-review-2026-09-07.md)"
   - "[Tagging Strategy](docs/documentation-standards/tagging-strategy.md)"
 ---
 -->
@@ -84,6 +85,7 @@ with its baseline fails and surfaces its diff.
 | Reference corpus | ✅ Complete | Catalog and capability map of the 28-pack UI pack corpus; license posture resolved, coordination rule adopted, and the module ladder recorded |
 | Harness | ✅ Complete | Recorded-baseline regression suite over every case; decisions recorded in the harness review |
 | Core primitives | ✅ Complete | Rung 1 meter and status family reviewed with all seven dispositions recorded |
+| Rung 1 amendment | ✅ Complete | All seven dispositions implemented and independently verified; five inherited defects surfaced and recorded in the [post-amendment review](docs/post-amendment-review-2026-09-07.md) |
 | Modules | ⬜ Planned | Composed from core; no module-to-module dependency |
 | First consumer | ⬜ Planned | Rogue Cellar integration, UI layer only |
 | Published demo | ⬜ Planned | One original game, after the framework is proven |
@@ -167,6 +169,12 @@ themes by setting `data-gc-theme` on `<html>`. The semantic vocabulary is
 frozen. Run `npm install` and `npm test` to execute the unit, registry,
 Playwright, and metrics gates.
 
+**Known first-run issue.** On a fresh clone `npm test` reports one browser
+failure: the reference page requests a generated metrics file that does not
+exist yet, and metrics generation runs after the browser suite. The remaining
+118 unit tests, 175 browser tests, and 165 golden comparisons pass. Tracked as
+PA-002 in the [post-amendment review](docs/post-amendment-review-2026-09-07.md).
+
 ---
 
 ## Where This Runs
@@ -186,4 +194,4 @@ Third-party reference material held locally under `reference-files-*` is license
 
 ---
 
-Last Updated: September 1, 2026 | Status: Rung 1 Reviewed
+Last Updated: September 7, 2026 | Status: Rung 1 Amended
