@@ -3,8 +3,8 @@
 title: "html5-game-ui-framework"
 description: "A renderer-agnostic browser game UI framework whose reference application is also its conformance surface"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-09-07"
-version: "0.6"
+date: "2026-09-14"
+version: "0.7"
 status: "Active"
 tags:
   - type: project-root
@@ -78,7 +78,8 @@ with its baseline fails and surfaces its diff.
 
 | Area | Status | Description |
 |------|--------|-------------|
-| Charter | ✅ Complete | Scope, architecture, and acceptance criteria approved at v1.5 |
+| Charter | ✅ Complete | v1.6 records the operator's 1080p-based 16:9 display contract |
+| Game display | ⬜ Implementation pending | One 1920x1080 layout, uniformly scaled to 1080p, 1440p, and 2160p; [contract and migration review](docs/display-contract-review-2026-09-14.md) |
 | Repository hydration | ✅ Complete | Public baseline initialized on `main` |
 | Foundations | ✅ Complete | The 83-token semantic vocabulary, cascade contract, state recipes, and four themes are approved |
 | Zero-raster spike | ✅ Complete | Four dark-fantasy techniques render with zero framework raster files; the position holds |
@@ -86,6 +87,7 @@ with its baseline fails and surfaces its diff.
 | Harness | ✅ Complete | Recorded-baseline regression suite over every case; decisions recorded in the harness review |
 | Core primitives | ✅ Complete | Rung 1 meter and status family reviewed with all seven dispositions recorded |
 | Rung 1 amendment | ✅ Complete | All seven dispositions implemented and independently verified; five inherited defects surfaced and recorded in the [post-amendment review](docs/post-amendment-review-2026-09-07.md) |
+| PR #3 review | ⏳ Open | Five PA dispositions remain pending; the September 8 Kilo review adds nine reported items. [Current review context](docs/display-contract-review-2026-09-14.md) |
 | Modules | ⬜ Planned | Composed from core; no module-to-module dependency |
 | First consumer | ⬜ Planned | Rogue Cellar integration, UI layer only |
 | Published demo | ⬜ Planned | One original game, after the framework is proven |
@@ -105,6 +107,12 @@ Four layers with dependency flowing in one direction. Foundations are designed d
 | Harness | Scenario registry, Playwright | Renders the reference application and drives the regression suite from one declaration |
 
 Full architecture, acceptance criteria, and the harvest corpus inventory are in the [project charter](docs/project-charter.md).
+
+Game UI is authored once at **1920x1080**, **16:9**, and scaled uniformly to
+**2560x1440** (4/3) and **3840x2160** (2). Other browser window sizes fit the
+same stage with centered letterboxing. The shared stage host and capture
+migration are pending; loading the current CSS and ESM does not install that
+behavior yet. See the [display contract](docs/project-charter.md#411-game-display-contract).
 
 ---
 
@@ -194,4 +202,4 @@ Third-party reference material held locally under `reference-files-*` is license
 
 ---
 
-Last Updated: September 7, 2026 | Status: Rung 1 Amended
+Last Updated: September 14, 2026 | Status: Rung 1 Review Open; Display Contract Adopted

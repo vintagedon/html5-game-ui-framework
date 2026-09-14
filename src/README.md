@@ -3,8 +3,8 @@
 title: "Framework Source"
 description: "Consumable CSS and ESM source for the game UI framework"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-03"
-version: "1.0"
+date: "2026-09-14"
+version: "1.1"
 status: "Active"
 tags:
   - type: directory-readme
@@ -52,6 +52,13 @@ defs inline, so the two files together are the complete consumption story:
 ```
 
 No build step, no bundler, no external network request.
+
+The [game display contract](../docs/project-charter.md#411-game-display-contract)
+defines one 1920x1080 logical stage scaled to the three supported 16:9 targets.
+The current entries supply tokens, primitives, themes, and shared SVG defs;
+the shared stage host is pending implementation. Consumers must not infer
+automatic viewport fitting from these imports. Existing vendored pins remain
+unchanged until each game's authorized migration.
 
 ---
 

@@ -3,8 +3,8 @@
 title: "UI Pack Capability Map"
 description: "Ranked operator review surface derived from the UI reference corpus catalog"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-17"
-version: "1.1"
+date: "2026-09-14"
+version: "1.2"
 status: "Active"
 tags:
   - type: report
@@ -238,6 +238,8 @@ Labs study technique and vocabulary without claiming runtime module ownership.
 **Vector Vortex's current role.** Vector Vortex is in flight (Specs 02 and 03 in the central queue). It consumes the current published GameUI foundations and Core primitives by vendoring, produces game-local wireframe shell and feedback candidates under `vv-` ownership, and hands those candidates to a later, separately approved backport spec. It does not repin mid-spec, and no framework module may claim ownership of a surface Vector Vortex is actively proving: notification, settings, tab, and feedback candidates wait for its backport reconciliation unless the operator overrides in UIREF-005.
 
 ## 7. Module Ladder (Agreed)
+
+All future game surfaces follow the [1080p-based 16:9 display contract](../project-charter.md#411-game-display-contract), adopted on 2026-09-14. The shared stage host and capture migration remain pending; see the [implementation handoff](../display-contract-review-2026-09-14.md). This foundation constraint does not reorder the ladder or repin active games.
 
 The earlier proposed next queue is replaced by the agreed module ladder, recorded here from operator decision. The ladder is the standing build order for the framework's module work; it still authorizes nothing by itself, and each rung is a separately dispatched spec. No ladder item is added, removed, or reordered except by operator decision.
 

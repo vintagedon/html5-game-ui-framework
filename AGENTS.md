@@ -3,8 +3,8 @@
 title: "Agent Instructions"
 description: "Repository identity, architectural constraints, documentation conventions, and spec execution pattern for html5-game-ui-framework"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-09-07"
-version: "1.4"
+date: "2026-09-14"
+version: "1.5"
 status: "Active"
 tags:
   - type: reference
@@ -52,6 +52,7 @@ These are non-negotiable. Each exists because violating it breaks something an a
 - **No raster assets in the framework or its themes.** Texture, ornament, and frames are produced with CSS and inline SVG. The framework raster count is a published metric and its correct value is zero.
 - **No module may depend on another module.** Modules compose core primitives. A primitive that two modules both need is promoted to core, never shared sideways.
 - **Frozen token names are API.** Renaming a semantic token is a major version. Values stay tunable until v1.0; the vocabulary does not. No hue-named tokens (`pink`), no domain-named tokens (`mana`, `hp`, `xp`).
+- **Game UI has one 1080p, 16:9 layout.** Follow [charter section 4.1.1](docs/project-charter.md#411-game-display-contract) for supported presentation targets and browser-window fitting. This contract is adopted ahead of runtime enforcement; read the [display contract review and migration handoff](docs/display-contract-review-2026-09-14.md) before stage or viewport work.
 - **Harvest requirements and technique, never source.** Reference packs under `reference-files-*` may be read to learn what a component must do and how an effect is achieved. Their rule blocks, markup, and files are never copied into this repository. Their licences prohibit redistribution as a component library, and this repository is exactly that. A pack with no local licence file records that no terms were in the archive, not that it is restricted; because nothing from a pack is redistributed, a missing terms file never gates derived-technique work. A pack whose terms forbid derived products is the one exception and is studied for nothing.
 - **A component without a registered scenario is incomplete.** Scenario registration ships in the same change as the component, not afterward.
 
