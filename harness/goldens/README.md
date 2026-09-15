@@ -82,20 +82,28 @@ temporary files are never removed. Symlink ancestors are rejected.
 
 Ordinary comparisons run through the fixed `npm run playwright` wrapper. It
 rejects protected `--output` and last-run targets before Playwright's startup
-cleanup, checking equal, descendant, and ancestor relationships in both lexical
-and resolved path space after `lstat`-inspecting existing path components.
-Every Playwright output path containing a symlink is rejected, including a
-dangling final link or dangling parent; output links are unsupported regardless
-of destination. It rejects alternate configs and reporters and leaves safe
-filtering arguments available. Public-config checks also contain
-Playwright's built-in reporter output environment variables and reject the
-internal `PW_TEST_REPORTER` extension hook before reporter creation. Canonical
-capture strips that hook and the native output variables so caller output
-routing cannot mutate the manifest or approved tree before transaction
-finalization. The configured JSON reporter validates its selected default or
-fallback with the same link and protected-relationship checks as an explicit
-target; an unsafe fallback fails config load before directory or reporter
-creation.
+cleanup, checking equal, descendant, and ancestor relationships in both
+lexical and resolved path space after `lstat`-inspecting existing path
+components, and rejects alternate configs and reporter overrides while
+leaving safe filtering arguments available. All run-owned output, candidates,
+diffs, the executed matrix, run state, membership evidence, and reporter
+files, lands in one fresh directory the runner creates beneath a validated
+parent, defaulting to the gitignored `harness/scratch/` tree.
+`GC_PLAYWRIGHT_JSON` selects that parent: it is a location to provision
+under, never an exact output file, because a caller-named existing file can
+alias curated bytes through a hardlink no ancestor check can see while a file
+the runner just created cannot. Curated locations, the approved tree, the
+manifest, and every sealed evidence directory, are refused as parents in
+lexical and resolved space, including `..` normalization and symlinked
+components, before any write happens; a refusal fails configuration load
+rather than rerouting. The resolved run directory is reported on every run,
+and candidate writes inside it are created exclusively so a pre-existing
+entry is refused rather than written through. Canonical capture honors a
+validated parent override and strips only native Playwright output routing
+and baseline authority. Public-config checks also contain Playwright's
+built-in reporter output environment variables, including a directory
+selected with no output name, and reject the internal `PW_TEST_REPORTER`
+extension hook before reporter creation.
 
 ---
 

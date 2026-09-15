@@ -21,8 +21,7 @@
 
 import { expect, test } from "@playwright/test";
 import { randomUUID } from "node:crypto";
-import { mkdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { PNG } from "pngjs";
 import { registry } from "../registry/scenarios.js";
@@ -40,6 +39,11 @@ import {
   captureIdentity,
   resolveCheckpointInteractions,
 } from "./cases.js";
+import {
+  recordLatestRun,
+  RUN_OUTPUT_ENVIRONMENT_KEY,
+  writeRunFile,
+} from "./run-output.js";
 import { semanticDeclarations } from "../metrics/contrast.js";
 import { designedPairs } from "../metrics/pairings.js";
 import { moduleResponseFailure } from "./smoke-assertions.js";
@@ -53,11 +57,19 @@ import { applyMeterValue, applyTogglePressed } from "./interactions.js";
 
 const BASE = process.env.GC_BASE_URL || "http://127.0.0.1:8123";
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
-const CANDIDATES = join(ROOT, "goldens/candidates");
-const APPROVED = join(ROOT, "goldens/approved");
 const PAGE = `${BASE}/reference/`;
+// All run-owned output (candidates, diffs, matrix, run state, membership)
+// lands in one fresh directory the config provisioned before this worker
+// started. Writing anywhere else would let a caller-named path alias curated
+// bytes, which is the defect class this layout exists to close.
+const RUN_DIRECTORY = process.env[RUN_OUTPUT_ENVIRONMENT_KEY];
+if (!RUN_DIRECTORY) {
+  throw new Error(
+    `${RUN_OUTPUT_ENVIRONMENT_KEY} is not set; the Playwright config provisions run output before workers start`,
+  );
+}
+const APPROVED = join(ROOT, "goldens/approved");
 const RUN_ID = randomUUID();
-const RUN_STATE = join(ROOT, "runner/playwright-run.json");
 const approvalManifest = readApprovalManifest();
 
 // One case per scenario x theme x viewport x checkpoint, all registry-sourced.
@@ -136,8 +148,9 @@ const manifest = [];
 const goldenCounts = { pass: 0, established: 0, failure: 0 };
 
 test.beforeAll(() => {
-  writeFileSync(
-    RUN_STATE,
+  writeRunFile(
+    RUN_DIRECTORY,
+    "playwright-run.json",
     JSON.stringify(
       { version: 1, runId: RUN_ID, startedAt: new Date().toISOString() },
       null,
@@ -183,14 +196,12 @@ for (const c of cases) {
       recordMembershipSample(membershipCollector, c, membershipSample);
 
       const rel = captureIdentity(c);
-      const candidatePath = join(CANDIDATES, rel);
       const approvedPath = join(APPROVED, rel);
-      mkdirSync(dirname(candidatePath), { recursive: true });
 
       const png = await page
         .locator(`[data-scenario="${c.id}"] .gc-specimen`)
         .screenshot({ type: "png", animations: "disabled" });
-      writeFileSync(candidatePath, png);
+      writeRunFile(RUN_DIRECTORY, `candidates/${rel}`, png);
 
       const result = compareCapture(png, {
         approvedPath,
@@ -235,8 +246,9 @@ for (const c of cases) {
       });
       if (result.status === "failure") {
         if (result.diffPng) {
-          writeFileSync(
-            join(CANDIDATES, `${rel.replace(/\.png$/, "")}.diff.png`),
+          writeRunFile(
+            RUN_DIRECTORY,
+            `candidates/${rel.replace(/\.png$/, "")}.diff.png`,
             PNG.sync.write(result.diffPng),
           );
         }
@@ -979,15 +991,22 @@ test.afterAll(async () => {
   // the full-run matrix or make that assertion inherit a zero-sample failure.
   if (!manifest.length) return;
 
-  mkdirSync(CANDIDATES, { recursive: true });
-  writeFileSync(join(CANDIDATES, "matrix.json"), JSON.stringify(manifest, null, 2) + "\n");
+  writeRunFile(
+    RUN_DIRECTORY,
+    "candidates/matrix.json",
+    JSON.stringify(manifest, null, 2) + "\n",
+  );
   const membershipReport = buildMembershipReport(membershipCollector, {
     runId: RUN_ID,
   });
-  writeFileSync(
-    join(ROOT, "runner/membership.json"),
+  writeRunFile(
+    RUN_DIRECTORY,
+    "membership.json",
     JSON.stringify(membershipReport, null, 2) + "\n",
   );
+  // Record this directory as the newest completed run so the metrics step,
+  // a separate process, reads this run's state and membership.
+  recordLatestRun(RUN_DIRECTORY);
   const coverage = membershipReport.coverage;
   console.log(
     `\nmembership: ${coverage.designedPairIdentities} designed identities; ${coverage.distinctObservedIdentities} distinct observed; ${coverage.totalObservations} total observations; ${Object.values(coverage.exclusionsByReason).reduce((sum, count) => sum + count, 0)} exclusions; ${coverage.unclassifiedObservations} unclassified`,

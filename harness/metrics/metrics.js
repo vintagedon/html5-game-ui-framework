@@ -22,15 +22,20 @@ import CleanCSS from "clean-css";
 import { minify } from "terser";
 import { isRasterPath, listScopeFiles, scopeSummary, REPO_ROOT } from "./scope.js";
 import { readCurrentMembership } from "./membership.js";
+import { readLatestRun } from "../runner/run-output.js";
 import { contrastGate } from "./contrast.js";
 import { EXEMPTIONS } from "./pairings.js";
 import { registry } from "../registry/scenarios.js";
 import { audit, dependencyGateFailures } from "../auditor/auditor.js";
 
 const files = listScopeFiles();
+// The newest completed Playwright run holds the state and membership evidence
+// this computation consumes; the run pointer lives in the gitignored scratch
+// parent and its target is validated against curated locations before read.
+const latestRun = readLatestRun();
 const membership = readCurrentMembership({
-  runStatePath: join(REPO_ROOT, "harness/runner/playwright-run.json"),
-  membershipPath: join(REPO_ROOT, "harness/runner/membership.json"),
+  runStatePath: join(latestRun, "playwright-run.json"),
+  membershipPath: join(latestRun, "membership.json"),
 });
 const read = (rel) => readFileSync(join(REPO_ROOT, rel), "utf8");
 const cssFiles = files.filter((f) => f.endsWith(".css"));

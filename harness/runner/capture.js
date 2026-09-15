@@ -38,11 +38,14 @@ const METRICS_SCRIPT = fileURLToPath(
 export const BASELINE_TRANSACTION_BYTE_LIMIT = 64 * 1024 * 1024;
 
 function stripBaselineAuthority(environment) {
+  // GC_PLAYWRIGHT_JSON selects a validated run-output parent and is honored:
+  // stripping a caller's destination override would force canonical capture
+  // back onto its default parent and take the supported redirect away. Only
+  // baseline authority and native Playwright output routing are removed.
   const clean = stripPlaywrightOutputEnvironment(environment);
   delete clean.GC_BASELINE_TRANSACTION;
   delete clean.GC_BASELINE_AUTHORIZATION;
   delete clean.GC_BASELINE_PROTOCOL;
-  delete clean.GC_PLAYWRIGHT_JSON;
   return clean;
 }
 

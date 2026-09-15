@@ -18,17 +18,17 @@ import {
   assertSafePlaywrightArguments,
   assertSafePlaywrightEnvironment,
 } from "./output-safety.js";
+import { curatedRoots } from "./run-output.js";
 
 const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const PLAYWRIGHT_CLI = fileURLToPath(
   new URL("../../node_modules/@playwright/test/cli.js", import.meta.url),
 );
 const PLAYWRIGHT_CONFIG = fileURLToPath(new URL("./playwright.config.js", import.meta.url));
-const GOLDENS_ROOT = fileURLToPath(new URL("../goldens/", import.meta.url));
 
 function protectedRoots(environment) {
   return [
-    GOLDENS_ROOT,
+    ...curatedRoots(),
     environment.GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT,
   ].filter(Boolean);
 }

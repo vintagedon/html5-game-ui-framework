@@ -11,50 +11,65 @@
  * single-browser, single-platform, consistent with the charter's ruling that
  * cross-browser pixel goldens are out of scope. No project is configured for a
  * browser the host cannot run.
+ *
+ * Every destination this configuration hands Playwright, the JSON report, and
+ * the native test-output directory, lives in one fresh run-owned directory
+ * created at import time beneath a validated parent. GC_PLAYWRIGHT_JSON
+ * selects that parent; it is never an exact output file, because a
+ * caller-named existing file can alias curated bytes through a hardlink no
+ * ancestor check can see. An unsafe parent fails configuration load before
+ * any write.
  */
 import { defineConfig, devices } from "@playwright/test";
-import { mkdirSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { BASELINE_TRANSACTION_PROTOCOL } from "./baseline-reporter.js";
 import {
   assertSafePlaywrightArguments,
   assertSafePlaywrightEnvironment,
-  targetTouchesProtected,
 } from "./output-safety.js";
+import {
+  curatedRoots,
+  DEFAULT_RUN_PARENT,
+  provisionRunDirectory,
+  RUN_OUTPUT_ENVIRONMENT_KEY,
+} from "./run-output.js";
 
 const RUNNER_DIR = fileURLToPath(new URL(".", import.meta.url));
 const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const BASELINE_REPORTER = fileURLToPath(
   new URL("./baseline-reporter.js", import.meta.url),
 );
-const GOLDENS_ROOT = fileURLToPath(new URL("../goldens/", import.meta.url));
-const DEFAULT_JSON_REPORT = join(
-    REPO_ROOT,
-    "..",
-    "work-logs/evidence/2026-08-05-h5gameui-03/gate-3.3-playwright-results.json",
-  );
+const CURATED_ROOTS = curatedRoots();
 const PROTECTED_OUTPUT_ROOTS = [
-  GOLDENS_ROOT,
+  ...CURATED_ROOTS,
   process.env.GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT,
 ].filter(Boolean);
 
-export function safeJsonReportPath(
-  requested,
-  { approvedRoot, fallback = DEFAULT_JSON_REPORT } = {},
-) {
-  const protectedRoots = approvedRoot ? [approvedRoot] : PROTECTED_OUTPUT_ROOTS;
-  const fallbackPath = resolve(process.cwd(), fallback);
-  if (targetTouchesProtected(fallbackPath, { protectedRoots })) {
-    throw new Error(
-      `Configured Playwright JSON fallback is not a safe output path: ${fallbackPath}`,
-    );
-  }
-  if (!requested) return fallbackPath;
-  const requestedPath = resolve(process.cwd(), requested);
-  return targetTouchesProtected(requestedPath, { protectedRoots })
-    ? fallbackPath
-    : requestedPath;
+/**
+ * Resolve this run's output parent, provision a fresh run directory beneath
+ * it, and report the resolved location. The parent is GC_PLAYWRIGHT_JSON when
+ * the caller selected one, otherwise the gitignored scratch parent inside the
+ * repository. Validation failures throw before any directory is created.
+ *
+ * @param {{environment?: object, cwd?: string}} [options]
+ * @returns {{runDirectory: string, jsonReport: string}}
+ */
+export function resolveRunOutput({
+  environment = process.env,
+  cwd = REPO_ROOT,
+} = {}) {
+  const runDirectory = provisionRunDirectory({
+    parent: environment.GC_PLAYWRIGHT_JSON || DEFAULT_RUN_PARENT,
+    curatedRoots: CURATED_ROOTS,
+    additionalRoots: environment.GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT
+      ? [environment.GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT]
+      : [],
+    cwd,
+  });
+  const jsonReport = join(runDirectory, "playwright-results.json");
+  console.log(`goldens: run output directory ${runDirectory}`);
+  return { runDirectory, jsonReport };
 }
 
 assertSafePlaywrightEnvironment(process.env, {
@@ -66,8 +81,12 @@ assertSafePlaywrightArguments(process.argv.slice(2), {
   cwd: process.cwd(),
   allowConfig: true,
 });
-const JSON_REPORT = safeJsonReportPath(process.env.GC_PLAYWRIGHT_JSON);
-mkdirSync(dirname(JSON_REPORT), { recursive: true });
+const RUN_OUTPUT = resolveRunOutput();
+// Worker processes inherit the main-process environment after the config
+// loads, so the runner spec writes its candidates, state, and reports into
+// the same freshly provisioned directory the reporters use.
+process.env[RUN_OUTPUT_ENVIRONMENT_KEY] = RUN_OUTPUT.runDirectory;
+const JSON_REPORT = RUN_OUTPUT.jsonReport;
 const canonicalBaselineProtocol =
   process.env.GC_BASELINE_PROTOCOL === BASELINE_TRANSACTION_PROTOCOL;
 
@@ -78,6 +97,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: 0,
   workers: 1,
+  outputDir: join(RUN_OUTPUT.runDirectory, "test-output"),
   reporter: [
     ["list"],
     ["json", { outputFile: JSON_REPORT }],

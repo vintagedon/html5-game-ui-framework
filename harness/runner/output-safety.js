@@ -133,6 +133,13 @@ export function assertSafePlaywrightEnvironment(
       outputFileFromDirectory(environment, prefix, cwd),
       { protectedRoots, cwd },
     );
+    // A directory selected with no output name is itself the destination and
+    // resolves through the same validation as a named output.
+    assertSafeTarget(
+      `PLAYWRIGHT_${prefix}_OUTPUT_DIR`,
+      environment[`PLAYWRIGHT_${prefix}_OUTPUT_DIR`],
+      { protectedRoots, cwd, directory: true },
+    );
   }
   for (const name of ["PLAYWRIGHT_BLOB_OUTPUT_DIR", "PLAYWRIGHT_HTML_OUTPUT_DIR", "PLAYWRIGHT_HTML_REPORT"]) {
     assertSafeTarget(name, environment[name], { protectedRoots, cwd, directory: true });
