@@ -21,7 +21,8 @@
  * any write.
  */
 import { defineConfig, devices } from "@playwright/test";
-import { join, resolve } from "node:path";
+import { statSync } from "node:fs";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { BASELINE_TRANSACTION_PROTOCOL } from "./baseline-reporter.js";
 import {
@@ -29,6 +30,7 @@ import {
   assertSafePlaywrightEnvironment,
 } from "./output-safety.js";
 import {
+  assertRunOutputParent,
   curatedRoots,
   DEFAULT_RUN_PARENT,
   provisionRunDirectory,
@@ -47,10 +49,15 @@ const PROTECTED_OUTPUT_ROOTS = [
 ].filter(Boolean);
 
 /**
- * Resolve this run's output parent, provision a fresh run directory beneath
- * it, and report the resolved location. The parent is GC_PLAYWRIGHT_JSON when
- * the caller selected one, otherwise the gitignored scratch parent inside the
- * repository. Validation failures throw before any directory is created.
+ * Resolve this run's output directory. The first process to load the
+ * configuration provisions a fresh directory beneath the validated parent
+ * and exports it through the environment; every later process that loads
+ * the configuration, and Playwright restarts a worker after each failed
+ * test, reuses that directory instead of provisioning another, so one run's
+ * candidates, reports, and state stay together. The parent is
+ * GC_PLAYWRIGHT_JSON when the caller selected one, otherwise the gitignored
+ * scratch parent inside the repository. Validation failures throw before
+ * any directory is created.
  *
  * @param {{environment?: object, cwd?: string}} [options]
  * @returns {{runDirectory: string, jsonReport: string}}
@@ -59,12 +66,21 @@ export function resolveRunOutput({
   environment = process.env,
   cwd = REPO_ROOT,
 } = {}) {
+  const additionalRoots = environment.GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT
+    ? [environment.GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT]
+    : [];
+  const recorded = environment[RUN_OUTPUT_ENVIRONMENT_KEY];
+  if (recorded) {
+    assertRunOutputParent(recorded, { curatedRoots: CURATED_ROOTS, additionalRoots, cwd });
+    if (!statSync(recorded).isDirectory()) {
+      throw new Error(`recorded run output directory is not a directory: ${recorded}`);
+    }
+    return { runDirectory: recorded, jsonReport: join(recorded, "playwright-results.json") };
+  }
   const runDirectory = provisionRunDirectory({
     parent: environment.GC_PLAYWRIGHT_JSON || DEFAULT_RUN_PARENT,
     curatedRoots: CURATED_ROOTS,
-    additionalRoots: environment.GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT
-      ? [environment.GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT]
-      : [],
+    additionalRoots,
     cwd,
   });
   const jsonReport = join(runDirectory, "playwright-results.json");

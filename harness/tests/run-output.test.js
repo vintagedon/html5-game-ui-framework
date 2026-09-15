@@ -441,6 +441,28 @@ test("the real repository's curated roots cover approved, the manifest, and seal
   assert.equal(roots[2].endsWith(join("work-logs", "evidence")), true);
 });
 
+test("a recorded run output directory is reused instead of provisioned again", () => {
+  const state = fixture();
+  const parent = join(state.directory, "reports");
+  const recorded = provisionRunDirectory({
+    parent,
+    curatedRoots: state.curated,
+    cwd: state.directory,
+  });
+  // A worker restart loads the configuration again mid-run; it must adopt the
+  // recorded directory rather than fragment the run across fresh ones.
+  const result = importConfig({ [runOutputEnvironmentKey()]: recorded }, state.directory);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stdout.includes("run output directory"), false,
+    "reuse must not provision or report a new directory");
+  assert.equal(readdirSync(parent).length, 1, "exactly one run directory exists");
+  rmSync(state.directory, { recursive: true, force: true });
+});
+
+function runOutputEnvironmentKey() {
+  return "GC_RUN_OUTPUT_DIR";
+}
+
 /** Import the real Playwright config once, capturing its provisioning output. */
 function importConfig(environment, cwd) {
   return spawnSync(
