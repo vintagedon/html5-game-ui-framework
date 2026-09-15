@@ -65,7 +65,7 @@ function runProcess(executable, args) {
   });
 }
 
-function referenceServer(root, injectedUrl) {
+function referenceServer(root, injectedUrl, injectedScript) {
   const boundary = root.endsWith(sep) ? root : `${root}${sep}`;
   return createServer((request, response) => {
     try {
@@ -79,9 +79,13 @@ function referenceServer(root, injectedUrl) {
       }
       if (statSync(path).isDirectory()) path = join(path, "index.html");
       if (path === join(root, "reference", "index.html")) {
+        const injections = [
+          injectedUrl ? `<script>fetch(${JSON.stringify(injectedUrl)}).catch(() => {});</script>` : "",
+          injectedScript ?? "",
+        ].filter(Boolean).join("");
         const html = readFileSync(path, "utf8").replace(
           "</body>",
-          `<script>fetch(${JSON.stringify(injectedUrl)}).catch(() => {});</script></body>`,
+          `${injections}</body>`,
         );
         response.writeHead(200, { "Content-Type": CONTENT_TYPES[".html"] });
         response.end(html);
@@ -137,5 +141,45 @@ test("published smoke aggregates deduplicated off-origin observations at run lev
   assert.deepEqual(
     report.network.offOriginRequests,
     [...new Map(perView.map((item) => [item.url, item])).values()],
+  );
+});
+
+test("published smoke merges induced module failures into the run-level report", async (t) => {
+  const scratch = mkdtempSync(join(tmpdir(), "h5gameui-smoke-"));
+  t.after(() => rmSync(scratch, { recursive: true, force: true }));
+
+  // A same-origin script that 404s is a module-load failure in every view.
+  // Removing the per-view merge into network.moduleFailures must make this
+  // test fail, which is the discrimination the merge previously lacked.
+  const missingModule = "/induced-missing-module.js";
+  const server = referenceServer(REPO_ROOT, undefined, `<script src="${missingModule}" defer></script>`);
+  await listen(server);
+  t.after(() => close(server));
+  const address = server.address();
+  const resultPath = join(scratch, "published-smoke.json");
+  const run = await runProcess(process.execPath, [
+    SMOKE_PATH,
+    "--url",
+    `http://127.0.0.1:${address.port}/reference/`,
+    "--result",
+    resultPath,
+  ]);
+
+  assert.equal(run.status, 1, `${run.stdout}\n${run.stderr}`);
+  const report = JSON.parse(readFileSync(resultPath, "utf8"));
+  const perView = report.views.flatMap((view) => view.moduleFailures);
+  assert.ok(
+    perView.some((item) => item.url.endsWith(missingModule)),
+    "the induced module failure must be observed per view",
+  );
+  assert.ok(
+    report.assertions.some(
+      (assertion) => assertion.id.endsWith(":module-load-failures") && !assertion.pass,
+    ),
+    "the induced module failure must continue to fail a per-view assertion",
+  );
+  assert.ok(
+    report.network.moduleFailures.some((item) => item.url.endsWith(missingModule)),
+    "the induced module failure must appear in the run-level report",
   );
 });

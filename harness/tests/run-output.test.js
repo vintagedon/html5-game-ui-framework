@@ -36,6 +36,7 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 import * as comparator from "../runner/compare.js";
+import { targetTouchesProtected } from "../runner/output-safety.js";
 import {
   assertRunOutputParent,
   assertRunOwnedPath,
@@ -399,6 +400,35 @@ test("run-owned destinations cannot escape their run directory", () => {
       curatedRoots: state.curated,
       cwd: state.directory,
     }),
+  );
+  rmSync(state.directory, { recursive: true, force: true });
+});
+
+test("a raw destination that resolves into a curated root only through symlink-then-.. is refused", () => {
+  const state = fixture();
+  // The kernel resolves outside/link -> approved/sub, so outside/link/../case.png
+  // lands inside approved. Lexical normalization collapses link/.. first and
+  // never looks at the symlink, which is the evasion this test pins.
+  mkdirSync(join(state.directory, "outside"), { recursive: true });
+  mkdirSync(join(state.approvedRoot, "sub"));
+  symlinkSync(join(state.approvedRoot, "sub"), join(state.directory, "outside", "link"));
+  const kernelEvasive = `${state.directory}/outside/link/../case.png`;
+
+  assert.throws(
+    () =>
+      assertRunOutputParent(kernelEvasive, {
+        curatedRoots: state.curated,
+        cwd: state.directory,
+      }),
+    /curated location/,
+  );
+  assert.equal(
+    targetTouchesProtected(kernelEvasive, {
+      protectedRoots: state.curated,
+      cwd: state.directory,
+    }),
+    true,
+    "the guard must resolve components in kernel order",
   );
   rmSync(state.directory, { recursive: true, force: true });
 });

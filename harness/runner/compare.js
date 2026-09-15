@@ -69,7 +69,13 @@ export function sha256(buffer) {
 }
 
 export function assertApprovedPathSafe(approvedRoot, approvedPath) {
-  if (!approvedRoot) return;
+  // An omitted or empty root is a programming error, not a pass: callers
+  // treat a silent return as validation, so refusing is the only safe
+  // default. A root that does not exist yet stays legal; the ancestor walk
+  // below tolerates ENOENT for exactly that case.
+  if (typeof approvedRoot !== "string" || approvedRoot === "") {
+    throw new Error("assertApprovedPathSafe requires an approved root");
+  }
   const root = resolve(approvedRoot);
   const target = resolve(approvedPath);
   const fromRoot = relative(root, target);
@@ -435,6 +441,11 @@ export function commitBaselineEstablishment({
     }
   }
   for (const candidate of recoveredCandidates) {
+    // Recovered orphans pass the same approved-path validation fresh
+    // candidates receive, re-checked at the commit point so a symlinked
+    // ancestor that appeared between staging and commit is refused here
+    // rather than recovered through.
+    assertApprovedPathSafe(candidate.approvedRoot, candidate.approvedPath);
     removeMatchingStaleLinks(candidate, path, pngIo);
   }
   const manifestResult = writeManifestEntries({

@@ -271,12 +271,14 @@ test("a recorded case with matching integrity but different pixels fails with th
 test("a comparison failure alone prevents baseline establishment", () =>
   withScratch((directory) => {
     const manifestPath = join(directory, "approval-manifest.json");
-    const approvedPath = join(directory, "unrecorded", "case.png");
+    const approvedRoot = join(directory, "unrecorded");
+    const approvedPath = join(approvedRoot, "case.png");
     const candidate = png(2, 2, [10, 20, 30]);
     writeManifest(manifestPath);
 
     const staged = comparator.establishBaseline({
       approvedPath,
+      approvedRoot,
       caseId: CASE_ID,
       candidatePng: candidate,
       manifest: EMPTY_MANIFEST,
@@ -310,12 +312,14 @@ test("a comparison failure alone prevents baseline establishment", () =>
 test("a conformance failure alone prevents baseline establishment", () =>
   withScratch((directory) => {
     const manifestPath = join(directory, "approval-manifest.json");
-    const approvedPath = join(directory, "unrecorded", "case.png");
+    const approvedRoot = join(directory, "unrecorded");
+    const approvedPath = join(approvedRoot, "case.png");
     const candidate = png(2, 2, [10, 20, 30]);
     writeManifest(manifestPath);
 
     const staged = comparator.establishBaseline({
       approvedPath,
+      approvedRoot,
       caseId: CASE_ID,
       candidatePng: candidate,
       manifest: EMPTY_MANIFEST,
@@ -338,12 +342,14 @@ test("a conformance failure alone prevents baseline establishment", () =>
 test("a run failure alone prevents baseline establishment", () =>
   withScratch((directory) => {
     const manifestPath = join(directory, "approval-manifest.json");
-    const approvedPath = join(directory, "unrecorded", "case.png");
+    const approvedRoot = join(directory, "unrecorded");
+    const approvedPath = join(approvedRoot, "case.png");
     const candidate = png(2, 2, [10, 20, 30]);
     writeManifest(manifestPath);
 
     const staged = comparator.establishBaseline({
       approvedPath,
+      approvedRoot,
       caseId: CASE_ID,
       candidatePng: candidate,
       manifest: EMPTY_MANIFEST,
@@ -1362,6 +1368,131 @@ test("a direct grep run cannot stage through a regular fd inside approved", () =
     }
   }));
 
+test("an omitted or empty approved root is refused and observed by the caller", () =>
+  withScratch((directory) => {
+    const approvedPath = join(directory, "approved", "case.png");
+    const candidate = png(2, 2, [0, 0, 0]);
+
+    for (const approvedRoot of [undefined, ""]) {
+      assert.throws(
+        () =>
+          comparator.establishBaseline({
+            approvedPath,
+            approvedRoot,
+            caseId: CASE_ID,
+            candidatePng: candidate,
+            manifest: EMPTY_MANIFEST,
+          }),
+        /requires an approved root/,
+        `establishment must refuse an omitted root (${approvedRoot})`,
+      );
+    }
+    assert.throws(
+      () => comparator.assertApprovedPathSafe(undefined, approvedPath),
+      /requires an approved root/,
+    );
+
+    // A root that does not exist yet stays legal: the ancestor walk
+    // tolerates ENOENT so first-run establishment against a fresh tree works.
+    assert.doesNotThrow(() =>
+      comparator.assertApprovedPathSafe(
+        join(directory, "not-yet-created-root"),
+        join(directory, "not-yet-created-root", "case.png"),
+      ),
+    );
+  }));
+
+test("a recovered candidate whose path gains a symlinked ancestor before commit is refused", () =>
+  withScratch((directory) => {
+    const approvedRoot = join(directory, "approved");
+    const caseDirectory = join(approvedRoot, "case-dir");
+    const approvedPath = join(caseDirectory, "case.png");
+    const manifestPath = join(directory, "approval-manifest.json");
+    const candidate = png(2, 2, [10, 20, 30]);
+    writeManifest(manifestPath);
+    mkdirSync(caseDirectory, { recursive: true });
+    writeFileSync(approvedPath, candidate);
+
+    const staged = comparator.establishBaseline({
+      approvedPath,
+      approvedRoot,
+      caseId: CASE_ID,
+      candidatePng: candidate,
+      manifest: EMPTY_MANIFEST,
+    });
+
+    // The fault mutation: between staging and commit, the orphan's parent
+    // directory becomes a symlink whose target holds a matching orphan, so
+    // the candidate still reads as recoverable through the alias. Recovery
+    // must refuse it exactly as a fresh write would.
+    const outsideDirectory = join(directory, "outside");
+    mkdirSync(outsideDirectory);
+    const aliasedOrphan = join(outsideDirectory, "case.png");
+    writeFileSync(aliasedOrphan, candidate);
+    rmSync(caseDirectory, { recursive: true, force: true });
+    symlinkSync(outsideDirectory, caseDirectory);
+
+    assert.throws(
+      () =>
+        comparator.commitBaselineEstablishment({
+          candidates: [staged],
+          comparisonResults: [{
+            status: "unrecorded",
+            reason: "baseline-entry-recoverable",
+            caseId: CASE_ID,
+          }],
+          conformanceFailures: [],
+          runFailed: false,
+          path: manifestPath,
+        }),
+      /symlink ancestor|escapes approved root/,
+    );
+    assert.deepEqual(readApprovalEntries(manifestPath), {});
+    assert.deepEqual(readFileSync(aliasedOrphan), candidate);
+  }));
+
+test("canonical capture exits nonzero when finalization is refused", async () =>
+  withScratchAsync(async (directory) => {
+    const manifestPath = join(directory, "approval-manifest.json");
+    const playwrightScript = join(directory, "fake-playwright.mjs");
+    const metricsScript = join(directory, "fake-metrics.mjs");
+    writeManifest(manifestPath);
+    // Both child processes exit zero while the transaction itself reports a
+    // failed run, so only the finalization refusal can make the status nonzero.
+    writeFileSync(
+      playwrightScript,
+      `import { writeFileSync } from "node:fs";\n` +
+        `writeFileSync(3, JSON.stringify({\n` +
+        `  version: 1,\n` +
+        `  authorization: process.env.GC_BASELINE_AUTHORIZATION,\n` +
+        `  runFailed: true,\n` +
+        `  comparisonResults: [{ status: "failure", reason: "pixel-difference", caseId: ${JSON.stringify(CASE_ID)} }],\n` +
+        `  conformanceFailures: [],\n` +
+        `  candidates: [],\n` +
+        `}, null, 2) + "\\n");\n`,
+    );
+    writeFileSync(metricsScript, "process.exitCode = 0;\n");
+    const captureUrl = new URL("../runner/capture.js", import.meta.url).href;
+    const driver =
+      `const { runCanonicalCapture } = await import(${JSON.stringify(captureUrl)});\n` +
+      `const result = await runCanonicalCapture({\n` +
+      `  repoRoot: ${JSON.stringify(directory)},\n` +
+      `  playwrightCli: ${JSON.stringify(playwrightScript)},\n` +
+      `  playwrightConfig: ${JSON.stringify(join(directory, "unused.config.mjs"))},\n` +
+      `  metricsScript: ${JSON.stringify(metricsScript)},\n` +
+      `  manifestPath: ${JSON.stringify(manifestPath)},\n` +
+      `  approvedRoot: ${JSON.stringify(join(directory, "approved"))},\n` +
+      `});\n` +
+      `if (result.status !== 0) process.exitCode = result.status;\n`;
+
+    const run = spawnSync(
+      process.execPath,
+      ["--input-type=module", "--eval", driver],
+      { encoding: "utf8" },
+    );
+    assert.equal(run.status, 1, `expected exit 1 on refused finalization\n${run.stdout}\n${run.stderr}`);
+  }));
+
 function readApprovalEntries(path) {
   return JSON.parse(readFileSync(path, "utf8")).entries;
 }
@@ -1369,12 +1500,14 @@ function readApprovalEntries(path) {
 test("a successful run commits PNGs and manifest entries at one commit point", () =>
   withScratch((directory) => {
     const manifestPath = join(directory, "approval-manifest.json");
-    const approvedPath = join(directory, "nested", "case.png");
+    const approvedRoot = join(directory, "nested");
+    const approvedPath = join(approvedRoot, "case.png");
     const candidate = png(2, 2, [10, 20, 30]);
     writeManifest(manifestPath);
 
     const staged = comparator.establishBaseline({
       approvedPath,
+      approvedRoot,
       caseId: CASE_ID,
       candidatePng: candidate,
       manifest: EMPTY_MANIFEST,
@@ -1399,9 +1532,11 @@ test("a successful run commits PNGs and manifest entries at one commit point", (
 test("a matching orphan is recovered without rewriting its PNG", () =>
   withScratch((directory) => {
     const manifestPath = join(directory, "approval-manifest.json");
-    const approvedPath = join(directory, "orphan.png");
+    const approvedRoot = join(directory, "approved-root");
+    const approvedPath = join(approvedRoot, "orphan.png");
     const candidate = png(2, 2, [10, 20, 30]);
     writeManifest(manifestPath);
+    mkdirSync(approvedRoot);
     writeFileSync(approvedPath, candidate);
     const fixedTime = new Date("2001-01-01T00:00:00.000Z");
     utimesSync(approvedPath, fixedTime, fixedTime);
@@ -1410,6 +1545,7 @@ test("a matching orphan is recovered without rewriting its PNG", () =>
     const result = compare(candidate, approvedPath);
     const staged = comparator.establishBaseline({
       approvedPath,
+      approvedRoot,
       caseId: CASE_ID,
       candidatePng: candidate,
       manifest: EMPTY_MANIFEST,
@@ -1432,12 +1568,14 @@ test("a matching orphan is recovered without rewriting its PNG", () =>
 test("a partial PNG staging write cannot publish a mismatching orphan", () =>
   withScratch((directory) => {
     const manifestPath = join(directory, "approval-manifest.json");
-    const approvedPath = join(directory, "approved", "case.png");
+    const approvedRoot = join(directory, "approved");
+    const approvedPath = join(approvedRoot, "case.png");
     const candidate = png(2, 2, [10, 20, 30]);
     writeManifest(manifestPath);
     const manifestBefore = readFileSync(manifestPath);
     const staged = comparator.establishBaseline({
       approvedPath,
+      approvedRoot,
       caseId: CASE_ID,
       candidatePng: candidate,
       manifest: EMPTY_MANIFEST,
@@ -1462,8 +1600,11 @@ test("a partial PNG staging write cannot publish a mismatching orphan", () =>
     );
     assert.equal(existsSync(approvedPath), false);
     assert.deepEqual(readFileSync(manifestPath), manifestBefore);
+    // The staging temporary is written beside the manifest, so the cleanup
+    // assertion must inspect the directory the run actually used. The old
+    // form inspected the approved directory and could never fail.
     assert.deepEqual(
-      readdirSync(dirname(approvedPath)).filter((name) => name.endsWith(".tmp")),
+      readdirSync(dirname(manifestPath)).filter((name) => name.endsWith(".tmp")),
       [],
     );
   }));
@@ -1634,12 +1775,14 @@ test("SIGKILL after atomic install leaves a stale link that green recovery remov
 test("a partial manifest write leaves the live manifest intact and the PNG recoverable", () =>
   withScratch((directory) => {
     const manifestPath = join(directory, "approval-manifest.json");
-    const approvedPath = join(directory, "approved", "case.png");
+    const approvedRoot = join(directory, "approved");
+    const approvedPath = join(approvedRoot, "case.png");
     const candidate = png(2, 2, [10, 20, 30]);
     writeManifest(manifestPath);
     const manifestBefore = readFileSync(manifestPath);
     const staged = comparator.establishBaseline({
       approvedPath,
+      approvedRoot,
       caseId: CASE_ID,
       candidatePng: candidate,
       manifest: EMPTY_MANIFEST,
@@ -1674,6 +1817,7 @@ test("a partial manifest write leaves the live manifest intact and the PNG recov
 
     const recovered = comparator.establishBaseline({
       approvedPath,
+      approvedRoot,
       caseId: CASE_ID,
       candidatePng: candidate,
       manifest: EMPTY_MANIFEST,
@@ -1698,12 +1842,14 @@ test("a partial manifest write leaves the live manifest intact and the PNG recov
 test("a manifest rename failure preserves the live manifest and removes its temp", () =>
   withScratch((directory) => {
     const manifestPath = join(directory, "approval-manifest.json");
-    const approvedPath = join(directory, "approved", "case.png");
+    const approvedRoot = join(directory, "approved");
+    const approvedPath = join(approvedRoot, "case.png");
     const candidate = png(2, 2, [10, 20, 30]);
     writeManifest(manifestPath);
     const manifestBefore = readFileSync(manifestPath);
     const staged = comparator.establishBaseline({
       approvedPath,
+      approvedRoot,
       caseId: CASE_ID,
       candidatePng: candidate,
       manifest: EMPTY_MANIFEST,
@@ -1776,6 +1922,7 @@ test("establish refuses a case whose manifest entry already exists", () =>
       () =>
         comparator.establishBaseline({
           approvedPath,
+          approvedRoot: directory,
           caseId: CASE_ID,
           candidatePng: png(2, 2, [0, 0, 0]),
           manifest: manifestWith("0".repeat(64)),
@@ -1798,6 +1945,7 @@ test("establish refuses a case whose baseline PNG does not match the capture", (
       () =>
         comparator.establishBaseline({
           approvedPath,
+          approvedRoot: directory,
           caseId: CASE_ID,
           candidatePng: png(2, 2, [0, 0, 0]),
           manifest: EMPTY_MANIFEST,

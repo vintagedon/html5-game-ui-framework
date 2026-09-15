@@ -151,8 +151,13 @@ export async function runCanonicalCapture({
     processSucceeded,
     manifestPath,
   });
+  // A refused finalization is a failed capture even when both child processes
+  // exited zero: the run's own report can carry failures (runFailed,
+  // conformance) that the exit statuses cannot see. The CLI maps a nonzero
+  // status here to its exit code, so a refusal can never read as success.
+  const refused = processSucceeded && !finalized.committed;
   return {
-    status: child.status === 0 ? metrics.status : child.status,
+    status: refused ? 1 : child.status === 0 ? metrics.status : child.status,
     finalized,
   };
 }
