@@ -4,12 +4,12 @@ schema: fixed-address-doc-v1
 document_type: project-charter
 status: Active
 owner: "VintageDon"
-updated: 2026-09-14
+updated: 2026-09-15
 title: "html5-game-ui-framework Project Charter"
 description: "Frozen scope, architecture, and acceptance criteria for a renderer-agnostic browser game UI framework"
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-07-25"
-version: "1.6"
+version: "1.7"
 tags:
   - type: charter
   - domain: foundations
@@ -137,7 +137,7 @@ DOM and CSS, ESM JavaScript, inline SVG for iconography and generated texture. N
 |----------|-------|--------|
 | Token prefix | `--gc-` | Continuous with the predecessor, so harvested rules port without renaming. Short enough to read inline. |
 | Game display | One 1920x1080 logical stage; supported presentation targets 1920x1080, 2560x1440, and 3840x2160, all 16:9. See section 4.1.1. | Author and validate one layout; uniform scaling preserves the composition across the supported set. |
-| Browser floor | Chrome and Edge 111, Safari 16.4, Firefox 128 | The binding features are `color-mix()` (Chrome 111), `@property` (Safari 16.4, Firefox 128), and `oklch()`. `@layer`, `:where()`, container queries, `backdrop-filter`, and SVG filters all clear that floor. No fallbacks are written for anything below it. |
+| Browser floor | Chrome and Edge 125, Safari 16.4, Firefox 128 | The binding features are `color-mix()` (Chrome 111), `round()` (Chrome and Edge 125), `@property` (Safari 16.4, Firefox 128), and `oklch()`. `@layer`, `:where()`, container queries, `backdrop-filter`, and SVG filters all clear that floor. No fallbacks are written for anything below it. The declared floor and the features that bind it are machine-checked against published source by the harness floor manifest and check under `harness/floor/`. |
 | Colour mixing space | OKLCH | Lightness is perceptually uniform, so one state-derivation recipe behaves the same against a near-black arcade base and a warm parchment fantasy base. sRGB mixing desaturates through grey and would need per-theme correction, which is exactly what `color-mix()` exists to avoid. |
 | Theme selector | `<html data-gc-theme="modern">` | Matches the token prefix. One attribute, no reload, no stylesheet swap. |
 | Icon geometry | Two families. **Chrome and input prompts** (Core): 24 by 24 viewBox, stroke-based, 2-unit stroke, round caps and joins, `stroke="currentColor"`, no fill except explicit optical corrections, 2-unit safe area. **Content** (shipped with the module that needs it): canonical 32 by 32 viewBox, filled silhouette, up to three local slots (`base`, `accent`, `rim`) bound to semantic or component tokens at the use site, no literal colours, geometry unchanged across themes. | Chrome icons sit inside buttons beside text, so inheriting text colour is correct and a second tone at 24 pixels reads as mud. Content icons carry per-theme recolouring through their three slots. No icon fonts, which are monochrome-only and cannot do either. |
@@ -297,6 +297,8 @@ Theme and component additions carry their scenario registration in the same chan
 | `gameui-browser-gaming-framework` charter and README | Predecessor scope and shipped component inventory |
 
 ### Lineage
+
+On 2026-09-15, charter v1.7 raises the Chrome and Edge browser floor from 111 to 125, naming CSS `round()` as binding alongside `color-mix()`, `@property`, and `oklch()`; discrete meter quantization requires it, and no fallback is written below the floor. Safari 16.4 and Firefox 128 are unchanged; the `round()` expressions in published source use same-type percentage arguments, which Safari clears at 15.4, so mixed-type argument forms remain out of use and would be an operator decision if introduced. The declared floor and published source are now compared automatically by the floor manifest and check under `harness/floor/`.
 
 On 2026-09-14, charter v1.6 records the operator's 1080p-based 16:9 display decision and limits supported presentation targets to 1080p, 1440p, and 2160p. Section 4.1.1 supersedes the previous multiple-aspect-ratio consumer criterion. Runtime enforcement remains follow-up work; this amendment does not change the browser-floor decision or authorize baseline replacement.
 

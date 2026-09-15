@@ -94,7 +94,12 @@ promotion into a curated tree happens only through explicit finalization.
 run-owned-output invariant across compare, report, and any future run
 destination in one change? (narrow-compare / invariant-across-destinations)
 
-**Disposition.** _Pending operator._
+**Disposition.** `invariant-across-destinations` (A3.1 of the 2026-09-15
+01c amendment). The false-green statement above did not survive rechecking
+against the current checkout on 2026-09-14: the manifest hash guard fails
+the first and every later comparison after an overwrite, so the defect
+destroys curated bytes rather than manufacturing a pass. The isolated
+outcomes are recorded in spec-reviews/2026-09-14-h5gameui-01c/.
 
 ### PA-002: The documented first test run fails on a fresh clone
 
@@ -122,7 +127,9 @@ or make the metrics request tolerate its own absence on first load? The
 general console-error assertion is preserved either way.
 (explicit-bootstrap / tolerate-absent-metrics)
 
-**Disposition.** _Pending operator._
+**Disposition.** `tolerate-absent-metrics`, with a visible not-generated
+state and an assertion that the artifact exists after the full sequence
+(A3.3).
 
 ### PA-003: Vertical segmented fills shrink in width as well as height
 
@@ -153,7 +160,8 @@ replacements in the follow-up, or fix the axis defect and defer baseline
 re-approval to a separate operator pass? (fix-and-authorize /
 fix-then-separate-approval)
 
-**Disposition.** _Pending operator._
+**Disposition.** `fix-and-authorize`, sequenced after the PA-001
+invariant landed (A3.4 with the authorized re-record in A3.5).
 
 ### PA-004: The declared browser floor does not support the CSS the discrete meters now require
 
@@ -183,7 +191,8 @@ floor sits under Frozen decisions rather than among the tunable values. Raise
 the declared Chrome and Edge floor to 125, or hold 111 and implement a
 `round()`-free quantization? (raise-floor / hold-floor-change-implementation)
 
-**Disposition.** _Pending operator._
+**Disposition.** `raise-floor` (A3.6: Chrome and Edge 125 in charter
+v1.7, with the floor manifest and check under `harness/floor/`).
 
 ### PA-005: Routine report output targets a sealed evidence directory
 
@@ -211,7 +220,7 @@ baselines in the other.
 sealed evidence as part of the PA-001 invariant work, or as an independent
 change? (with-pa-001 / independent)
 
-**Disposition.** _Pending operator._
+**Disposition.** `with-pa-001` (A3.1).
 
 ## Merge position
 
