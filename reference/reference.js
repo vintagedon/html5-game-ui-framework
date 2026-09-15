@@ -224,24 +224,43 @@ function metricCard({ label, value, scope }) {
   return card;
 }
 
+function renderMetricsNotGenerated(grid) {
+  // Absent metrics are a rendered state, not a silent gap: a fresh clone has
+  // not run the generator yet, and the block says so until it does.
+  grid.innerHTML = "";
+  const notice = document.createElement("p");
+  notice.className = "section-copy";
+  notice.dataset.metricsState = "not-generated";
+  notice.textContent = "Metrics are not generated yet. Run npm run metrics to compute them.";
+  grid.append(notice);
+}
+
 async function buildMetrics() {
   const section = document.getElementById("metrics");
   const grid = document.getElementById("metrics-grid");
   try {
     const res = await fetch("../harness/metrics/metrics.json", { cache: "no-cache" });
-    if (!res.ok) return;
-    const data = await res.json();
+    const data = res.ok ? await res.json().catch(() => null) : null;
+    if (!data || data.generated === false || !Array.isArray(data.metrics) || data.metrics.length === 0) {
+      renderMetricsNotGenerated(grid);
+      section.hidden = false;
+      return;
+    }
     grid.innerHTML = "";
-    for (const m of data.metrics || []) grid.append(metricCard(m));
+    for (const m of data.metrics) grid.append(metricCard(m));
     if (data.generatedAt) {
       const stamp = document.createElement("p");
       stamp.className = "section-copy";
+      stamp.dataset.metricsState = "generated";
       stamp.textContent = `Generated ${data.generatedAt} from ${data.scopeSummary || "the resolved framework paths"}.`;
       grid.before(stamp);
     }
     section.hidden = false;
   } catch {
-    // Metrics are a build artifact; absent until `npm run metrics` runs.
+    // Metrics are a build artifact; a server that cannot serve one at all
+    // still gets the visible not-generated state rather than a silent gap.
+    renderMetricsNotGenerated(grid);
+    section.hidden = false;
   }
 }
 

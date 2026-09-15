@@ -119,9 +119,11 @@ export default defineConfig({
 
   // The reference application is a static page. A local file server serves the
   // repository root so the page resolves ../src/gc.css and ../harness/* with
-  // the same paths it uses under the nginx preview.
+  // the same paths it uses under the nginx preview. The server answers an
+  // absent generated metrics artifact with an explicit not-generated payload
+  // so a fresh clone renders that state instead of failing the request.
   webServer: {
-    command: "python3 -m http.server 8123 --bind 127.0.0.1",
+    command: `node ${fileURLToPath(new URL("./reference-server.js", import.meta.url))} 8123`,
     url: "http://127.0.0.1:8123/reference/",
     cwd: REPO_ROOT,
     reuseExistingServer: true,
