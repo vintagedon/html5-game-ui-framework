@@ -222,6 +222,7 @@ for (const c of cases) {
       if (result.status === "unrecorded") {
         const staged = establishBaseline({
           approvedPath,
+          approvedRoot: APPROVED,
           caseId: rel,
           candidatePng: png,
           manifest: approvalManifest,
