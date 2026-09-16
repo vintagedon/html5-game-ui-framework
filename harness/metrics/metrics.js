@@ -31,10 +31,11 @@ import { audit, dependencyGateFailures } from "../auditor/auditor.js";
 const files = listScopeFiles();
 // The newest completed Playwright run holds the state and membership evidence
 // this computation consumes. Run output lives in the one fixed gitignored
-// scratch location the entry points initialize, so the run state read here
-// names the invocation whose evidence is consumed; the metrics step runs as
-// a separate process after Playwright in the documented sequence.
-const runState = readRunState();
+// scratch location the entry points initialize; this read names the
+// invocation whose evidence is consumed and fails with the supported entry
+// points when none exists. The membership reader re-reads the same run state
+// and enforces that the report belongs to it.
+readRunState();
 const membership = readCurrentMembership({
   runStatePath: join(RUN_OUTPUT_ROOT, "playwright-run.json"),
   membershipPath: join(RUN_OUTPUT_ROOT, "membership.json"),
