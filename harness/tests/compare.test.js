@@ -1016,7 +1016,7 @@ test("the npm comparison wrapper rejects PW_TEST_REPORTER before Playwright", ()
     assert.equal(readFileSync(sentinelPath, "utf8"), "original\n");
   }));
 
-test("the npm comparison wrapper ignores obsolete and native destination overrides and uses the fixed location", () =>
+test("the npm comparison wrapper ignores environment destination overrides and rejects native destination options", () =>
   withScratch((directory) => {
     const nativeSentinel = join(directory, "native-destination-sentinel.json");
     const sentinel = Buffer.from("native destination sentinel\n");
@@ -1047,6 +1047,42 @@ test("the npm comparison wrapper ignores obsolete and native destination overrid
       true,
       "the JSON report must land in the fixed run-output location",
     );
+
+    // Native CLI destinations must be rejected even outside the protected
+    // trees. Exercise both accepted CLI spellings through the real wrapper.
+    const outputDirectory = join(directory, "previous-output");
+    const outputSentinel = join(outputDirectory, "saved-result.txt");
+    const lastRunFile = join(directory, "saved-last-run.json");
+    mkdirSync(outputDirectory);
+    writeFileSync(outputSentinel, sentinel);
+    writeFileSync(lastRunFile, sentinel);
+    for (const outputArguments of [
+      ["--output", outputDirectory],
+      [`--output=${outputDirectory}`],
+      ["--last-failed-file", lastRunFile],
+      [`--last-failed-file=${lastRunFile}`],
+    ]) {
+      const rejected = spawnSync(
+        "npm",
+        ["run", "playwright", "--", ...outputArguments, "--grep", "no such test", "--pass-with-no-tests"],
+        {
+          cwd: fileURLToPath(new URL("../../", import.meta.url)),
+          env: { ...process.env },
+          encoding: "utf8",
+          timeout: 120_000,
+        },
+      );
+      const option = outputArguments[0].split("=")[0];
+      assert.equal(existsSync(outputSentinel), true, `${option} must preserve the directory contents`);
+      assert.deepEqual(readFileSync(outputSentinel), sentinel);
+      assert.deepEqual(readFileSync(lastRunFile), sentinel);
+      assert.notEqual(rejected.status, 0, `${option} must be rejected`);
+      assert.ok(
+        rejected.stderr.includes(`comparison command does not accept ${option}`),
+        rejected.stdout + rejected.stderr,
+      );
+      assert.deepEqual(readRunState(), runState, "reject before resetting the current run");
+    }
   }));
 
 test("canonical capture strips native reporter outputs before Playwright", async () =>

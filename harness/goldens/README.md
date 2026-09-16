@@ -81,11 +81,11 @@ manifest publication, preserves the PNG mtime, and adds the entry. Unrelated
 temporary files are never removed. Symlink ancestors are rejected.
 
 Ordinary comparisons run through the fixed `npm run playwright` wrapper. It
-rejects protected `--output` and last-run targets before Playwright's startup
-cleanup, checking equal, descendant, and ancestor relationships in both
-lexical and resolved path space after `lstat`-inspecting existing path
-components, and rejects alternate configs and reporter overrides while
-leaving safe filtering arguments available. There is one supported way to
+rejects `--output` and `--last-failed-file` outright before initializing run
+output or starting Playwright, including both separate-value and `=` forms.
+Existing curated-path checks remain in place. It also rejects alternate
+configs and reporter overrides while leaving safe filtering arguments
+available. There is one supported way to
 run and one fixed place run output lands: the gitignored
 `harness/scratch/run` location inside the repository. The comparison wrapper
 and canonical capture are the only entry points that initialize it, wiping

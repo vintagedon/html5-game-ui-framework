@@ -235,8 +235,7 @@ export function assertSafePlaywrightArguments(
         cwd,
         directory: true,
       });
-      index += outputOption.consumed;
-      continue;
+      throw new Error("comparison command does not accept --output");
     }
     const lastRunOption = optionValue(args, index, "--last-failed-file");
     if (lastRunOption) {
@@ -244,7 +243,7 @@ export function assertSafePlaywrightArguments(
         protectedRoots,
         cwd,
       });
-      index += lastRunOption.consumed;
+      throw new Error("comparison command does not accept --last-failed-file");
     }
   }
 }
