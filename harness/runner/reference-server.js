@@ -52,10 +52,23 @@ const { port = 0, root } = argumentsByName(process.argv.slice(2));
 const boundary = root.endsWith(sep) ? root : `${root}${sep}`;
 
 function sendFile(response, path) {
+  // Stream open and read errors are asynchronous: a synchronous try/catch
+  // around the handler cannot see them, and an unhandled stream error would
+  // take the whole server down. Answer 404 when headers allow it, and tear
+  // the socket down rather than the process when they do not.
+  const stream = createReadStream(path);
+  stream.once("error", () => {
+    if (response.headersSent) {
+      response.destroy();
+      return;
+    }
+    response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    response.end("Not found");
+  });
   response.writeHead(200, {
     "Content-Type": CONTENT_TYPES[extname(path)] || "application/octet-stream",
   });
-  createReadStream(path).pipe(response);
+  stream.pipe(response);
 }
 
 const server = createServer((request, response) => {
@@ -80,7 +93,24 @@ const server = createServer((request, response) => {
         return;
       }
     }
-    if (statSync(path).isDirectory()) path = join(path, "index.html");
+    if (statSync(path).isDirectory()) {
+      // A directory request is handled, never streamed open: without an
+      // index file the read stream would fail asynchronously and crash the
+      // process, so the index is verified to exist and be a file first.
+      const index = join(path, "index.html");
+      let indexStatus;
+      try {
+        indexStatus = statSync(index);
+      } catch {
+        indexStatus = undefined;
+      }
+      if (!indexStatus?.isFile()) {
+        response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+        response.end("Not found");
+        return;
+      }
+      path = index;
+    }
     sendFile(response, path);
   } catch {
     response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });

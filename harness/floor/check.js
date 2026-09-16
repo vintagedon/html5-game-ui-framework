@@ -1,17 +1,21 @@
 /**
  * Script Name : check.js
- * Description : Verify published source clears the declared browser floor.
+ * Description : Verify the floor manifest agrees with the charter and that declared forms appear in source.
  * Repository  : html5-game-ui-framework
  * Author      : VintageDon (https://github.com/vintagedon/)
  * Created     : 2026-09-15
  * Link        : https://github.com/vintagedon/html5-game-ui-framework
  *
  * The charter declares a browser floor under frozen decisions; this checker
- * keeps that declaration honest. It lists the floor-binding features actually
- * in use, the versions each requires with its compatibility source, and the
- * forms scanned for in published source. A feature present in src/ that needs
- * a version above a declared floor is a violation; a manifest that disagrees
- * with the charter's floor row is a violation of a different kind.
+ * keeps the parts of that declaration it can actually verify. It guarantees
+ * two things: the manifest's floor row agrees with the charter's frozen row,
+ * and each declared feature form appears as a substring in published source
+ * with requirements the declared floors clear. The scan is substring
+ * presence checking and nothing more: it does not parse argument forms, so
+ * an assumption like round() taking only same-type arguments is a manually
+ * reviewed declaration recorded in the manifest, not something this check
+ * verifies. A form needing a version above the floor is still caught,
+ * because the requirement is checked wherever the form appears.
  */
 
 import { readFileSync, readdirSync } from "node:fs";
@@ -67,7 +71,14 @@ function filesUnder(root, filter) {
   return out;
 }
 
-/** Scan published source for each declared feature form. */
+/**
+ * Scan published source for each declared feature form. This is substring
+ * presence checking: a feature is "present" when its form string occurs in
+ * any scanned file, with no parsing of how it is used. Argument-form
+ * assumptions, such as round() receiving only same-type arguments, are
+ * declared in the manifest and reviewed by the operator; this scan cannot
+ * verify them and does not claim to.
+ */
 export function scanPublishedSource(
   manifest,
   sourceRoot = join(REPO_ROOT, "src"),
@@ -88,7 +99,9 @@ export function scanPublishedSource(
  * Report every listed feature whose requirements exceed the declared floors,
  * and any disagreement between the manifest and the charter. The mutation
  * this exists to catch is a spec introducing a feature above the floor and
- * nothing comparing the two.
+ * nothing comparing the two. Requirements are compared wherever a form is
+ * present in source; how that form's arguments are shaped is outside what
+ * this check can see.
  */
 export function floorViolations({ manifest, floors, present }) {
   const violations = [];
