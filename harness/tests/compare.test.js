@@ -47,7 +47,7 @@ import BaselineReporter, {
   parseBaselineTransaction,
 } from "../runner/baseline-reporter.js";
 import { runCanonicalCapture } from "../runner/capture.js";
-import { assertRunOutputParent } from "../runner/run-output.js";
+import { assertRunOutputParent, readRunState, RUN_OUTPUT_ROOT } from "../runner/run-output.js";
 
 const CASE_ID = "scenario/theme/checkpoint.png";
 const EMPTY_MANIFEST = { version: 1, algorithm: "sha256", entries: {} };
@@ -681,7 +681,7 @@ test("a direct grep-filtered Playwright run cannot approve an unrecorded case", 
     assert.equal(readApprovalEntries(manifestPath)[CASE_ID], undefined);
   }));
 
-test("a direct grep run cannot redirect run output into approved", () =>
+test("a direct grep run ignores an obsolete run-output parent override", () =>
   withScratch((directory) => {
     const approvedRoot = join(directory, "goldens", "approved");
     const target = join(approvedRoot, "json-report-sentinel");
@@ -716,14 +716,15 @@ test("a direct grep run cannot redirect run output into approved", () =>
         env: {
           ...process.env,
           GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT: join(directory, "goldens"),
-          // A parent selected inside the approved tree is refused during
-          // config load, loudly rather than by silently rerouting.
+          // The removed parent-override key is dead configuration: the run
+          // proceeds on the fixed location and the curated sentinel is
+          // neither read as a parent nor written through.
           GC_PLAYWRIGHT_JSON: target,
         },
         encoding: "utf8",
       },
     );
-    assert.notEqual(result.status, 0, "a curated run-output parent must fail config load");
+    assert.equal(result.status, 0, result.stdout + result.stderr);
     assert.deepEqual(readFileSync(target), sentinel);
     assert.deepEqual(readdirSync(approvedRoot).sort(), ["json-report-sentinel"]);
   }));
@@ -766,7 +767,6 @@ test("native JSON and last-run output files fail closed inside scratch goldens",
         env: {
           ...process.env,
           GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT: goldensRoot,
-          GC_PLAYWRIGHT_JSON: join(directory, "safe-reports"),
           PLAYWRIGHT_JSON_OUTPUT_FILE: jsonTarget,
           PLAYWRIGHT_LAST_RUN_OUTPUT_FILE: lastRunTarget,
         },
@@ -867,7 +867,6 @@ test("native reporter outputs reject symlinks in both protected directions", () 
           env: {
             ...process.env,
             GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT: goldensRoot,
-            GC_PLAYWRIGHT_JSON: join(directory, "safe-reports"),
             PLAYWRIGHT_JSON_OUTPUT_FILE: target,
           },
           encoding: "utf8",
@@ -929,7 +928,6 @@ for (const linkKind of ["final", "parent"]) {
           env: {
             ...process.env,
             GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT: goldensRoot,
-            GC_PLAYWRIGHT_JSON: join(directory, "safe-reports"),
             GC_TEST_MARKER: marker,
             PLAYWRIGHT_JSON_OUTPUT_FILE: output,
           },
@@ -942,59 +940,6 @@ for (const linkKind of ["final", "parent"]) {
       assert.equal(lstatSync(link).isSymbolicLink(), true);
     }));
 }
-
-test("an unsafe run-output parent fails before reporter construction", () =>
-  withScratch((directory) => {
-    const goldensRoot = join(directory, "goldens");
-    const approvedRoot = join(goldensRoot, "approved");
-    const protectedTarget = join(approvedRoot, "future-configured-results.json");
-    const danglingParent = join(directory, "configured-reports");
-    const marker = join(directory, "configured-fallback-test-ran");
-    const configPath = join(directory, "playwright.config.mjs");
-    const specPath = join(directory, "configured-fallback.spec.mjs");
-    const playwrightModule = new URL(
-      "../../node_modules/@playwright/test/index.mjs",
-      import.meta.url,
-    ).href;
-    const publicConfig = new URL("../runner/playwright.config.js", import.meta.url).href;
-    const playwrightCli = fileURLToPath(
-      new URL("../../node_modules/@playwright/test/cli.js", import.meta.url),
-    );
-    mkdirSync(approvedRoot, { recursive: true });
-    symlinkSync(protectedTarget, danglingParent);
-    writeFileSync(
-      specPath,
-      `import { test } from ${JSON.stringify(playwrightModule)};\n` +
-        `import { writeFileSync } from "node:fs";\n` +
-        `test("configured fallback", () => writeFileSync(process.env.GC_TEST_MARKER, "ran\\n"));\n`,
-    );
-    writeFileSync(
-      configPath,
-      `import baseConfig from ${JSON.stringify(publicConfig)};\n` +
-        `export default { ...baseConfig, testDir: ${JSON.stringify(directory)}, testMatch: /configured-fallback\\.spec\\.mjs$/, webServer: undefined };\n`,
-    );
-    const result = spawnSync(
-      process.execPath,
-      [playwrightCli, "test", "--config", configPath, "--grep", "configured fallback"],
-      {
-        cwd: directory,
-        env: {
-          ...process.env,
-          GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT: goldensRoot,
-          // The selected parent is a dangling symlink whose target resolves
-          // into approved; provisioning must refuse it during config load.
-          GC_PLAYWRIGHT_JSON: danglingParent,
-          GC_TEST_MARKER: marker,
-        },
-        encoding: "utf8",
-      },
-    );
-    assert.notEqual(result.status, 0, "an unsafe run-output parent must fail during config load");
-    assert.equal(existsSync(marker), false, "Playwright must not reach the test body");
-    assert.equal(existsSync(protectedTarget), false);
-    assert.equal(lstatSync(danglingParent).isSymbolicLink(), true);
-    assert.equal(existsSync(join(directory, "configured-reports")), false);
-  }));
 
 test("the public config rejects PW_TEST_REPORTER before loading custom code", () =>
   withScratch((directory) => {
@@ -1036,7 +981,6 @@ test("the public config rejects PW_TEST_REPORTER before loading custom code", ()
         env: {
           ...process.env,
           GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT: goldensRoot,
-          GC_PLAYWRIGHT_JSON: join(directory, "safe-reports"),
           PW_TEST_REPORTER: reporterPath,
         },
         encoding: "utf8",
@@ -1063,7 +1007,6 @@ test("the npm comparison wrapper rejects PW_TEST_REPORTER before Playwright", ()
         cwd: fileURLToPath(new URL("../../", import.meta.url)),
         env: {
           ...process.env,
-          GC_PLAYWRIGHT_JSON: join(directory, "safe-reports"),
           PW_TEST_REPORTER: reporterPath,
         },
         encoding: "utf8",
@@ -1071,6 +1014,39 @@ test("the npm comparison wrapper rejects PW_TEST_REPORTER before Playwright", ()
     );
     assert.notEqual(result.status, 0);
     assert.equal(readFileSync(sentinelPath, "utf8"), "original\n");
+  }));
+
+test("the npm comparison wrapper ignores obsolete and native destination overrides and uses the fixed location", () =>
+  withScratch((directory) => {
+    const nativeSentinel = join(directory, "native-destination-sentinel.json");
+    const sentinel = Buffer.from("native destination sentinel\n");
+    writeFileSync(nativeSentinel, sentinel);
+    const result = spawnSync(
+      "npm",
+      ["run", "playwright", "--", "--grep", "no such test", "--pass-with-no-tests"],
+      {
+        cwd: fileURLToPath(new URL("../../", import.meta.url)),
+        env: {
+          ...process.env,
+          GC_PLAYWRIGHT_JSON: join(directory, "obsolete-parent"),
+          PLAYWRIGHT_JSON_OUTPUT_FILE: nativeSentinel,
+        },
+        encoding: "utf8",
+        timeout: 120_000,
+      },
+    );
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    // The overrides were ignored, not honored: the sentinel received no
+    // report bytes and the supported run recorded its state and report in
+    // the fixed scratch location instead.
+    assert.deepEqual(readFileSync(nativeSentinel), sentinel);
+    const runState = readRunState();
+    assert.match(runState.runId, /^[0-9a-f-]{36}$/);
+    assert.equal(
+      existsSync(join(RUN_OUTPUT_ROOT, "playwright-results.json")),
+      true,
+      "the JSON report must land in the fixed run-output location",
+    );
   }));
 
 test("canonical capture strips native reporter outputs before Playwright", async () =>
@@ -1179,8 +1155,7 @@ test("the npm comparison command refuses destructive output routing", () =>
           env: {
             ...process.env,
             GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT: goldensRoot,
-            GC_PLAYWRIGHT_JSON: join(directory, "safe-reports"),
-          },
+            },
           encoding: "utf8",
         },
       );
@@ -1206,7 +1181,6 @@ test("the npm comparison command preserves a protected symlink to outside", () =
         env: {
           ...process.env,
           GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT: goldensRoot,
-          GC_PLAYWRIGHT_JSON: join(directory, "safe-reports"),
         },
         encoding: "utf8",
       },
@@ -1233,7 +1207,6 @@ test("the npm comparison command preserves a dangling output symlink", () =>
         env: {
           ...process.env,
           GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT: goldensRoot,
-          GC_PLAYWRIGHT_JSON: join(directory, "safe-reports"),
         },
         encoding: "utf8",
       },
@@ -1265,7 +1238,7 @@ test("the npm comparison command rejects an alternate config before loading it",
         ["run", "playwright", "--", ...configArguments, "--pass-with-no-tests"],
         {
           cwd: fileURLToPath(new URL("../../", import.meta.url)),
-          env: { ...process.env, GC_PLAYWRIGHT_JSON: join(directory, "safe-reports") },
+          env: { ...process.env },
           encoding: "utf8",
         },
       );
@@ -1348,7 +1321,6 @@ test("a direct grep run cannot stage through a regular fd inside approved", () =
             GC_BASELINE_TRANSACTION: forgedTransactionPath,
             GC_BASELINE_AUTHORIZATION: "caller-forged-authorization",
             GC_BASELINE_PROTOCOL: BASELINE_TRANSACTION_PROTOCOL,
-            GC_PLAYWRIGHT_JSON: join(directory, "reports"),
           },
           encoding: "utf8",
           stdio: ["ignore", "pipe", "pipe", forgedFd],

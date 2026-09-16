@@ -12,11 +12,12 @@
  * file-hardlink reproductions from 2026-09-07 and the 2026-09-14 isolated
  * comparison reproduction (see work-logs/evidence/2026-09-14-h5gameui-01c/
  * and spec-reviews/2026-09-14-h5gameui-01c/) live on as these tests rather
- * than as scripts.
+ * than as scripts. Initialization tests cover the fixed run-output
+ * location: entry-point ownership, the wipe that separates invocations, and
+ * the shared run identity.
  */
 
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import {
   existsSync,
@@ -41,13 +42,15 @@ import {
   assertRunOutputParent,
   assertRunOwnedPath,
   curatedRoots,
-  provisionRunDirectory,
+  initializeRunOutput,
+  readCaseRecords,
+  readRunState,
+  stripObsoleteRunOutputEnvironment,
   writeRunFile,
 } from "../runner/run-output.js";
 import { PNG } from "pngjs";
 
 const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
-const CONFIG_URL = new URL("../runner/playwright.config.js", import.meta.url).href;
 const CASE_ID = "core-meter-vertical/modern/desktop/resting.png";
 
 function png(width, height, [r, g, b]) {
@@ -96,6 +99,11 @@ function fixture() {
   };
 }
 
+/** The fixed run-output location for one scratch repository root. */
+function runDirectory(state) {
+  return join(state.directory, "harness", "scratch", "run");
+}
+
 function hashTree(root) {
   const hashes = {};
   const walk = (directory, prefix = "") => {
@@ -109,18 +117,17 @@ function hashTree(root) {
   return hashes;
 }
 
-test("a run whose output parent resolves onto approved through a directory symlink is refused and preserves every curated byte", () => {
+test("a run-output location that resolves onto approved through a directory symlink is refused and preserves every curated byte", () => {
   const state = fixture();
   state.manifestBefore = readFileSync(state.manifestPath);
   const approvedBefore = hashTree(state.approvedRoot);
-  // The alias: the run-output parent is a symlink onto the approved tree.
-  const aliasedParent = join(state.directory, "runs");
-  symlinkSync(state.approvedRoot, aliasedParent);
+  // The alias: the run-output location is a symlink onto the approved tree.
+  const aliasedLocation = join(state.directory, "run-target");
+  symlinkSync(state.approvedRoot, aliasedLocation);
 
   assert.throws(
     () =>
-      provisionRunDirectory({
-        parent: aliasedParent,
+      assertRunOutputParent(aliasedLocation, {
         curatedRoots: state.curated,
         cwd: state.directory,
       }),
@@ -129,7 +136,25 @@ test("a run whose output parent resolves onto approved through a directory symli
 
   assert.deepEqual(hashTree(state.approvedRoot), approvedBefore);
   assert.deepEqual(readFileSync(state.manifestPath), state.manifestBefore);
-  assert.equal(existsSync(join(state.directory, "run-")), false);
+  rmSync(state.directory, { recursive: true, force: true });
+});
+
+test("initialization refuses a fixed location behind a symlink and never wipes through it", () => {
+  const state = fixture();
+  state.manifestBefore = readFileSync(state.manifestPath);
+  const approvedBefore = hashTree(state.approvedRoot);
+  mkdirSync(join(state.directory, "harness", "scratch"), { recursive: true });
+  // The fixed location itself is a link onto the approved tree: wiping it
+  // would delete curated bytes, so initialization must refuse it first.
+  symlinkSync(state.approvedRoot, runDirectory(state));
+
+  assert.throws(
+    () => initializeRunOutput({ repoRoot: state.directory, curatedRoots: state.curated }),
+    /curated location/,
+  );
+
+  assert.deepEqual(hashTree(state.approvedRoot), approvedBefore);
+  assert.deepEqual(readFileSync(state.manifestPath), state.manifestBefore);
   rmSync(state.directory, { recursive: true, force: true });
 });
 
@@ -137,21 +162,20 @@ test("a candidate write behind a file hardlink onto an approved PNG is refused a
   const state = fixture();
   state.manifestBefore = readFileSync(state.manifestPath);
   const approvedBefore = hashTree(state.approvedRoot);
-  const runDirectory = provisionRunDirectory({
-    parent: join(state.directory, "runs"),
+  const initialized = initializeRunOutput({
+    repoRoot: state.directory,
     curatedRoots: state.curated,
-    cwd: state.directory,
   });
   // A hardlink pre-planted at the candidate destination shares an inode with
   // the approved PNG. Exclusive creation inside the run directory refuses it
   // instead of writing through the shared inode.
-  const candidatePath = join(runDirectory, "candidates", ...CASE_ID.split("/"));
+  const candidatePath = join(initialized.runDirectory, "candidates", ...CASE_ID.split("/"));
   mkdirSync(dirname(candidatePath), { recursive: true });
   linkSync(state.approvedPath, candidatePath);
 
   assert.throws(
     () =>
-      writeRunFile(runDirectory, `candidates/${CASE_ID}`, WHITE, {
+      writeRunFile(initialized.runDirectory, `candidates/${CASE_ID}`, WHITE, {
         curatedRoots: state.curated,
         cwd: state.directory,
       }),
@@ -163,10 +187,10 @@ test("a candidate write behind a file hardlink onto an approved PNG is refused a
   rmSync(state.directory, { recursive: true, force: true });
 });
 
-test("a parent that normalizes into a curated root is refused in both the .. form and the symlinked-parent form", () => {
+test("a location that normalizes into a curated root is refused in both the .. form and the symlinked-parent form", () => {
   const state = fixture();
 
-  // The .. form: a raw parent string whose normalization lands exactly on the
+  // The .. form: a raw path string whose normalization lands exactly on the
   // approved root.
   const normalizing = [state.directory, "runs", "..", "goldens", "approved"].join("/");
   assert.equal(normalizing.includes(".."), true);
@@ -217,87 +241,87 @@ test("a parent that normalizes into a curated root is refused in both the .. for
   rmSync(state.directory, { recursive: true, force: true });
 });
 
-test("provisioning always creates a fresh directory and never adopts a pre-existing one", () => {
+test("initialization creates a fresh empty location with shared run state, and a second invocation never reads the first's artifacts", () => {
   const state = fixture();
-  const parent = join(state.directory, "runs");
-  const first = provisionRunDirectory({
-    parent,
+  const first = initializeRunOutput({
+    repoRoot: state.directory,
     curatedRoots: state.curated,
-    cwd: state.directory,
   });
-  const second = provisionRunDirectory({
-    parent,
+  assert.equal(first.runDirectory, runDirectory(state));
+  assert.equal(readdirSync(first.runDirectory).length, 1, "a fresh location starts with only the run state");
+  assert.deepEqual(readRunState({ runDirectory: first.runDirectory }), first.runState);
+
+  // Artifacts of the first invocation: a stale record and aggregate.
+  writeRunFile(
+    first.runDirectory,
+    "records/stale/case.json",
+    JSON.stringify({ runId: first.runState.runId, capture: "stale/case.json" }) + "\n",
+    { curatedRoots: state.curated, cwd: state.directory },
+  );
+  writeRunFile(
+    first.runDirectory,
+    "membership.json",
+    "{}\n",
+    { curatedRoots: state.curated, cwd: state.directory },
+  );
+
+  const second = initializeRunOutput({
+    repoRoot: state.directory,
     curatedRoots: state.curated,
-    cwd: state.directory,
   });
-
-  assert.notEqual(first, second);
-  assert.equal(dirname(first), parent);
-  assert.equal(readdirSync(first).length, 0, "a fresh run directory starts empty");
-  assert.equal(lstatSync(first).isDirectory(), true);
-  rmSync(state.directory, { recursive: true, force: true });
-});
-
-test("an unsafe GC_PLAYWRIGHT_JSON parent is refused before any write", () => {
-  const state = fixture();
-  const unsafeParent = join(state.approvedRoot, "reports");
-  const result = importConfig({
-    GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT: state.goldensRoot,
-    GC_PLAYWRIGHT_JSON: unsafeParent,
-  }, state.directory);
-
-  assert.notEqual(result.status, 0, "config load must refuse the curated parent");
-  assert.equal(existsSync(unsafeParent), false, "nothing may be created inside the curated tree");
-  assert.equal(existsSync(state.approvedPath), true);
-  rmSync(state.directory, { recursive: true, force: true });
-});
-
-test("a safe GC_PLAYWRIGHT_JSON parent yields a fresh run-owned directory whose resolved location is reported", () => {
-  const state = fixture();
-  const parent = join(state.directory, "reports");
-  const result = importConfig({ GC_PLAYWRIGHT_JSON: parent }, state.directory);
-
-  assert.equal(result.status, 0, result.stderr);
-  const match = result.stdout.match(/run output directory (\S+)/);
-  assert.ok(match, "the resolved run output location must be reported");
-  const runDirectory = match[1];
-  assert.equal(dirname(runDirectory), parent, "the run directory is a fresh child of the selected parent");
-  assert.equal(existsSync(runDirectory), true);
-  assert.equal(readdirSync(runDirectory).length, 0);
-  rmSync(state.directory, { recursive: true, force: true });
-});
-
-test("JSON and JUnit reporter directories with no output name resolve through the same validation", () => {
-  const state = fixture();
-  for (const key of ["PLAYWRIGHT_JSON_OUTPUT_DIR", "PLAYWRIGHT_JUNIT_OUTPUT_DIR"]) {
-    const result = importConfig({
-      GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT: state.goldensRoot,
-      [key]: state.approvedRoot,
-    }, state.directory);
-    assert.notEqual(result.status, 0, `${key} aimed at a curated root must fail validation`);
-    assert.equal(existsSync(join(state.approvedRoot, "run-")), false);
-  }
-  assert.equal(existsSync(state.approvedPath), true);
-  rmSync(state.directory, { recursive: true, force: true });
-});
-
-test("the process-test report path resolves under scratch, not a sealed evidence location", () => {
-  const result = importConfig({}, REPO_ROOT);
-  assert.equal(result.status, 0, result.stderr);
-  const match = result.stdout.match(/run output directory (\S+)/);
-  assert.ok(match, "the resolved run output location must be reported");
-  const runDirectory = match[1];
-  const scratchParent = fileURLToPath(new URL("../../harness/scratch/", import.meta.url));
-  assert.equal(
-    runDirectory.startsWith(scratchParent),
-    true,
-    `report output must live under the scratch parent, got ${runDirectory}`,
+  assert.equal(second.runDirectory, runDirectory(state));
+  assert.notEqual(second.runState.runId, first.runState.runId);
+  assert.equal(readdirSync(second.runDirectory).length, 1, "the previous invocation's artifacts are gone");
+  assert.deepEqual(
+    readCaseRecords({ runDirectory: second.runDirectory, runId: second.runState.runId }),
+    [],
+    "no record of the first invocation survives the second",
   );
-  assert.equal(
-    runDirectory.includes(join("work-logs", "evidence")),
-    false,
-    "report output must never resolve under a sealed evidence location",
+  rmSync(state.directory, { recursive: true, force: true });
+});
+
+test("a case record stamped with a different run identity is refused, not adopted", () => {
+  const state = fixture();
+  const initialized = initializeRunOutput({
+    repoRoot: state.directory,
+    curatedRoots: state.curated,
+  });
+  writeRunFile(
+    initialized.runDirectory,
+    "records/other/case.json",
+    JSON.stringify({ runId: "a-previous-run", capture: "other/case.json" }) + "\n",
+    { curatedRoots: state.curated, cwd: state.directory },
   );
+
+  assert.throws(
+    () =>
+      readCaseRecords({
+        runDirectory: initialized.runDirectory,
+        runId: initialized.runState.runId,
+      }),
+    /belongs to run a-previous-run/,
+  );
+  rmSync(state.directory, { recursive: true, force: true });
+});
+
+test("reading run state without initialization names the supported entry points", () => {
+  const state = fixture();
+  assert.throws(
+    () => readRunState({ runDirectory: runDirectory(state) }),
+    /initialized only by npm run playwright or npm run capture/,
+  );
+  rmSync(state.directory, { recursive: true, force: true });
+});
+
+test("the removed configuration surface is stripped from child environments", () => {
+  const environment = stripObsoleteRunOutputEnvironment({
+    GC_PLAYWRIGHT_JSON: "/tmp/somewhere",
+    GC_RUN_OUTPUT_DIR: "/tmp/somewhere-else",
+    PATH: process.env.PATH,
+  });
+  assert.equal("GC_PLAYWRIGHT_JSON" in environment, false);
+  assert.equal("GC_RUN_OUTPUT_DIR" in environment, false);
+  assert.equal(environment.PATH, process.env.PATH);
 });
 
 test("a changed image fails on repeated safe comparison without altering approved state", () => {
@@ -332,18 +356,17 @@ test("the entry-less recovery path cannot record corrupted bytes once candidate 
     state.manifestPath,
     JSON.stringify({ version: 1, algorithm: "sha256", entries: {} }, null, 2) + "\n",
   );
-  const runDirectory = provisionRunDirectory({
-    parent: join(state.directory, "runs"),
+  const initialized = initializeRunOutput({
+    repoRoot: state.directory,
     curatedRoots: state.curated,
-    cwd: state.directory,
   });
-  const candidatePath = join(runDirectory, "candidates", ...CASE_ID.split("/"));
+  const candidatePath = join(initialized.runDirectory, "candidates", ...CASE_ID.split("/"));
   mkdirSync(dirname(candidatePath), { recursive: true });
   linkSync(state.approvedPath, candidatePath);
 
   assert.throws(
     () =>
-      writeRunFile(runDirectory, `candidates/${CASE_ID}`, WHITE, {
+      writeRunFile(initialized.runDirectory, `candidates/${CASE_ID}`, WHITE, {
         curatedRoots: state.curated,
         cwd: state.directory,
       }),
@@ -382,24 +405,27 @@ test("the entry-less recovery path cannot record corrupted bytes once candidate 
 
 test("run-owned destinations cannot escape their run directory", () => {
   const state = fixture();
-  const runDirectory = provisionRunDirectory({
-    parent: join(state.directory, "runs"),
+  const initialized = initializeRunOutput({
+    repoRoot: state.directory,
     curatedRoots: state.curated,
-    cwd: state.directory,
   });
   assert.throws(
     () =>
-      assertRunOwnedPath(runDirectory, join(state.directory, "escape.png"), {
+      assertRunOwnedPath(initialized.runDirectory, join(state.directory, "escape.png"), {
         curatedRoots: state.curated,
         cwd: state.directory,
       }),
     /escapes its run directory/,
   );
   assert.doesNotThrow(() =>
-    assertRunOwnedPath(runDirectory, join(runDirectory, "candidates", "case.png"), {
-      curatedRoots: state.curated,
-      cwd: state.directory,
-    }),
+    assertRunOwnedPath(
+      initialized.runDirectory,
+      join(initialized.runDirectory, "candidates", "case.png"),
+      {
+        curatedRoots: state.curated,
+        cwd: state.directory,
+      },
+    ),
   );
   rmSync(state.directory, { recursive: true, force: true });
 });
@@ -440,34 +466,3 @@ test("the real repository's curated roots cover approved, the manifest, and seal
   assert.equal(roots[1].endsWith("approval-manifest.json"), true);
   assert.equal(roots[2].endsWith(join("work-logs", "evidence")), true);
 });
-
-test("a recorded run output directory is reused instead of provisioned again", () => {
-  const state = fixture();
-  const parent = join(state.directory, "reports");
-  const recorded = provisionRunDirectory({
-    parent,
-    curatedRoots: state.curated,
-    cwd: state.directory,
-  });
-  // A worker restart loads the configuration again mid-run; it must adopt the
-  // recorded directory rather than fragment the run across fresh ones.
-  const result = importConfig({ [runOutputEnvironmentKey()]: recorded }, state.directory);
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.stdout.includes("run output directory"), false,
-    "reuse must not provision or report a new directory");
-  assert.equal(readdirSync(parent).length, 1, "exactly one run directory exists");
-  rmSync(state.directory, { recursive: true, force: true });
-});
-
-function runOutputEnvironmentKey() {
-  return "GC_RUN_OUTPUT_DIR";
-}
-
-/** Import the real Playwright config once, capturing its provisioning output. */
-function importConfig(environment, cwd) {
-  return spawnSync(
-    process.execPath,
-    ["--input-type=module", "--eval", `await import(${JSON.stringify(CONFIG_URL)})`],
-    { cwd, env: { ...process.env, ...environment }, encoding: "utf8" },
-  );
-}

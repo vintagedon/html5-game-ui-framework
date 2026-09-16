@@ -24,6 +24,7 @@ import {
   parseBaselineTransaction,
 } from "./baseline-reporter.js";
 import { stripPlaywrightOutputEnvironment } from "./output-safety.js";
+import { curatedRoots, initializeRunOutput, stripObsoleteRunOutputEnvironment } from "./run-output.js";
 
 const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const PLAYWRIGHT_CLI = fileURLToPath(
@@ -38,11 +39,13 @@ const METRICS_SCRIPT = fileURLToPath(
 export const BASELINE_TRANSACTION_BYTE_LIMIT = 64 * 1024 * 1024;
 
 function stripBaselineAuthority(environment) {
-  // GC_PLAYWRIGHT_JSON selects a validated run-output parent and is honored:
-  // stripping a caller's destination override would force canonical capture
-  // back onto its default parent and take the supported redirect away. Only
-  // baseline authority and native Playwright output routing are removed.
-  const clean = stripPlaywrightOutputEnvironment(environment);
+  // Native Playwright output routing, the reporter extension hook, and the
+  // keys of the removed caller-configurable output surface are deleted: the
+  // canonical run owns its fixed destinations. Only baseline authority is
+  // additionally removed here, because this wrapper is what grants it.
+  const clean = stripObsoleteRunOutputEnvironment(
+    stripPlaywrightOutputEnvironment(environment),
+  );
   delete clean.GC_BASELINE_TRANSACTION;
   delete clean.GC_BASELINE_AUTHORIZATION;
   delete clean.GC_BASELINE_PROTOCOL;
@@ -120,6 +123,16 @@ export async function runCanonicalCapture({
 } = {}) {
   const authorization = randomUUID();
   const cleanEnvironment = stripBaselineAuthority(process.env);
+  // One invocation-wide owner initializes the fixed run-output location
+  // before Playwright starts, so this capture cannot read a previous
+  // invocation's results and its workers all share one run identity. The
+  // curated set reflects the locations this capture actually finalizes
+  // into when it is pointed at fixture trees.
+  const { runDirectory } = initializeRunOutput({
+    repoRoot,
+    curatedRoots: curatedRoots({ repoRoot, approvedRoot, manifestPath }),
+  });
+  console.log(`goldens: run output directory ${runDirectory}`);
   const child = await runPlaywright(
     process.execPath,
     [playwrightCli, "test", "--config", playwrightConfig],

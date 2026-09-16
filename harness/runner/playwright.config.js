@@ -6,87 +6,44 @@
  * Created     : 2026-08-03
  * Link        : https://github.com/vintagedon/html5-game-ui-framework
  *
- * ML01 runs Chromium headless only; Firefox and WebKit are unavailable on this
- * host (charter §4.1, spec-02 Execution Environment). Goldens are therefore
+ * ML01 runs Chromium headless only; Firefox and WebKit are unavailable on
+ * this host (charter §4.1, spec-02 Execution Environment). Goldens are therefore
  * single-browser, single-platform, consistent with the charter's ruling that
  * cross-browser pixel goldens are out of scope. No project is configured for a
  * browser the host cannot run.
  *
  * Every destination this configuration hands Playwright, the JSON report, and
- * the native test-output directory, lives in one fresh run-owned directory
- * created at import time beneath a validated parent. GC_PLAYWRIGHT_JSON
- * selects that parent; it is never an exact output file, because a
- * caller-named existing file can alias curated bytes through a hardlink no
- * ancestor check can see. An unsafe parent fails configuration load before
- * any write.
+ * the native test-output directory, lives in one fixed gitignored run-output
+ * location inside the repository. There is no caller-configurable output
+ * surface to guard: environment keys that would redirect native reporters are
+ * validated first, so an override aimed at a curated location fails
+ * configuration load, and every other destination override is then deleted
+ * from the environment so Playwright's own environment-file precedence can
+ * never displace the fixed destinations. The location is initialized by the
+ * comparison and canonical-capture entry points, never by loading this
+ * configuration, so a worker reusing the configuration cannot clear the run
+ * it belongs to.
  */
 import { defineConfig, devices } from "@playwright/test";
-import { statSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { BASELINE_TRANSACTION_PROTOCOL } from "./baseline-reporter.js";
 import {
   assertSafePlaywrightArguments,
   assertSafePlaywrightEnvironment,
+  PLAYWRIGHT_OUTPUT_ENVIRONMENT_KEYS,
 } from "./output-safety.js";
-import {
-  assertRunOutputParent,
-  curatedRoots,
-  DEFAULT_RUN_PARENT,
-  provisionRunDirectory,
-  RUN_OUTPUT_ENVIRONMENT_KEY,
-} from "./run-output.js";
+import { curatedRoots, RUN_OUTPUT_ROOT } from "./run-output.js";
 
 const RUNNER_DIR = fileURLToPath(new URL(".", import.meta.url));
 const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const BASELINE_REPORTER = fileURLToPath(
   new URL("./baseline-reporter.js", import.meta.url),
 );
-const CURATED_ROOTS = curatedRoots();
 const PROTECTED_OUTPUT_ROOTS = [
-  ...CURATED_ROOTS,
+  ...curatedRoots(),
   process.env.GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT,
 ].filter(Boolean);
-
-/**
- * Resolve this run's output directory. The first process to load the
- * configuration provisions a fresh directory beneath the validated parent
- * and exports it through the environment; every later process that loads
- * the configuration, and Playwright restarts a worker after each failed
- * test, reuses that directory instead of provisioning another, so one run's
- * candidates, reports, and state stay together. The parent is
- * GC_PLAYWRIGHT_JSON when the caller selected one, otherwise the gitignored
- * scratch parent inside the repository. Validation failures throw before
- * any directory is created.
- *
- * @param {{environment?: object, cwd?: string}} [options]
- * @returns {{runDirectory: string, jsonReport: string}}
- */
-export function resolveRunOutput({
-  environment = process.env,
-  cwd = REPO_ROOT,
-} = {}) {
-  const additionalRoots = environment.GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT
-    ? [environment.GC_ADDITIONAL_PROTECTED_OUTPUT_ROOT]
-    : [];
-  const recorded = environment[RUN_OUTPUT_ENVIRONMENT_KEY];
-  if (recorded) {
-    assertRunOutputParent(recorded, { curatedRoots: CURATED_ROOTS, additionalRoots, cwd });
-    if (!statSync(recorded).isDirectory()) {
-      throw new Error(`recorded run output directory is not a directory: ${recorded}`);
-    }
-    return { runDirectory: recorded, jsonReport: join(recorded, "playwright-results.json") };
-  }
-  const runDirectory = provisionRunDirectory({
-    parent: environment.GC_PLAYWRIGHT_JSON || DEFAULT_RUN_PARENT,
-    curatedRoots: CURATED_ROOTS,
-    additionalRoots,
-    cwd,
-  });
-  const jsonReport = join(runDirectory, "playwright-results.json");
-  console.log(`goldens: run output directory ${runDirectory}`);
-  return { runDirectory, jsonReport };
-}
 
 assertSafePlaywrightEnvironment(process.env, {
   protectedRoots: PROTECTED_OUTPUT_ROOTS,
@@ -97,12 +54,15 @@ assertSafePlaywrightArguments(process.argv.slice(2), {
   cwd: process.cwd(),
   allowConfig: true,
 });
-const RUN_OUTPUT = resolveRunOutput();
-// Worker processes inherit the main-process environment after the config
-// loads, so the runner spec writes its candidates, state, and reports into
-// the same freshly provisioned directory the reporters use.
-process.env[RUN_OUTPUT_ENVIRONMENT_KEY] = RUN_OUTPUT.runDirectory;
-const JSON_REPORT = RUN_OUTPUT.jsonReport;
+// A destination override that survived validation aimed outside the curated
+// trees is ignored, not honored: Playwright reads these environment keys at
+// reporter construction with precedence over the configured output file, so
+// deleting them here is what keeps the fixed destinations authoritative for
+// every invocation that loads this configuration.
+for (const name of PLAYWRIGHT_OUTPUT_ENVIRONMENT_KEYS) {
+  delete process.env[name];
+}
+
 const canonicalBaselineProtocol =
   process.env.GC_BASELINE_PROTOCOL === BASELINE_TRANSACTION_PROTOCOL;
 
@@ -113,10 +73,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: 0,
   workers: 1,
-  outputDir: join(RUN_OUTPUT.runDirectory, "test-output"),
+  outputDir: join(RUN_OUTPUT_ROOT, "test-output"),
   reporter: [
     ["list"],
-    ["json", { outputFile: JSON_REPORT }],
+    ["json", { outputFile: join(RUN_OUTPUT_ROOT, "playwright-results.json") }],
     [
       BASELINE_REPORTER,
       {

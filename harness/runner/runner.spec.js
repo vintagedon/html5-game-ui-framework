@@ -20,7 +20,6 @@
  */
 
 import { expect, test } from "@playwright/test";
-import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { PNG } from "pngjs";
@@ -40,8 +39,10 @@ import {
   resolveCheckpointInteractions,
 } from "./cases.js";
 import {
-  recordLatestRun,
-  RUN_OUTPUT_ENVIRONMENT_KEY,
+  overwriteRunFile,
+  readCaseRecords,
+  readRunState,
+  RUN_OUTPUT_ROOT,
   writeRunFile,
 } from "./run-output.js";
 import { semanticDeclarations } from "../metrics/contrast.js";
@@ -58,18 +59,14 @@ import { applyMeterValue, applyTogglePressed } from "./interactions.js";
 const BASE = process.env.GC_BASE_URL || "http://127.0.0.1:8123";
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const PAGE = `${BASE}/reference/`;
-// All run-owned output (candidates, diffs, matrix, run state, membership)
-// lands in one fresh directory the config provisioned before this worker
-// started. Writing anywhere else would let a caller-named path alias curated
-// bytes, which is the defect class this layout exists to close.
-const RUN_DIRECTORY = process.env[RUN_OUTPUT_ENVIRONMENT_KEY];
-if (!RUN_DIRECTORY) {
-  throw new Error(
-    `${RUN_OUTPUT_ENVIRONMENT_KEY} is not set; the Playwright config provisions run output before workers start`,
-  );
-}
+// All run-owned output (candidates, diffs, records, matrix, membership)
+// lands in the one fixed gitignored location the entry point initialized
+// before this worker started. The run identity is shared with every other
+// worker and the metrics step through the run state that initialization
+// wrote; a worker restart reuses both without clearing anything.
+const RUN_DIRECTORY = RUN_OUTPUT_ROOT;
+const RUN_ID = readRunState().runId;
 const APPROVED = join(ROOT, "goldens/approved");
-const RUN_ID = randomUUID();
 const approvalManifest = readApprovalManifest();
 
 // One case per scenario x theme x viewport x checkpoint, all registry-sourced.
@@ -93,10 +90,6 @@ const DESIGNED_KEYS = new Set(
     `${foreground}|${background}`,
   ),
 );
-const membershipCollector = createMembershipCollector({
-  designedKeys: DESIGNED_KEYS,
-  expectedSamples: cases.length,
-});
 
 /** Resolve an interaction target selector within the scenario's section. */
 function within(id, selector) {
@@ -142,22 +135,10 @@ async function runInteraction(page, id, it) {
   }
 }
 
-// The manifest records every scenario, theme, viewport, and checkpoint case,
-// so the single-declaration mutation test can observe the matrix directly.
-const manifest = [];
-const goldenCounts = { pass: 0, established: 0, failure: 0 };
-
-test.beforeAll(() => {
-  writeRunFile(
-    RUN_DIRECTORY,
-    "playwright-run.json",
-    JSON.stringify(
-      { version: 1, runId: RUN_ID, startedAt: new Date().toISOString() },
-      null,
-      2,
-    ) + "\n",
-  );
-});
+// The executed matrix is aggregated from per-case records. Each case writes
+// exactly one record under records/, so the single-declaration mutation test
+// still observes the matrix through candidates/matrix.json, and a worker
+// restart adds records instead of colliding with a fixed-name write.
 
 for (const c of cases) {
   test(
@@ -188,12 +169,12 @@ for (const c of cases) {
 
       // Membership is sampled from the exact interacted state photographed
       // below. The shared case loop makes capture and classification one
-      // traversal and the report asserts that all matrix cases contributed.
+      // traversal, and the per-case record carries this sample so the
+      // aggregate rebuild asserts that all matrix cases contributed.
       const membershipSample = await page.evaluate(inspectRenderedSpecimen, {
         scenarioId: c.id,
         declarations: SEMANTIC_DECLARATIONS,
       });
-      recordMembershipSample(membershipCollector, c, membershipSample);
 
       const rel = captureIdentity(c);
       const approvedPath = join(APPROVED, rel);
@@ -235,16 +216,26 @@ for (const c of cases) {
         });
       }
 
-      goldenCounts[result.status === "unrecorded" ? "established" : result.status]++;
-      manifest.push({
-        id: c.id,
-        theme: c.theme,
-        viewport: c.viewport.name,
-        checkpoint: c.checkpoint.name,
-        capture: rel,
-        golden: result.status === "unrecorded" ? "established" : result.status,
-        reason: result.reason,
-      });
+      // The per-case record is the restart-safe aggregation unit: written
+      // once by the one execution of this case, stamped with the shared run
+      // identity, and read back by whichever worker's afterAll runs last.
+      writeRunFile(
+        RUN_DIRECTORY,
+        `records/${rel.replace(/\.png$/, "")}.json`,
+        JSON.stringify(
+          {
+            runId: RUN_ID,
+            id: c.id,
+            theme: c.theme,
+            viewport: c.viewport.name,
+            checkpoint: c.checkpoint.name,
+            capture: rel,
+            golden: result.status === "unrecorded" ? "established" : result.status,
+            reason: result.reason,
+            membership: membershipSample,
+          },
+        ) + "\n",
+      );
       if (result.status === "failure") {
         if (result.diffPng) {
           writeRunFile(
@@ -987,28 +978,49 @@ test("second-level links preserve nonordinary and cancelled anchor activations",
 });
 
 // After the run, persist the executed matrix for inspection/mutation tests.
-test.afterAll(async () => {
-  // A focused behavior assertion captures no registry case. Do not overwrite
-  // the full-run matrix or make that assertion inherit a zero-sample failure.
-  if (!manifest.length) return;
+test.afterAll(() => {
+  // Aggregates are rebuilt from every record this invocation wrote, not from
+  // any one worker's memory. Playwright restarts a worker after a failed
+  // test, so the worker that runs last is not necessarily the one that ran
+  // the most cases; rebuilding from the complete record set is what keeps a
+  // restart from losing earlier results or colliding with their writes.
+  const records = readCaseRecords({ runDirectory: RUN_DIRECTORY, runId: RUN_ID });
+  // A focused behavior assertion captures no registry case. Do not write a
+  // zero-sample matrix or make that assertion inherit a sample-count failure.
+  if (!records.length) return;
 
-  writeRunFile(
+  overwriteRunFile(
     RUN_DIRECTORY,
     "candidates/matrix.json",
-    JSON.stringify(manifest, null, 2) + "\n",
+    JSON.stringify(
+      records.map(({ runId, membership, ...entry }) => entry),
+      null,
+      2,
+    ) + "\n",
   );
-  const membershipReport = buildMembershipReport(membershipCollector, {
+  const collector = createMembershipCollector({
+    designedKeys: DESIGNED_KEYS,
+    expectedSamples: cases.length,
+  });
+  for (const record of records) {
+    recordMembershipSample(collector, {
+      id: record.id,
+      theme: record.theme,
+      viewport: { name: record.viewport },
+      checkpoint: { name: record.checkpoint },
+    }, record.membership);
+  }
+  const membershipReport = buildMembershipReport(collector, {
     runId: RUN_ID,
   });
-  writeRunFile(
+  overwriteRunFile(
     RUN_DIRECTORY,
     "membership.json",
     JSON.stringify(membershipReport, null, 2) + "\n",
   );
-  // Record this directory as the newest completed run so the metrics step,
-  // a separate process, reads this run's state and membership.
-  recordLatestRun(RUN_DIRECTORY);
   const coverage = membershipReport.coverage;
+  const goldenCounts = { pass: 0, established: 0, failure: 0 };
+  for (const record of records) goldenCounts[record.golden] = (goldenCounts[record.golden] || 0) + 1;
   console.log(
     `\nmembership: ${coverage.designedPairIdentities} designed identities; ${coverage.distinctObservedIdentities} distinct observed; ${coverage.totalObservations} total observations; ${Object.values(coverage.exclusionsByReason).reduce((sum, count) => sum + count, 0)} exclusions; ${coverage.unclassifiedObservations} unclassified`,
   );

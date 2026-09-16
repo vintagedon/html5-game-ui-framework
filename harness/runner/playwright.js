@@ -1,14 +1,17 @@
 /**
  * Script Name : playwright.js
- * Description : Run filtered comparisons with protected output routing.
+ * Description : Run filtered comparisons against the fixed run-output contract.
  * Repository  : html5-game-ui-framework
  * Author      : VintageDon (https://github.com/vintagedon/)
  * Created     : 2026-09-01
  * Link        : https://github.com/vintagedon/html5-game-ui-framework
  *
  * Ordinary comparison filters remain available. The config and reporter chain
- * stay fixed, while output paths are validated before Playwright can clear a
- * directory or construct a built-in reporter.
+ * stay fixed, destructive output routing is rejected before Playwright can
+ * clear a directory, native destination overrides never reach the child, and
+ * the fixed run-output location is initialized here so a fresh invocation
+ * cannot read a previous one's results. Concurrent invocations are
+ * unsupported: each initialization wipes the location.
  */
 
 import { spawn } from "node:child_process";
@@ -17,8 +20,9 @@ import { fileURLToPath } from "node:url";
 import {
   assertSafePlaywrightArguments,
   assertSafePlaywrightEnvironment,
+  stripPlaywrightOutputEnvironment,
 } from "./output-safety.js";
-import { curatedRoots } from "./run-output.js";
+import { curatedRoots, initializeRunOutput, stripObsoleteRunOutputEnvironment } from "./run-output.js";
 
 const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const PLAYWRIGHT_CLI = fileURLToPath(
@@ -43,11 +47,19 @@ export async function runComparison(args = process.argv.slice(2)) {
     protectedRoots: roots,
     cwd: REPO_ROOT,
   });
+  // Curated-aimed overrides were rejected above; every surviving destination
+  // override and key from the removed configuration surface is deleted so
+  // the child sees only the fixed destinations.
+  const environment = stripObsoleteRunOutputEnvironment(
+    stripPlaywrightOutputEnvironment(process.env),
+  );
+  const { runDirectory } = initializeRunOutput();
+  console.log(`goldens: run output directory ${runDirectory}`);
   return await new Promise((resolve, reject) => {
     const child = spawn(
       process.execPath,
       [PLAYWRIGHT_CLI, "test", "--config", PLAYWRIGHT_CONFIG, ...args],
-      { cwd: REPO_ROOT, env: process.env, stdio: "inherit" },
+      { cwd: REPO_ROOT, env: environment, stdio: "inherit" },
     );
     child.once("error", reject);
     child.once("close", (status) => resolve(status ?? 1));

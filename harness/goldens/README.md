@@ -85,25 +85,31 @@ rejects protected `--output` and last-run targets before Playwright's startup
 cleanup, checking equal, descendant, and ancestor relationships in both
 lexical and resolved path space after `lstat`-inspecting existing path
 components, and rejects alternate configs and reporter overrides while
-leaving safe filtering arguments available. All run-owned output, candidates,
-diffs, the executed matrix, run state, membership evidence, and reporter
-files, lands in one fresh directory the runner creates beneath a validated
-parent, defaulting to the gitignored `harness/scratch/` tree.
-`GC_PLAYWRIGHT_JSON` selects that parent: it is a location to provision
-under, never an exact output file, because a caller-named existing file can
-alias curated bytes through a hardlink no ancestor check can see while a file
-the runner just created cannot. Curated locations, the approved tree, the
-manifest, and every sealed evidence directory, are refused as parents in
-lexical and resolved space, including `..` normalization and symlinked
-components, before any write happens; a refusal fails configuration load
-rather than rerouting. The resolved run directory is reported on every run,
-and candidate writes inside it are created exclusively so a pre-existing
-entry is refused rather than written through. Canonical capture honors a
-validated parent override and strips only native Playwright output routing
-and baseline authority. Public-config checks also contain Playwright's
-built-in reporter output environment variables, including a directory
-selected with no output name, and reject the internal `PW_TEST_REPORTER`
-extension hook before reporter creation.
+leaving safe filtering arguments available. There is one supported way to
+run and one fixed place run output lands: the gitignored
+`harness/scratch/run` location inside the repository. The comparison wrapper
+and canonical capture are the only entry points that initialize it, wiping
+whatever a previous invocation left there before Playwright starts, so a
+run can never read an earlier invocation's results as its own. Loading the
+Playwright configuration initializes nothing, so worker restarts reuse the
+location and the invocation-wide run identity without clearing either, and
+per-case records make the executed-matrix and membership aggregates
+rebuildable from the complete set whichever worker finishes last.
+Concurrent invocations are unsupported: a second invocation wipes the
+location the first is using, which is why they are not engineered for.
+Native Playwright destination overrides (`PLAYWRIGHT_*_OUTPUT_*`) aimed at a
+curated location fail validation when the configuration loads; every other
+destination override is ignored, deleted from the environment by the entry
+points and the configuration so Playwright's environment-file precedence
+cannot displace the fixed destinations. The former `GC_PLAYWRIGHT_JSON`
+and `GC_RUN_OUTPUT_DIR` keys are dead configuration: honored by nothing,
+stripped from child environments. Curated locations, the approved tree,
+the manifest, and every sealed evidence directory, are refused as
+destinations in lexical and resolved space, including `..` normalization
+and symlinked components, before any write happens; a refusal fails
+configuration load rather than rerouting, and candidate writes inside the
+run location are created exclusively so a pre-existing entry is refused
+rather than written through.
 
 ---
 
