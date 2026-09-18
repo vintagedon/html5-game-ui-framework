@@ -26,5 +26,6 @@
     --gc-meter-track: var(--gc-surface-sunken);
     --gc-meter-fill: var(--gc-accent);
     --gc-meter-text: var(--gc-text-primary);
+    --gc-meter-trail: var(--gc-status-danger);
   }
 }

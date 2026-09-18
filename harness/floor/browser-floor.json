@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "description": "Declared browser floor and the features that bind it. The charter's frozen browser-floor row is the authority; this manifest is the machine-checked copy, and harness/tests/browser-floor.test.js verifies the two agree, that every listed feature form is present as a substring in published source, and that no present form requires a version above a declared floor. The scan is substring presence checking: argument-form assumptions are declarations reviewed by the operator, not something the check verifies.",
+  "floors": {
+    "chrome": 125,
+    "edge": 125,
+    "safari": 16.4,
+    "firefox": 128
+  },
+  "features": [
+    {
+      "feature": "color-mix()",
+      "form": "color-mix(",
+      "requires": { "chrome": 111, "edge": 111, "firefox": 113, "safari": 16.2 },
+      "binding": true,
+      "sources": [
+        "MDN browser-compat-data css/properties/color-mix.json",
+        "charter frozen decisions, browser floor row"
+      ]
+    },
+    {
+      "feature": "oklch()",
+      "form": "oklch(",
+      "requires": { "chrome": 111, "edge": 111, "firefox": 113, "safari": 15.4 },
+      "binding": true,
+      "sources": [
+        "MDN browser-compat-data css/types/color-value/oklch.json",
+        "charter frozen decisions, browser floor row"
+      ]
+    },
+    {
+      "feature": "round()",
+      "form": "round(",
+      "requires": { "chrome": 125, "edge": 125, "firefox": 118, "safari": 15.4 },
+      "binding": true,
+      "argumentForms": "same-type percentage arguments only; the meter quantization expressions multiply a unitless count by a percentage and round against a 100% interval. This is a manually reviewed assumption recorded here, not something the source scan verifies: the scan reports substring presence of round( and scores it against this same-type requirement. Mixed length/percentage arguments would require Safari 17.2, above the declared 16.4 floor, and are a stop condition for the operator, not a floor the harness may raise on its own.",
+      "sources": [
+        "MDN browser-compat-data css/types/round.json (verified 2026-09-14)",
+        "WebKit features in Safari 17.2, math functions note (webkit.org/blog/14787)"
+      ]
+    }
+  ]
+}

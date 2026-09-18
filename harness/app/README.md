@@ -3,8 +3,8 @@
 title: "Reference Renderer"
 description: "Shared registry-to-DOM renderer for the reference application"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-05"
-version: "1.1"
+date: "2026-08-25"
+version: "1.2"
 status: "Active"
 tags:
   - type: directory-readme
@@ -21,7 +21,10 @@ related_documents:
 Browser ESM that turns a scenario declaration into reference-page markup. The
 page imports the registry and this renderer and builds a section per scenario, so
 the page source carries no per-scenario markup: adding a scenario to the registry
-makes it appear with no other file edited.
+makes it appear with no other file edited. `specimenRoot` dispatches through a
+frozen builder table keyed by specimen type, so adding a specimen is a
+registration (one builder plus one `SPECIMEN_TYPES` entry), never a new branch
+in the renderer.
 
 The interaction targets a scenario declares (for example
 `.gc-button[data-variant="resting"]`) resolve against `[data-scenario="<id>"]`,
@@ -29,7 +32,9 @@ which is the same contract the Playwright runner relies on.
 
 Interactive specimens render a complete initial state before the runner acts.
 Toggle buttons expose `aria-pressed="false"`, and meter markup keeps its fill,
-visible value, and accessible value addressable as one state unit.
+visible value, and accessible value addressable as one state unit; the meter
+builder carries the whole family (shapes, orientations, damage trail) from
+sample config alone.
 
 ---
 

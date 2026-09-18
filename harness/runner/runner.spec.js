@@ -13,28 +13,41 @@
  * mutation test relies on that: changing a scenario's theme coverage in the
  * registry changes both the rendered page and this runner's executed matrix.
  *
- * Modes:
- *   GC_CAPTURE=1  write candidate captures; do not fail on a missing/diffing
- *                 approved baseline (first-run candidate generation).
- *   (default)     compare each candidate against the approved baseline; fail on
- *                 a diff. A missing baseline is reported, not fatal, until the
- *                 operator approves goldens (agents never write the approved path).
+ * Golden model: a case with no recorded baseline stages an in-memory candidate.
+ * Only the canonical capture wrapper can commit it after the complete
+ * Playwright process exits zero. A case whose capture disagrees with its
+ * baseline fails and surfaces its diff.
  */
 
-import { test } from "@playwright/test";
-import { randomUUID } from "node:crypto";
-import { mkdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { expect, test } from "@playwright/test";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { PNG } from "pngjs";
 import { registry } from "../registry/scenarios.js";
-import { compareCapture, readApprovalManifest } from "./compare.js";
+import {
+  compareCapture,
+  establishBaseline,
+  readApprovalManifest,
+} from "./compare.js";
+import {
+  BASELINE_ATTACHMENT_TYPE,
+  BASELINE_COMPARISON_TYPE,
+} from "./baseline-reporter.js";
 import {
   buildCases,
   captureIdentity,
   resolveCheckpointInteractions,
 } from "./cases.js";
+import {
+  overwriteRunFile,
+  readCaseRecords,
+  readRunState,
+  RUN_OUTPUT_ROOT,
+  writeRunFile,
+} from "./run-output.js";
 import { semanticDeclarations } from "../metrics/contrast.js";
 import { designedPairs } from "../metrics/pairings.js";
+import { moduleResponseFailure } from "./smoke-assertions.js";
 import {
   buildMembershipReport,
   createMembershipCollector,
@@ -43,32 +56,49 @@ import {
 } from "./membership.js";
 import { applyMeterValue, applyTogglePressed } from "./interactions.js";
 
-const CAPTURE = !!process.env.GC_CAPTURE;
 const BASE = process.env.GC_BASE_URL || "http://127.0.0.1:8123";
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
-const CANDIDATES = join(ROOT, "goldens/candidates");
-const APPROVED = join(ROOT, "goldens/approved");
 const PAGE = `${BASE}/reference/`;
-const RUN_ID = randomUUID();
-const RUN_STATE = join(ROOT, "runner/playwright-run.json");
+// All run-owned output (candidates, diffs, records, matrix, membership)
+// lands in the one fixed gitignored location the entry point initialized
+// before this worker started. The run identity is shared with every other
+// worker and the metrics step through the run state that initialization
+// wrote; a worker restart reuses both without clearing anything.
+const RUN_DIRECTORY = RUN_OUTPUT_ROOT;
+const RUN_ID = readRunState().runId;
+const APPROVED = join(ROOT, "goldens/approved");
 const approvalManifest = readApprovalManifest();
 
 // One case per scenario x theme x viewport x checkpoint, all registry-sourced.
 const cases = buildCases(registry);
+const METER_SCENARIOS = registry.scenarios.filter((s) => s.specimen === "meter");
+const QUANTIZED_SAMPLES = METER_SCENARIOS.flatMap((s) =>
+  (s.config.samples || [])
+    .filter((m) => m.shape === "segmented" || m.shape === "pips")
+    .map((m) => ({ scenarioId: s.id, variant: m.variant, shape: m.shape })),
+);
+const TRAIL_SAMPLES = METER_SCENARIOS.flatMap((s) =>
+  (s.config.samples || [])
+    .filter((m) => m.trail != null)
+    .map((m) => ({ scenarioId: s.id, variant: m.variant })),
+);
+const SETTLE_STYLE =
+  ":where(*, *::before, *::after) { transition: none !important; animation: none !important; }";
 const SEMANTIC_DECLARATIONS = semanticDeclarations();
 const DESIGNED_KEYS = new Set(
   designedPairs().map(([foreground, background]) =>
     `${foreground}|${background}`,
   ),
 );
-const membershipCollector = createMembershipCollector({
-  designedKeys: DESIGNED_KEYS,
-  expectedSamples: cases.length,
-});
 
 /** Resolve an interaction target selector within the scenario's section. */
 function within(id, selector) {
   return `[data-scenario="${id}"] ${selector}`;
+}
+
+/** The section view URL that renders one scenario, straight from the registry. */
+function sectionUrl(sectionId) {
+  return `${PAGE}#/${sectionId}`;
 }
 
 /** Execute one declared interaction on the page. */
@@ -105,35 +135,22 @@ async function runInteraction(page, id, it) {
   }
 }
 
-// The manifest records every scenario, theme, viewport, and checkpoint case,
-// so the single-declaration mutation test can observe the matrix directly.
-const manifest = [];
-const goldenCounts = { pass: 0, awaiting: 0, failure: 0 };
-
-test.beforeAll(() => {
-  writeFileSync(
-    RUN_STATE,
-    JSON.stringify(
-      { version: 1, runId: RUN_ID, startedAt: new Date().toISOString() },
-      null,
-      2,
-    ) + "\n",
-  );
-});
+// The executed matrix is aggregated from per-case records. Each case writes
+// exactly one record under records/, so the single-declaration mutation test
+// still observes the matrix through candidates/matrix.json, and a worker
+// restart adds records instead of colliding with a fixed-name write.
 
 for (const c of cases) {
   test(
     `${c.id} [${c.theme}] [${c.viewport.name}] ${c.checkpoint.name}`,
-    async ({ page }) => {
+    async ({ page }, testInfo) => {
       await page.setViewportSize({
         width: c.viewport.width,
         height: c.viewport.height,
       });
-      await page.goto(PAGE, { waitUntil: "networkidle" });
+      await page.goto(sectionUrl(c.scenario.section), { waitUntil: "networkidle" });
       await page.locator(`[data-scenario="${c.id}"]`).waitFor({ state: "visible" });
-      await page.addStyleTag({
-        content: ":where(*, *::before, *::after) { transition: none !important; animation: none !important; }",
-      });
+      await page.addStyleTag({ content: SETTLE_STYLE });
 
       // Set this case's theme on the root, then let transitions settle.
       await page.evaluate((t) => {
@@ -152,51 +169,81 @@ for (const c of cases) {
 
       // Membership is sampled from the exact interacted state photographed
       // below. The shared case loop makes capture and classification one
-      // traversal and the report asserts that all matrix cases contributed.
+      // traversal, and the per-case record carries this sample so the
+      // aggregate rebuild asserts that all matrix cases contributed.
       const membershipSample = await page.evaluate(inspectRenderedSpecimen, {
         scenarioId: c.id,
         declarations: SEMANTIC_DECLARATIONS,
       });
-      recordMembershipSample(membershipCollector, c, membershipSample);
 
       const rel = captureIdentity(c);
-      const candidatePath = join(CANDIDATES, rel);
       const approvedPath = join(APPROVED, rel);
-      mkdirSync(dirname(candidatePath), { recursive: true });
 
       const png = await page
         .locator(`[data-scenario="${c.id}"] .gc-specimen`)
         .screenshot({ type: "png", animations: "disabled" });
-      writeFileSync(candidatePath, png);
-
-      if (CAPTURE) {
-        manifest.push({
-          id: c.id,
-          theme: c.theme,
-          viewport: c.viewport.name,
-          checkpoint: c.checkpoint.name,
-          capture: rel,
-          golden: "captured",
-        });
-        return;
-      }
+      writeRunFile(RUN_DIRECTORY, `candidates/${rel}`, png);
 
       const result = compareCapture(png, {
         approvedPath,
         caseId: rel,
         manifest: approvalManifest,
       });
-      goldenCounts[result.status]++;
-      manifest.push({
-        id: c.id,
-        theme: c.theme,
-        viewport: c.viewport.name,
-        checkpoint: c.checkpoint.name,
-        capture: rel,
-        golden: result.status,
-        reason: result.reason,
+      await testInfo.attach(`baseline-comparison:${rel}`, {
+        body: Buffer.from(
+          JSON.stringify({
+            status: result.status,
+            reason: result.reason,
+            caseId: rel,
+          }),
+        ),
+        contentType: BASELINE_COMPARISON_TYPE,
       });
+
+      if (result.status === "unrecorded") {
+        const staged = establishBaseline({
+          approvedPath,
+          approvedRoot: APPROVED,
+          caseId: rel,
+          candidatePng: png,
+          manifest: approvalManifest,
+        });
+        // The reporter keeps this body in memory until every Playwright test
+        // and hook has passed. Failed runs discard it without a durable write.
+        await testInfo.attach(`baseline-establishment:${rel}`, {
+          body: staged.candidatePng,
+          contentType: BASELINE_ATTACHMENT_TYPE,
+        });
+      }
+
+      // The per-case record is the restart-safe aggregation unit: written
+      // once by the one execution of this case, stamped with the shared run
+      // identity, and read back by whichever worker's afterAll runs last.
+      writeRunFile(
+        RUN_DIRECTORY,
+        `records/${rel.replace(/\.png$/, "")}.json`,
+        JSON.stringify(
+          {
+            runId: RUN_ID,
+            id: c.id,
+            theme: c.theme,
+            viewport: c.viewport.name,
+            checkpoint: c.checkpoint.name,
+            capture: rel,
+            golden: result.status === "unrecorded" ? "established" : result.status,
+            reason: result.reason,
+            membership: membershipSample,
+          },
+        ) + "\n",
+      );
       if (result.status === "failure") {
+        if (result.diffPng) {
+          writeRunFile(
+            RUN_DIRECTORY,
+            `candidates/${rel.replace(/\.png$/, "")}.diff.png`,
+            PNG.sync.write(result.diffPng),
+          );
+        }
         const pixelDetail = result.diffPixels >= 0
           ? `: ${result.diffPixels}/${result.total} pixels (${(result.ratio * 100).toFixed(2)}%)`
           : "";
@@ -206,26 +253,780 @@ for (const c of cases) {
   );
 }
 
+// Meter family synchronization. These run where a drift would otherwise fail
+// silently: in the browser, against computed geometry, for every registered
+// shape and orientation. Targets derive from the registry, never a fixed list.
+test("meter fill geometry, visible text, and accessible value agree across the family", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const observations = [];
+  for (const section of registry.sections) {
+    const scenarios = METER_SCENARIOS.filter((s) => s.section === section.id);
+    if (!scenarios.length) continue;
+    await page.goto(sectionUrl(section.id), { waitUntil: "networkidle" });
+    await page.addStyleTag({ content: SETTLE_STYLE });
+    for (const scenario of scenarios) {
+      await page.locator(`[data-scenario="${scenario.id}"]`).waitFor({ state: "visible" });
+    }
+
+    observations.push(
+      ...(await page.evaluate(() => {
+        // Pips clip their paint rather than their box, so a pip fill's honest
+        // geometry is how many unit centers it still hit-tests over; segmented
+        // and continuous fills size their box directly.
+        const filledUnits = (meter, fill, vertical, count) => {
+          const box = meter.getBoundingClientRect();
+          const style = getComputedStyle(meter);
+          // Probes resolve against the fill's box, which is the meter's content
+          // box: the border belongs to the track, not to any unit.
+          const innerW = box.width - Number.parseFloat(style.borderLeftWidth) - Number.parseFloat(style.borderRightWidth);
+          const innerH = box.height - Number.parseFloat(style.borderTopWidth) - Number.parseFloat(style.borderBottomWidth);
+          let filled = 0;
+          for (let i = 0; i < count; i += 1) {
+            const x = vertical ? box.x + box.width / 2 : box.x + Number.parseFloat(style.borderLeftWidth) + ((i + 0.5) * innerW) / count;
+            const y = vertical
+              ? box.y + box.height - Number.parseFloat(style.borderBottomWidth) - ((i + 0.5) * innerH) / count
+              : box.y + box.height / 2;
+            const hit = document.elementFromPoint(x, y);
+            if (hit && (hit === fill || fill.contains(hit))) filled += 1;
+          }
+          return filled;
+        };
+        const fillFraction = (meter, fill, vertical) => {
+          const box = meter.getBoundingClientRect();
+          const style = getComputedStyle(meter);
+          const inner = vertical
+            ? box.height - Number.parseFloat(style.borderTopWidth) - Number.parseFloat(style.borderBottomWidth)
+            : box.width - Number.parseFloat(style.borderLeftWidth) - Number.parseFloat(style.borderRightWidth);
+          const fillBox = fill.getBoundingClientRect();
+          return vertical ? fillBox.height / inner : fillBox.width / inner;
+        };
+        const out = [];
+        for (const sectionElement of document.querySelectorAll("[data-scenario]")) {
+          for (const meter of sectionElement.querySelectorAll(".gc-meter")) {
+            meter.scrollIntoView({ block: "center", inline: "center" });
+            const fill = meter.querySelector(".gc-meter__fill");
+            const display = meter.parentElement?.querySelector("[data-meter-display]");
+            const shape = meter.dataset.shape || "continuous";
+            const vertical = meter.dataset.orientation === "vertical";
+            const countRaw = getComputedStyle(meter).getPropertyValue("--gc-meter-count").trim();
+            const count = countRaw ? Number(countRaw) : null;
+            const fraction = shape === "pips"
+              ? filledUnits(meter, fill, vertical, count) / count
+              : fillFraction(meter, fill, vertical);
+            out.push({
+              scenario: sectionElement.dataset.scenario,
+              variant: meter.dataset.variant,
+              shape,
+              orientation: meter.dataset.orientation || "horizontal",
+              aria: Number(meter.getAttribute("aria-valuenow")),
+              displayText: display ? display.textContent : null,
+              fraction,
+              count,
+            });
+          }
+        }
+        return out;
+      })),
+    );
+  }
+
+  expect(observations.length).toBeGreaterThan(0);
+  const seen = new Set();
+  for (const o of observations) {
+    const where = `${o.scenario}/${o.variant} (${o.shape}/${o.orientation})`;
+    expect(o.displayText, `${where} display text`).toBe(`${o.aria}%`);
+    const expectedFraction = o.count
+      ? Math.floor((o.count * o.aria) / 100) / o.count
+      : o.aria / 100;
+    expect(
+      Math.abs(o.fraction - expectedFraction),
+      `${where} fill geometry vs accessible value`,
+    ).toBeLessThan(0.01);
+    seen.add(`${o.shape}/${o.orientation}`);
+  }
+  for (const coverage of [
+    "continuous/horizontal",
+    "segmented/horizontal",
+    "pips/horizontal",
+    "continuous/vertical",
+    "segmented/vertical",
+    "pips/vertical",
+  ]) {
+    expect(seen.has(coverage), `geometry must be observed for ${coverage}`).toBe(true);
+  }
+});
+
+test("meter labels and values remain compositionally separated", async ({ page }) => {
+  const verticalScenario = METER_SCENARIOS.find((s) =>
+    (s.config.samples || []).some((sample) => sample.orientation === "vertical"),
+  );
+  expect(verticalScenario, "a vertical meter scenario must be registered").toBeTruthy();
+
+  const seen = new Set();
+  for (const viewport of verticalScenario.viewports) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await page.goto(sectionUrl(verticalScenario.section), { waitUntil: "networkidle" });
+    await page.addStyleTag({ content: SETTLE_STYLE });
+
+    for (const theme of verticalScenario.themes) {
+      await page.evaluate((nextTheme) => {
+        document.documentElement.dataset.gcTheme = nextTheme;
+      }, theme);
+
+      const readings = await page.evaluate(() =>
+        [...document.querySelectorAll(".gc-meter")].map((meter) => {
+          const labelRegion = meter.parentElement?.querySelector(".meter-label");
+          const label = labelRegion?.querySelector("span:not([data-meter-display])");
+          const value = labelRegion?.querySelector("[data-meter-display]");
+          const labelBox = label?.getBoundingClientRect();
+          const valueBox = value?.getBoundingClientRect();
+          const inlineGap = labelBox && valueBox
+            ? Math.max(valueBox.left - labelBox.right, labelBox.left - valueBox.right)
+            : 0;
+          const blockGap = labelBox && valueBox
+            ? Math.max(valueBox.top - labelBox.bottom, labelBox.top - valueBox.bottom)
+            : 0;
+
+          return {
+            variant: meter.dataset.variant,
+            orientation: meter.dataset.orientation || "horizontal",
+            distinctNodes: Boolean(label && value && label !== value),
+            separation: Math.max(inlineGap, blockGap),
+            displayedValue: value?.innerText || "",
+            exposedValue: meter.getAttribute("aria-valuenow") || "",
+          };
+        }),
+      );
+
+      for (const reading of readings) {
+        const where = `${theme}/${viewport.name}/${reading.variant}/${reading.orientation}`;
+        expect.soft(reading.distinctNodes, `${where}: label and value nodes`).toBe(true);
+        expect.soft(reading.separation, `${where}: rendered label/value separation`).toBeGreaterThan(0);
+        expect.soft(
+          reading.displayedValue,
+          `${where}: rendered meter display must expose its numeric value`,
+        ).toBe(`${reading.exposedValue}%`);
+        seen.add(`${theme}/${viewport.name}/${reading.orientation}`);
+      }
+    }
+  }
+
+  for (const theme of verticalScenario.themes) {
+    for (const viewport of verticalScenario.viewports) {
+      for (const orientation of ["horizontal", "vertical"]) {
+        expect(
+          seen.has(`${theme}/${viewport.name}/${orientation}`),
+          `composition must cover ${theme}/${viewport.name}/${orientation}`,
+        ).toBe(true);
+      }
+    }
+  }
+});
+
+test("meter fills remain contiguous and anchored at the orientation origin", async ({ page }) => {
+  const targets = METER_SCENARIOS.flatMap((scenario) =>
+    (scenario.config.samples || []).map((sample) => ({
+      scenarioId: scenario.id,
+      variant: sample.variant,
+    })),
+  );
+  expect(targets.length).toBeGreaterThan(0);
+
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const sections = [...new Set(
+    targets.map((target) =>
+      registry.scenarios.find((scenario) => scenario.id === target.scenarioId).section,
+    ),
+  )];
+  const seen = new Set();
+
+  for (const sectionId of sections) {
+    const sectionTargets = targets.filter(
+      (target) =>
+        registry.scenarios.find((scenario) => scenario.id === target.scenarioId).section === sectionId,
+    );
+    await page.goto(sectionUrl(sectionId), { waitUntil: "networkidle" });
+    await page.addStyleTag({ content: SETTLE_STYLE });
+
+    for (const value of [0, 43, 100]) {
+      for (const target of sectionTargets) {
+        await page
+          .locator(`[data-scenario="${target.scenarioId}"] .gc-meter[data-variant="${target.variant}"]`)
+          .evaluate(applyMeterValue, String(value));
+      }
+
+      const readings = await page.evaluate(({ targets, value }) => {
+        const out = [];
+        for (const target of targets) {
+          const meter = document.querySelector(
+            `[data-scenario="${target.scenarioId}"] .gc-meter[data-variant="${target.variant}"]`,
+          );
+          meter.scrollIntoView({ block: "center", inline: "center" });
+          const fill = meter.querySelector(".gc-meter__fill");
+          const shape = meter.dataset.shape || "continuous";
+          const orientation = meter.dataset.orientation || "horizontal";
+          const vertical = orientation === "vertical";
+          const style = getComputedStyle(meter);
+          const declaredCount = Number(style.getPropertyValue("--gc-meter-count").trim());
+          const probeCount = declaredCount || 10;
+          const box = meter.getBoundingClientRect();
+          const borderInlineStart = Number.parseFloat(style.borderLeftWidth);
+          const borderInlineEnd = Number.parseFloat(style.borderRightWidth);
+          const borderBlockStart = Number.parseFloat(style.borderTopWidth);
+          const borderBlockEnd = Number.parseFloat(style.borderBottomWidth);
+          const innerWidth = box.width - borderInlineStart - borderInlineEnd;
+          const innerHeight = box.height - borderBlockStart - borderBlockEnd;
+          const fillBox = fill.getBoundingClientRect();
+          const filledFromOrigin = [];
+
+          for (let index = 0; index < probeCount; index += 1) {
+            const x = vertical
+              ? (shape === "pips" ? box.x + box.width / 2 : fillBox.x + fillBox.width / 2)
+              : box.x + borderInlineStart + ((index + 0.5) * innerWidth) / probeCount;
+            const y = vertical
+              ? box.y + box.height - borderBlockEnd - ((index + 0.5) * innerHeight) / probeCount
+              : (shape === "pips" ? box.y + box.height / 2 : fillBox.y + fillBox.height / 2);
+            if (shape === "pips") {
+              // Pip paint is clipped inside a full-size fill box, so its
+              // visible run must be sampled through browser hit-testing.
+              const hit = document.elementFromPoint(x, y);
+              filledFromOrigin.push(Boolean(hit && (hit === fill || fill.contains(hit))));
+            } else {
+              filledFromOrigin.push(
+                x >= fillBox.left && x <= fillBox.right &&
+                y >= fillBox.top && y <= fillBox.bottom,
+              );
+            }
+          }
+
+          out.push({
+            ...target,
+            value,
+            shape,
+            orientation,
+            filledFromOrigin,
+          });
+        }
+        return out;
+      }, { targets: sectionTargets, value });
+
+      for (const reading of readings) {
+        const where = `${reading.scenarioId}/${reading.variant} (${reading.shape}/${reading.orientation}) at ${value}%`;
+        const firstEmpty = reading.filledFromOrigin.indexOf(false);
+        const contiguous = firstEmpty === -1 ||
+          reading.filledFromOrigin.slice(firstEmpty).every((filled) => !filled);
+        const filledCount = reading.filledFromOrigin.filter(Boolean).length;
+
+        expect(contiguous, `${where}: filled units must form one origin-anchored run`).toBe(true);
+        if (value === 0) {
+          expect(filledCount, `${where}: empty state`).toBe(0);
+        } else if (value === 100) {
+          expect(filledCount, `${where}: full state`).toBe(reading.filledFromOrigin.length);
+        } else {
+          expect(filledCount, `${where}: intermediate state starts at the origin`).toBeGreaterThan(0);
+          expect(filledCount, `${where}: intermediate state leaves empty units`).toBeLessThan(
+            reading.filledFromOrigin.length,
+          );
+        }
+        seen.add(`${reading.shape}/${reading.orientation}`);
+      }
+    }
+  }
+
+  for (const coverage of [
+    "continuous/horizontal",
+    "segmented/horizontal",
+    "pips/horizontal",
+    "continuous/vertical",
+    "segmented/vertical",
+    "pips/vertical",
+  ]) {
+    expect(seen.has(coverage), `origin anchoring must be observed for ${coverage}`).toBe(true);
+  }
+});
+
+test("segmented and pip fills land on whole units at empty, partial, and full values", async ({ page }) => {
+  expect(QUANTIZED_SAMPLES.length).toBeGreaterThan(0);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const sections = [...new Set(
+    QUANTIZED_SAMPLES.map((t) => registry.scenarios.find((s) => s.id === t.scenarioId).section),
+  )];
+
+  for (const sectionId of sections) {
+    const targets = QUANTIZED_SAMPLES.filter(
+      (t) => registry.scenarios.find((s) => s.id === t.scenarioId).section === sectionId,
+    );
+    await page.goto(sectionUrl(sectionId), { waitUntil: "networkidle" });
+    await page.addStyleTag({ content: SETTLE_STYLE });
+
+    for (const value of [0, 43, 94, 99, 100]) {
+      for (const target of targets) {
+        await page
+          .locator(`[data-scenario="${target.scenarioId}"] .gc-meter[data-variant="${target.variant}"]`)
+          .evaluate(applyMeterValue, String(value));
+      }
+      const readings = await page.evaluate((targets) => {
+        const filledUnits = (meter, fill, vertical, count) => {
+          const box = meter.getBoundingClientRect();
+          const style = getComputedStyle(meter);
+          const innerW = box.width - Number.parseFloat(style.borderLeftWidth) - Number.parseFloat(style.borderRightWidth);
+          const innerH = box.height - Number.parseFloat(style.borderTopWidth) - Number.parseFloat(style.borderBottomWidth);
+          let filled = 0;
+          for (let i = 0; i < count; i += 1) {
+            const x = vertical ? box.x + box.width / 2 : box.x + Number.parseFloat(style.borderLeftWidth) + ((i + 0.5) * innerW) / count;
+            const y = vertical
+              ? box.y + box.height - Number.parseFloat(style.borderBottomWidth) - ((i + 0.5) * innerH) / count
+              : box.y + box.height / 2;
+            const hit = document.elementFromPoint(x, y);
+            if (hit && (hit === fill || fill.contains(hit))) filled += 1;
+          }
+          return filled;
+        };
+        const out = [];
+        for (const target of targets) {
+          const meter = document.querySelector(
+            `[data-scenario="${target.scenarioId}"] .gc-meter[data-variant="${target.variant}"]`,
+          );
+          meter.scrollIntoView({ block: "center", inline: "center" });
+          const fill = meter.querySelector(".gc-meter__fill");
+          const shape = meter.dataset.shape || "continuous";
+          const vertical = meter.dataset.orientation === "vertical";
+          const count = Number(getComputedStyle(meter).getPropertyValue("--gc-meter-count").trim());
+          let fraction;
+          let units;
+          if (shape === "pips") {
+            units = filledUnits(meter, fill, vertical, count);
+            fraction = units / count;
+          } else {
+            const box = meter.getBoundingClientRect();
+            const style = getComputedStyle(meter);
+            const fillBox = fill.getBoundingClientRect();
+            fraction = vertical
+              ? fillBox.height / (box.height - Number.parseFloat(style.borderTopWidth) - Number.parseFloat(style.borderBottomWidth))
+              : fillBox.width / (box.width - Number.parseFloat(style.borderLeftWidth) - Number.parseFloat(style.borderRightWidth));
+            units = fraction * count;
+          }
+          out.push({
+            ...target,
+            shape,
+            value: Number(meter.getAttribute("aria-valuenow")),
+            count,
+            fraction,
+            units,
+          });
+        }
+        return out;
+      }, targets);
+
+      for (const r of readings) {
+        const where = `${r.scenarioId}/${r.variant} (${r.shape}) at ${r.value}%`;
+        const expectedUnits = Math.floor((r.count * r.value) / 100);
+        if (r.shape === "pips") {
+          expect(r.units, `${where} filled pip count`).toBe(expectedUnits);
+        } else {
+          expect(Math.abs(r.units - expectedUnits), `${where} filled segment count`).toBeLessThan(0.05);
+        }
+        if (r.value === 0) {
+          expect(r.units, `${where} must show no partial artifact when empty`).toBe(0);
+        }
+        if (r.value === 100) {
+          expect(r.units, `${where} must fill every unit without an end artifact`).toBe(r.count);
+        }
+      }
+    }
+  }
+});
+
+test("vertical pip layers paint declared units without clipped edge pips", async ({ page }) => {
+  const verticalPipScenario = METER_SCENARIOS.find((scenario) =>
+    (scenario.config.samples || []).some(
+      (sample) => sample.shape === "pips" && sample.orientation === "vertical",
+    ),
+  );
+  expect(verticalPipScenario, "a vertical pip scenario must be registered").toBeTruthy();
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto(sectionUrl(verticalPipScenario.section), { waitUntil: "networkidle" });
+  await page.addStyleTag({
+    content: `${SETTLE_STYLE} html, body { background: transparent !important; } body > :not(#vertical-pip-phase-fixture) { visibility: hidden; }`,
+  });
+
+  const pipRuns = async (selector) => {
+    const locator = page.locator(selector);
+    const box = await locator.boundingBox();
+    expect(box, `${selector} must have a rendered box`).toBeTruthy();
+    expect(box.width, `${selector} width`).toBeGreaterThan(0);
+    expect(box.height, `${selector} height`).toBeGreaterThan(0);
+    const png = PNG.sync.read(await page.screenshot({ clip: box, omitBackground: true }));
+    const x = Math.floor(png.width / 2);
+    const painted = [...Array(png.height)].map((_, y) =>
+      png.data[(y * png.width + x) * 4 + 3] > 64,
+    );
+    const runs = [];
+    for (let y = 0; y < painted.length; y += 1) {
+      if (!painted[y] || painted[y - 1]) continue;
+      let end = y;
+      while (painted[end + 1]) end += 1;
+      runs.push([y, end]);
+    }
+    return { runs, touchesStart: painted[0], touchesEnd: painted.at(-1) };
+  };
+
+  for (const theme of ["modern", "arcade", "sci-fi", "fantasy"]) {
+    await page.evaluate((nextTheme) => {
+      document.documentElement.dataset.gcTheme = nextTheme;
+    }, theme);
+
+    for (const value of [0, 43, 100]) {
+      await page.evaluate((nextValue) => {
+        document.querySelector("#vertical-pip-phase-fixture")?.remove();
+        const fixture = document.createElement("div");
+        fixture.id = "vertical-pip-phase-fixture";
+        const meter = (layer) => {
+          const left = layer === "track" ? 24 : layer === "fill-parent" ? 64 : 104;
+          const element = document.createElement("div");
+          element.className = "gc-meter";
+          element.dataset.shape = "pips";
+          element.dataset.orientation = "vertical";
+          element.dataset.layer = layer;
+          element.style.cssText = [
+            "--gc-meter-count: 10",
+            "position: fixed",
+            `inset: 24px auto auto ${left}px`,
+            "z-index: 1",
+            "border-color: transparent",
+            "box-shadow: none",
+          ].join("; ");
+          return element;
+        };
+
+        const track = meter("track");
+        fixture.append(track);
+        for (const layer of ["fill", "trail"]) {
+          const parent = meter(`${layer}-parent`);
+          parent.style.setProperty("background-image", "none");
+          const child = document.createElement("div");
+          child.className = `gc-meter__${layer}`;
+          child.style.setProperty(`--gc-meter-${layer === "fill" ? "value" : "trail-value"}`, `${nextValue}%`);
+          parent.append(child);
+          fixture.append(parent);
+        }
+        document.body.append(fixture);
+      }, value);
+
+      for (const layer of ["track", "fill", "trail"]) {
+        const reading = await pipRuns(
+          `[data-layer="${layer === "track" ? layer : `${layer}-parent`}"]${layer === "track" ? "" : ` > .gc-meter__${layer}`}`,
+        );
+        const expected = layer === "track" ? 10 : Math.floor((10 * value) / 100);
+        const where = `${theme}/${layer} at ${value}%`;
+        expect(reading.runs.length, `${where}: rendered pip count`).toBe(expected);
+        expect(reading.touchesStart, `${where}: no pip may clip at the top edge`).toBe(false);
+        expect(reading.touchesEnd, `${where}: no pip may clip at the bottom edge`).toBe(false);
+      }
+    }
+  }
+});
+
+test("the damage trail keeps the previous value's geometry while the fill moves", async ({ page }) => {
+  expect(TRAIL_SAMPLES.length).toBeGreaterThan(0);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const trailSection = registry.scenarios.find(
+    (s) => s.id === TRAIL_SAMPLES[0].scenarioId,
+  ).section;
+  await page.goto(sectionUrl(trailSection), { waitUntil: "networkidle" });
+  await page.addStyleTag({ content: SETTLE_STYLE });
+
+  const before = await page.evaluate((targets) => targets.map((target) => {
+    const meter = document.querySelector(
+      `[data-scenario="${target.scenarioId}"] .gc-meter[data-variant="${target.variant}"]`,
+    );
+    return { ...target, previous: Number(meter.getAttribute("aria-valuenow")) };
+  }), TRAIL_SAMPLES);
+
+  for (const target of before) {
+    await page
+      .locator(`[data-scenario="${target.scenarioId}"] .gc-meter[data-variant="${target.variant}"]`)
+      .evaluate(applyMeterValue, "38");
+  }
+
+  const readings = await page.evaluate((targets) => {
+    const out = [];
+    for (const target of targets) {
+      const meter = document.querySelector(
+        `[data-scenario="${target.scenarioId}"] .gc-meter[data-variant="${target.variant}"]`,
+      );
+      const fill = meter.querySelector(".gc-meter__fill");
+      const trail = meter.querySelector(".gc-meter__trail");
+      const trackBox = meter.getBoundingClientRect();
+      out.push({
+        ...target,
+        aria: Number(meter.getAttribute("aria-valuenow")),
+        fillFraction: fill.getBoundingClientRect().width / trackBox.width,
+        trailFraction: trail.getBoundingClientRect().width / trackBox.width,
+      });
+    }
+    return out;
+  }, TRAIL_SAMPLES);
+
+  for (const r of readings) {
+    const target = before.find((b) => b.scenarioId === r.scenarioId && b.variant === r.variant);
+    const where = `${r.scenarioId}/${r.variant}`;
+    expect(r.aria, `${where} accessible value`).toBe(38);
+    expect(Math.abs(r.fillFraction - 0.38), `${where} fill geometry`).toBeLessThan(0.01);
+    expect(
+      Math.abs(r.trailFraction - target.previous / 100),
+      `${where} trail holds the previous value`,
+    ).toBeLessThan(0.01);
+  }
+});
+
+// Section navigation. The walk is registry-driven: every scenario must be
+// reachable from the landing view in at most two clicks (section link, then
+// scenario link), the theme toolbar must switch themes in every view, and the
+// walk itself must stay clean of console errors, module failures, and
+// off-origin requests.
+test("malformed hashes fall back without disabling later hash routing", async ({ page }) => {
+  const pageErrors = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+
+  await page.goto(`${PAGE}#/%`, { waitUntil: "networkidle" });
+  await expect(page.locator("#view-landing")).toBeVisible();
+  expect.soft(pageErrors, "the malformed route must not raise a URIError").toEqual([]);
+
+  await page.evaluate(() => {
+    location.hash = "#/core";
+  });
+  await expect(page.locator("#view-section")).toBeVisible();
+  expect(await page.locator("#scenarios [data-scenario]").count()).toBeGreaterThan(0);
+});
+
+test("the landing route removes scenario nodes rendered by a section visit", async ({ page }) => {
+  const section = registry.sections.find((entry) =>
+    registry.scenarios.some((scenario) => scenario.section === entry.id),
+  );
+  await page.goto(sectionUrl(section.id), { waitUntil: "networkidle" });
+  expect(await page.locator("#scenarios [data-scenario]").count()).toBeGreaterThan(0);
+
+  await page.locator(".reference-nav__home").click();
+  await page.waitForURL("**#/");
+  await expect(page.locator("#view-landing")).toBeVisible();
+  expect(await page.locator("[data-scenario]").count()).toBe(0);
+});
+
+test("every second-level link scrolls its scrolled-away scenario into view", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const consoleErrors = [];
+  const moduleFailures = [];
+  const offOriginRequests = [];
+  const origin = new URL(PAGE).origin;
+  page.on("console", (message) => {
+    if (message.type() === "error") consoleErrors.push(message.text());
+  });
+  page.on("pageerror", (error) => consoleErrors.push(`page error: ${error.message}`));
+  page.on("request", (request) => {
+    if (new URL(request.url()).origin !== origin) {
+      offOriginRequests.push(request.url());
+    }
+  });
+  page.on("response", (response) => {
+    const failure = moduleResponseFailure({
+      url: response.url(),
+      status: response.status(),
+      resourceType: response.request().resourceType(),
+      contentType: response.headers()["content-type"] || "",
+    });
+    if (failure) moduleFailures.push(failure);
+  });
+
+  await page.goto(PAGE, { waitUntil: "networkidle" });
+  // The added space makes the last scenario scrollable away in a one-scenario
+  // section too. The test observes the page's real target geometry, not visibility.
+  await page.addStyleTag({ content: "body { padding-block-end: 200vh !important; }" });
+
+  // The landing view carries no scenario sections; it lists the roster.
+  const landingScenarioCount = await page.locator("#scenarios [data-scenario]").count();
+  expect(landingScenarioCount).toBe(0);
+
+  async function switchThemeAndBack(viewLabel) {
+    const before = await page.evaluate(() => document.documentElement.dataset.gcTheme);
+    const controls = page.locator("[data-theme-choice]");
+    const count = await controls.count();
+    const target = before === registry.themes[0] && count > 1 ? registry.themes[1] : registry.themes[0];
+    await page.locator(`[data-theme-choice="${target}"]`).click();
+    const after = await page.evaluate(() => document.documentElement.dataset.gcTheme);
+    expect(after, `${viewLabel}: theme toolbar must switch themes in place`).toBe(target);
+    await page.locator(`[data-theme-choice="${before}"]`).click();
+  }
+
+  await switchThemeAndBack("landing");
+  const scrollFailures = [];
+
+  for (const section of registry.sections) {
+    // Click one: the section link in the nav tree.
+    await page.locator(`.reference-nav__section-link[data-nav-section="${section.id}"]`).click();
+    await page.waitForURL(`**#/${section.id}`);
+
+    const expected = registry.scenarios.filter((s) => s.section === section.id);
+    for (const scenario of expected) {
+      await page.locator(`[data-scenario="${scenario.id}"]`).waitFor({ state: "visible" });
+    }
+    const observedCount = await page.locator("#scenarios [data-scenario]").count();
+    expect(observedCount, `section ${section.id} renders exactly its roster`).toBe(expected.length);
+
+    // Click two: every scenario link must move its deliberately scrolled-away
+    // target. In-page activation avoids Playwright locator auto-scrolling the
+    // sticky navigation link and becoming the movement this assertion observes.
+    for (const scenario of expected) {
+      const target = page.locator(`[data-scenario="${scenario.id}"]`);
+      const before = await target.evaluate((element) => {
+        window.scrollBy(0, element.getBoundingClientRect().top + window.innerHeight);
+        return {
+          scrollY: window.scrollY,
+          top: element.getBoundingClientRect().top,
+        };
+      });
+      expect(before.top, `${scenario.id} begins outside the viewport`).toBeLessThan(-1);
+
+      await page
+        .locator(`.reference-nav__item-link[data-scenario-nav="${scenario.id}"]`)
+        .evaluate((link) => link.click());
+      const after = await target.evaluate((element) => ({
+        scrollY: window.scrollY,
+        top: element.getBoundingClientRect().top,
+      }));
+      if (after.scrollY === before.scrollY || after.top <= before.top + 100) {
+        scrollFailures.push({ scenario: scenario.id, before, after });
+      }
+    }
+
+    await switchThemeAndBack(`section ${section.id}`);
+  }
+
+  expect(scrollFailures, "every scenario link scrolls its own target").toEqual([]);
+
+  expect(consoleErrors, "console errors across the walk").toEqual([]);
+  expect(moduleFailures, "module load failures across the walk").toEqual([]);
+  expect(offOriginRequests, "off-origin requests across the walk").toEqual([]);
+});
+
+test("second-level links preserve nonordinary and cancelled anchor activations", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const section = registry.sections.find((entry) =>
+    registry.scenarios.some((scenario) => scenario.section === entry.id),
+  );
+  const scenario = registry.scenarios.find((entry) => entry.section === section.id);
+  await page.goto(sectionUrl(section.id), { waitUntil: "networkidle" });
+  await page.addStyleTag({ content: "body { padding-block-end: 200vh !important; }" });
+
+  const link = page.locator(`.reference-nav__item-link[data-scenario-nav="${scenario.id}"]`);
+  const target = page.locator(`[data-scenario="${scenario.id}"]`);
+  const activations = [
+    { label: "Ctrl", ctrlKey: true },
+    { label: "Meta", metaKey: true },
+    { label: "Shift", shiftKey: true },
+    { label: "Alt", altKey: true },
+    { label: "non-primary", button: 1 },
+  ];
+
+  for (const activation of activations) {
+    const before = await target.evaluate((element) => {
+      window.scrollBy(0, element.getBoundingClientRect().top + window.innerHeight);
+      return { scrollY: window.scrollY, top: element.getBoundingClientRect().top };
+    });
+    const after = await link.evaluate((element, init) => {
+      const event = new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+        button: init.button ?? 0,
+        ctrlKey: init.ctrlKey,
+        metaKey: init.metaKey,
+        shiftKey: init.shiftKey,
+        altKey: init.altKey,
+      });
+      const defaultAllowed = element.dispatchEvent(event);
+      const target = document.querySelector(`[data-scenario="${element.dataset.scenarioNav}"]`);
+      return {
+        defaultAllowed,
+        scrollY: window.scrollY,
+        top: target.getBoundingClientRect().top,
+      };
+    }, activation);
+    expect(after.defaultAllowed, `${activation.label} link activation remains an anchor default`).toBe(true);
+    expect(after.scrollY, `${activation.label} link activation does not scroll`).toBe(before.scrollY);
+    expect(after.top, `${activation.label} target geometry stays put`).toBe(before.top);
+  }
+
+  const beforeCancelled = await target.evaluate((element) => {
+    window.scrollBy(0, element.getBoundingClientRect().top + window.innerHeight);
+    return { scrollY: window.scrollY, top: element.getBoundingClientRect().top };
+  });
+  const afterCancelled = await link.evaluate((element) => {
+    const nav = element.closest("#reference-nav");
+    nav.addEventListener("click", (event) => event.preventDefault(), { capture: true, once: true });
+    const event = new MouseEvent("click", { bubbles: true, cancelable: true, button: 0 });
+    const defaultAllowed = element.dispatchEvent(event);
+    const target = document.querySelector(`[data-scenario="${element.dataset.scenarioNav}"]`);
+    return {
+      defaultAllowed,
+      scrollY: window.scrollY,
+      top: target.getBoundingClientRect().top,
+    };
+  });
+  expect(afterCancelled.defaultAllowed, "cancelled activation keeps its cancellation").toBe(false);
+  expect(afterCancelled.scrollY, "cancelled activation does not scroll").toBe(beforeCancelled.scrollY);
+  expect(afterCancelled.top, "cancelled target geometry stays put").toBe(beforeCancelled.top);
+});
+
 // After the run, persist the executed matrix for inspection/mutation tests.
-test.afterAll(async () => {
-  mkdirSync(CANDIDATES, { recursive: true });
-  writeFileSync(join(CANDIDATES, "matrix.json"), JSON.stringify(manifest, null, 2) + "\n");
-  const membershipReport = buildMembershipReport(membershipCollector, {
+test.afterAll(() => {
+  // Aggregates are rebuilt from every record this invocation wrote, not from
+  // any one worker's memory. Playwright restarts a worker after a failed
+  // test, so the worker that runs last is not necessarily the one that ran
+  // the most cases; rebuilding from the complete record set is what keeps a
+  // restart from losing earlier results or colliding with their writes.
+  const records = readCaseRecords({ runDirectory: RUN_DIRECTORY, runId: RUN_ID });
+  // A focused behavior assertion captures no registry case. Do not write a
+  // zero-sample matrix or make that assertion inherit a sample-count failure.
+  if (!records.length) return;
+
+  overwriteRunFile(
+    RUN_DIRECTORY,
+    "candidates/matrix.json",
+    JSON.stringify(
+      records.map(({ runId, membership, ...entry }) => entry),
+      null,
+      2,
+    ) + "\n",
+  );
+  const collector = createMembershipCollector({
+    designedKeys: DESIGNED_KEYS,
+    expectedSamples: cases.length,
+  });
+  for (const record of records) {
+    recordMembershipSample(collector, {
+      id: record.id,
+      theme: record.theme,
+      viewport: { name: record.viewport },
+      checkpoint: { name: record.checkpoint },
+    }, record.membership);
+  }
+  const membershipReport = buildMembershipReport(collector, {
     runId: RUN_ID,
   });
-  writeFileSync(
-    join(ROOT, "runner/membership.json"),
+  overwriteRunFile(
+    RUN_DIRECTORY,
+    "membership.json",
     JSON.stringify(membershipReport, null, 2) + "\n",
   );
   const coverage = membershipReport.coverage;
+  const goldenCounts = { pass: 0, established: 0, failure: 0 };
+  for (const record of records) goldenCounts[record.golden] = (goldenCounts[record.golden] || 0) + 1;
   console.log(
     `\nmembership: ${coverage.designedPairIdentities} designed identities; ${coverage.distinctObservedIdentities} distinct observed; ${coverage.totalObservations} total observations; ${Object.values(coverage.exclusionsByReason).reduce((sum, count) => sum + count, 0)} exclusions; ${coverage.unclassifiedObservations} unclassified`,
   );
-  if (!CAPTURE) {
-    console.log(
-      `\ngoldens: ${goldenCounts.pass} approved pass, ${goldenCounts.awaiting} awaiting operator approval, ${goldenCounts.failure} failure`,
-    );
-  }
+  console.log(
+    `\ngoldens: ${goldenCounts.pass} pass, ${goldenCounts.established} established, ${goldenCounts.failure} failure`,
+  );
   if (membershipReport.failures.length) {
     throw new Error(
       `membership: ${membershipReport.failures.length} unclassified observation(s):\n  ` +

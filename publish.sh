@@ -39,7 +39,10 @@ WEB_ROOT="${GC_WEB_ROOT:-/opt/agents/www/gameui}"
 RECYCLE_ROOT="${GC_RECYCLE_ROOT:-/opt/agents/recycle-bin}"
 PREVIEW_URL="${GC_PREVIEW_URL:-https://gameui.donfather.site/reference/}"
 SMOKE_RESULT="${GC_SMOKE_RESULT:-$REPO_ROOT/staging/published-smoke.json}"
-EXPECTED_SCENARIOS="${GC_SMOKE_EXPECT_SCENARIOS:-7}"
+# Cross-check only: smoke-published.js walks the registry itself and this
+# count must agree with it, so a stale default fails loudly instead of
+# silently blessing a drifted registry.
+EXPECTED_SCENARIOS="${GC_SMOKE_EXPECT_SCENARIOS:-11}"
 CHECK_ONLY=0
 [ "${1:-}" = "--check" ] && CHECK_ONLY=1
 

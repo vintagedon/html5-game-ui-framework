@@ -24,13 +24,50 @@ const ALL_THEMES = ["modern", "arcade", "sci-fi", "fantasy"];
 
 const DESKTOP = { name: "desktop", width: 1280, height: 800 };
 
+// Status-family chrome gets a portrait second viewport; swatch and spike
+// specimens do not (H-006: viewports are per scenario).
+const COMPACT = { name: "compact", width: 480, height: 900 };
+
+// The section roster drives the reference application's navigation. A nav
+// tree, routing table, or page list written anywhere outside this file is a
+// second source of truth and a defect. Section membership is navigation, not
+// identity: it never enters a capture identity, so sections can be rearranged
+// without invalidating a single baseline.
+const SECTIONS = [
+  {
+    id: "foundations",
+    title: "Foundations",
+    summary: "Primitive palette scales and the semantic roles every layer consumes.",
+  },
+  {
+    id: "core",
+    title: "Core",
+    summary: "Domain-neutral primitives a consumer uses without translating game concepts.",
+  },
+  {
+    id: "status",
+    title: "Status",
+    summary: "The meter family: continuous, segmented, and pip shapes in both orientations, with a lagging damage trail.",
+  },
+  {
+    id: "technique",
+    title: "Technique",
+    summary: "Zero-raster technique proofs: generated surfaces, ornament, and displaced geometry from text assets.",
+  },
+];
+
 export const registry = {
   // The full theme roster. The validator cross-checks this against src/themes/*.
   themes: ALL_THEMES,
 
+  // The navigation roster. The validator requires every scenario to file
+  // under one of these and no roster section to be empty.
+  sections: SECTIONS,
+
   scenarios: [
     {
       id: "foundations-palette",
+      section: "foundations",
       layer: "foundations",
       title: "Primitive palette scales",
       summary:
@@ -69,6 +106,7 @@ export const registry = {
 
     {
       id: "foundations-semantic",
+      section: "foundations",
       layer: "foundations",
       title: "Semantic roles",
       summary: "These swatches change in place when the root theme attribute changes.",
@@ -105,6 +143,7 @@ export const registry = {
 
     {
       id: "core-panel",
+      section: "core",
       layer: "core",
       title: "Panel levels",
       summary:
@@ -132,6 +171,7 @@ export const registry = {
 
     {
       id: "core-button",
+      section: "core",
       layer: "core",
       title: "Button states",
       summary:
@@ -173,6 +213,7 @@ export const registry = {
 
     {
       id: "core-input",
+      section: "core",
       layer: "core",
       title: "Text input",
       summary: "Hover, focus, typed, and disabled inputs share one recipe set across themes.",
@@ -210,6 +251,7 @@ export const registry = {
 
     {
       id: "core-meter",
+      section: "status",
       layer: "core",
       title: "Meter",
       summary: "A track and fill whose value transitions on change, themed through semantic tokens.",
@@ -217,7 +259,7 @@ export const registry = {
       initialState: "The charge meter displays and exposes a value of 72 percent.",
       tokens: ["--gc-meter-track", "--gc-meter-fill", "--gc-meter-text"],
       themes: ALL_THEMES,
-      viewports: [DESKTOP],
+      viewports: [DESKTOP, COMPACT],
       config: {
         samples: [{ label: "Charge", variant: "charge", value: 72, display: "72%" }],
       },
@@ -232,7 +274,170 @@ export const registry = {
     },
 
     {
+      id: "core-meter-segmented",
+      section: "status",
+      layer: "core",
+      title: "Segmented meter",
+      summary:
+        "The fill quantizes to whole segments; the gaps are painted by the track, never emitted as markup.",
+      specimen: "meter",
+      initialState:
+        "The segmented meter displays 63 percent with five of eight segments filled.",
+      tokens: [
+        "--gc-meter-track",
+        "--gc-meter-fill",
+        "--gc-meter-text",
+      ],
+      themes: ALL_THEMES,
+      viewports: [DESKTOP, COMPACT],
+      config: {
+        samples: [
+          {
+            label: "Shield",
+            variant: "shield",
+            value: 63,
+            display: "63%",
+            shape: "segmented",
+            count: "var(--gc-meter-segments)",
+          },
+        ],
+      },
+      interactions: [
+        { name: "drain", action: "set-value", target: '.gc-meter[data-variant="shield"]', value: "25" },
+        { name: "empty", action: "set-value", target: '.gc-meter[data-variant="shield"]', value: "0" },
+        { name: "fill", action: "set-value", target: '.gc-meter[data-variant="shield"]', value: "100" },
+      ],
+      checkpoints: [
+        { name: "resting", after: [] },
+        { name: "drained", after: ["drain"] },
+        { name: "emptied", after: ["empty"] },
+        { name: "filled", after: ["fill"] },
+      ],
+      dependsOn: [],
+    },
+
+    {
+      id: "core-meter-pips",
+      section: "status",
+      layer: "core",
+      title: "Pip meter",
+      summary:
+        "Discrete units each read filled or empty; the pip count flows from a token through one custom property.",
+      specimen: "meter",
+      initialState: "The pip meter displays 70 percent with seven of ten pips filled.",
+      tokens: [
+        "--gc-meter-track",
+        "--gc-meter-fill",
+        "--gc-meter-text",
+      ],
+      themes: ALL_THEMES,
+      viewports: [DESKTOP, COMPACT],
+      config: {
+        samples: [
+          {
+            label: "Charges",
+            variant: "charges",
+            value: 70,
+            display: "70%",
+            shape: "pips",
+            count: "var(--gc-meter-pips)",
+          },
+        ],
+      },
+      interactions: [
+        { name: "drain", action: "set-value", target: '.gc-meter[data-variant="charges"]', value: "30" },
+        { name: "empty", action: "set-value", target: '.gc-meter[data-variant="charges"]', value: "0" },
+        { name: "fill", action: "set-value", target: '.gc-meter[data-variant="charges"]', value: "100" },
+      ],
+      checkpoints: [
+        { name: "resting", after: [] },
+        { name: "drained", after: ["drain"] },
+        { name: "emptied", after: ["empty"] },
+        { name: "filled", after: ["fill"] },
+      ],
+      dependsOn: [],
+    },
+
+    {
+      id: "core-meter-vertical",
+      section: "status",
+      layer: "core",
+      title: "Vertical meters",
+      summary:
+        "The same shapes render bottom-anchored in vertical orientation from unchanged value channels.",
+      specimen: "meter",
+      initialState:
+        "Vertical meters display velocity 64, heat 50, and cells 40 percent at rest.",
+      tokens: [
+        "--gc-meter-track",
+        "--gc-meter-fill",
+        "--gc-meter-text",
+      ],
+      themes: ALL_THEMES,
+      viewports: [DESKTOP, COMPACT],
+      config: {
+        samples: [
+          { label: "Velocity", variant: "velocity", value: 64, display: "64%", orientation: "vertical" },
+          {
+            label: "Heat",
+            variant: "heat",
+            value: 50,
+            display: "50%",
+            orientation: "vertical",
+            shape: "segmented",
+            count: "var(--gc-meter-segments)",
+          },
+          {
+            label: "Cells",
+            variant: "cells",
+            value: 40,
+            display: "40%",
+            orientation: "vertical",
+            shape: "pips",
+            count: "var(--gc-meter-pips)",
+          },
+        ],
+      },
+      interactions: [
+        { name: "drain", action: "set-value", target: '.gc-meter[data-variant="velocity"]', value: "22" },
+      ],
+      checkpoints: [
+        { name: "resting", after: [] },
+        { name: "drained", after: ["drain"] },
+      ],
+      dependsOn: [],
+    },
+
+    {
+      id: "core-meter-damage",
+      section: "status",
+      layer: "core",
+      title: "Damage trail",
+      summary:
+        "A secondary band holds the previous value behind the fill, reading as recent loss while the fill moves first.",
+      specimen: "meter",
+      initialState: "The hull meter reads 80 percent with no damage trail visible.",
+      tokens: ["--gc-meter-track", "--gc-meter-fill", "--gc-meter-text", "--gc-meter-trail"],
+      themes: ALL_THEMES,
+      viewports: [DESKTOP, COMPACT],
+      config: {
+        samples: [{ label: "Hull", variant: "hull", value: 80, display: "80%", trail: 80 }],
+      },
+      interactions: [
+        { name: "hit", action: "set-value", target: '.gc-meter[data-variant="hull"]', value: "38" },
+        { name: "repair", action: "set-value", target: '.gc-meter[data-variant="hull"]', value: "91" },
+      ],
+      checkpoints: [
+        { name: "resting", after: [] },
+        { name: "damaged", after: ["hit"] },
+        { name: "repaired", after: ["repair"] },
+      ],
+      dependsOn: [],
+    },
+
+    {
       id: "core-spike",
+      section: "technique",
       layer: "core",
       title: "Dark-fantasy zero-raster spike",
       summary:

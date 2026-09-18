@@ -15,6 +15,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { specimenRoot } from "../app/render.js";
+import { SPECIMEN_TYPES } from "../app/specimens.js";
 import { registry } from "../registry/scenarios.js";
 import { validateRegistry } from "../registry/schema.js";
 
@@ -29,6 +30,7 @@ function validScenario(id) {
     id,
     layer: "core",
     title: `Scenario ${id}`,
+    section: "core",
     specimen: "panel",
     initialState: "A panel is visible in its resting state.",
     tokens: ["--gc-test-token"],
@@ -41,7 +43,14 @@ function validScenario(id) {
 }
 
 function validRegistry(scenarios = [validScenario("one")]) {
-  return { themes: ["modern"], scenarios };
+  return {
+    themes: ["modern"],
+    sections: [
+      { id: "core", title: "Core", summary: "Core primitives." },
+      { id: "extra", title: "Extra", summary: "Another section." },
+    ],
+    scenarios,
+  };
 }
 
 function installDocumentStandIn() {
@@ -125,6 +134,45 @@ test("an unknown specimen produces a validation error", () => {
   assert.match(errors.join("\n"), /unknown specimen "not-a-specimen"/);
 });
 
+test("a scenario naming a section off the roster is rejected", () => {
+  const scenario = { ...validScenario("stray-section"), section: "not-a-section" };
+  const errors = validateRegistry(validRegistry([scenario]), CONTRACT);
+
+  assert.match(errors.join("\n"), /names unknown section "not-a-section"/);
+});
+
+test("a scenario missing its section is rejected", () => {
+  const scenario = validScenario("missing-section");
+  delete scenario.section;
+  const errors = validateRegistry(validRegistry([scenario]), CONTRACT);
+
+  assert.match(errors.join("\n"), /missing section/);
+});
+
+test("a roster section with no scenarios is rejected", () => {
+  const registryFixture = validRegistry([validScenario("one")]);
+  const extra = registryFixture.sections.find((s) => s.id === "extra");
+  assert.ok(extra, "fixture carries an unused roster section");
+  const errors = validateRegistry(registryFixture, CONTRACT);
+
+  assert.match(errors.join("\n"), /section "extra" has no scenarios/);
+});
+
+test("the real registry files every scenario under a nonempty roster section", () => {
+  const errors = validateRegistry(registry, {
+    tokens: registry.scenarios.flatMap((s) => s.tokens),
+    themes: registry.themes,
+    layers: ["foundations", "core", "modules", "consumers"],
+  });
+  assert.deepEqual(errors.filter((e) => e.includes("section")), []);
+
+  const counts = new Map();
+  for (const s of registry.scenarios) counts.set(s.section, (counts.get(s.section) || 0) + 1);
+  for (const section of registry.sections) {
+    assert.ok(counts.get(section.id) > 0, `section ${section.id} must not be empty`);
+  }
+});
+
 test("a checkpoint after value must be an array", () => {
   const scenario = {
     ...validScenario("wrong-after"),
@@ -144,19 +192,36 @@ test("initialState is required", () => {
 });
 
 test("all registered scenarios declare a nonempty initialState", () => {
-  assert.equal(registry.scenarios.length, 7);
+  assert.equal(registry.scenarios.length, 11);
   for (const scenario of registry.scenarios) {
     assert.equal(typeof scenario.initialState, "string", scenario.id);
     assert.match(scenario.initialState, /\S/, scenario.id);
   }
 });
 
-test("the renderer throws on an unknown specimen", () => {
+test("every scenario declares a specimen inside the seven-value vocabulary", () => {
+  assert.equal(SPECIMEN_TYPES.length, 7);
+  const vocabulary = new Set(SPECIMEN_TYPES);
+  for (const scenario of registry.scenarios) {
+    assert.ok(vocabulary.has(scenario.specimen), `${scenario.id} names "${scenario.specimen}"`);
+  }
+});
+
+test("the renderer throws on an unknown specimen and enumerates the supported types", () => {
   const restoreDocument = installDocumentStandIn();
   try {
     assert.throws(
       () => specimenRoot({ specimen: "not-a-specimen", config: {} }),
-      /Unknown specimen "not-a-specimen"/,
+      (error) => {
+        assert.match(error.message, /Unknown specimen "not-a-specimen"/);
+        for (const type of SPECIMEN_TYPES) {
+          assert.ok(
+            error.message.includes(type),
+            `the error message must enumerate "${type}"`,
+          );
+        }
+        return true;
+      },
     );
   } finally {
     restoreDocument();

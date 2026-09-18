@@ -4,9 +4,92 @@
   }
 
   body {
+    display: grid;
+    grid-template-columns: 16rem minmax(0, 1fr);
+    align-items: start;
     background-image:
       radial-gradient(circle at 10% 0%, color-mix(in oklch, var(--gc-accent) 10%, transparent), transparent 34rem),
       linear-gradient(var(--gc-surface-canvas), var(--gc-surface-canvas));
+  }
+
+  /* Reference chrome only: navigation is the application's, never a
+     framework component, so it carries .reference-nav and no .gc- class. */
+  .reference-nav {
+    position: sticky;
+    top: 0;
+    display: grid;
+    gap: var(--gc-space-2);
+    align-content: start;
+    max-block-size: 100vh;
+    padding: var(--gc-space-5) var(--gc-space-4);
+    border-inline-end: var(--gc-border-width) solid var(--gc-border-default);
+    background: color-mix(in oklch, var(--gc-surface-raised) 88%, transparent);
+    overflow-y: auto;
+  }
+
+  .reference-nav__home,
+  .reference-nav__section-link,
+  .reference-nav__item-link,
+  .section-card-link {
+    color: var(--gc-text-secondary);
+    text-decoration: none;
+  }
+
+  .reference-nav__home,
+  .reference-nav__section-link {
+    display: block;
+    padding: var(--gc-space-2) var(--gc-space-3);
+    border-radius: var(--gc-radius-control);
+    font-size: var(--gc-type-label-size);
+    font-weight: var(--gc-type-label-weight);
+    letter-spacing: var(--gc-type-label-tracking);
+  }
+
+  .reference-nav__home:hover,
+  .reference-nav__section-link:hover,
+  .reference-nav__item-link:hover,
+  .section-card-link:hover {
+    color: var(--gc-text-primary);
+    background: var(--gc-surface-interactive);
+  }
+
+  .reference-nav__home:focus-visible,
+  .reference-nav__section-link:focus-visible,
+  .reference-nav__item-link:focus-visible,
+  .section-card-link:focus-visible {
+    outline: var(--gc-focus-width) solid var(--gc-focus-ring);
+    outline-offset: var(--gc-focus-offset);
+  }
+
+  .reference-nav__home[aria-current="page"],
+  .reference-nav__section-link[aria-current="page"] {
+    color: var(--gc-on-accent);
+    background: var(--gc-control-fill-selected);
+  }
+
+  .reference-nav__branch {
+    display: grid;
+    gap: var(--gc-space-1);
+  }
+
+  .reference-nav__items {
+    display: none;
+    margin: 0;
+    padding: 0;
+    padding-inline-start: var(--gc-space-5);
+    list-style: none;
+  }
+
+  .reference-nav__branch[data-active="true"] .reference-nav__items {
+    display: grid;
+    gap: var(--gc-space-1);
+  }
+
+  .reference-nav__item-link {
+    display: block;
+    padding: var(--gc-space-1) var(--gc-space-2);
+    border-radius: var(--gc-radius-control);
+    font-size: var(--gc-type-caption-size);
   }
 
   .reference-shell {
@@ -61,6 +144,43 @@
   .reference-section {
     display: grid;
     gap: var(--gc-space-4);
+  }
+
+  .reference-view-head {
+    display: grid;
+    gap: var(--gc-space-2);
+  }
+
+  .section-index-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: var(--gc-space-3);
+  }
+
+  .section-card {
+    display: grid;
+    gap: var(--gc-space-2);
+    align-content: start;
+    padding: var(--gc-space-4);
+    border: var(--gc-border-width) solid var(--gc-border-default);
+    border-radius: var(--gc-radius-panel);
+    background: var(--gc-surface-raised);
+    box-shadow: var(--gc-elevation-low);
+  }
+
+  .section-card h3 {
+    font-family: var(--gc-font-display);
+    font-size: var(--gc-type-title-size);
+  }
+
+  .section-card-count {
+    color: var(--gc-text-muted);
+    font-family: var(--gc-font-code);
+    font-size: var(--gc-type-caption-size);
+  }
+
+  .section-card-link {
+    font-size: var(--gc-type-label-size);
   }
 
   .scenario-head {
@@ -121,8 +241,23 @@
 
   .meter-label {
     display: flex;
+    gap: var(--gc-space-2);
     justify-content: space-between;
     color: var(--gc-meter-text);
+  }
+
+  /* Vertical meter samples read side by side; horizontal samples keep the
+     stacked default. The selector keys off the rendered orientation, so no
+     scenario id or sample list lives here. */
+  .proof-card:has(.gc-meter[data-orientation="vertical"]) {
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    align-items: start;
+  }
+
+  .proof-card:has(.gc-meter[data-orientation="vertical"]) > div {
+    display: grid;
+    gap: var(--gc-space-3);
+    justify-items: start;
   }
 
   .metrics-grid {
@@ -205,7 +340,19 @@
     color: var(--gc-text-secondary);
   }
 
-  @media (max-width: 42rem) {
+  @media (max-width: 48rem) {
+    body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .reference-nav {
+      position: static;
+      max-block-size: none;
+      overflow-y: visible;
+      border-inline-end: 0;
+      border-block-end: var(--gc-border-width) solid var(--gc-border-default);
+    }
+
     .theme-status {
       inline-size: 100%;
       margin-inline-start: 0;

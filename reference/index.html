@@ -11,31 +11,46 @@
     <script type="module" src="reference.js"></script>
   </head>
   <body>
+    <!-- Built from the registry's section roster; no section or scenario is hand-authored here. -->
+    <nav class="reference-nav" id="reference-nav" aria-label="Sections"></nav>
     <main class="reference-shell">
       <header class="reference-header">
         <h1 class="reference-title">Game UI Conformance Surface</h1>
         <p class="reference-lede">
           One scenario registry drives this page, the Playwright runner, the
-          dependency auditor, and the computed metrics. Every specimen below is
+          dependency auditor, and the computed metrics. Every specimen is
           rendered from that single declaration; none is hand-authored here.
         </p>
         <nav class="theme-toolbar" aria-label="Theme selection" id="theme-toolbar"></nav>
       </header>
 
-      <!-- Computed at build time by harness/metrics; populated by reference.js. -->
-      <section class="reference-section" id="metrics" aria-labelledby="metrics-heading" hidden>
-        <h2 class="section-heading" id="metrics-heading">Computed metrics</h2>
-        <div class="metrics-grid" id="metrics-grid"></div>
-      </section>
+      <!-- Landing view: the registry's section roster as cards, plus the
+           computed metrics and dependency auditor. -->
+      <div class="reference-view" id="view-landing">
+        <section class="reference-section" id="section-index" aria-labelledby="section-index-heading" hidden>
+          <h2 class="section-heading" id="section-index-heading">Sections</h2>
+          <div class="section-index-grid" id="section-index-grid"></div>
+        </section>
 
-      <!-- Dependency auditor result; populated by reference.js. -->
-      <section class="reference-section" id="auditor" aria-labelledby="auditor-heading" hidden>
-        <h2 class="section-heading" id="auditor-heading">Dependency audit</h2>
-        <div id="auditor-body"></div>
-      </section>
+        <!-- Computed at build time by harness/metrics; populated by reference.js. -->
+        <section class="reference-section" id="metrics" aria-labelledby="metrics-heading" hidden>
+          <h2 class="section-heading" id="metrics-heading">Computed metrics</h2>
+          <div class="metrics-grid" id="metrics-grid"></div>
+        </section>
 
-      <!-- Every registry scenario renders here; no per-scenario markup lives in this file. -->
-      <div id="scenarios"></div>
+        <!-- Dependency auditor result; populated by reference.js. -->
+        <section class="reference-section" id="auditor" aria-labelledby="auditor-heading" hidden>
+          <h2 class="section-heading" id="auditor-heading">Dependency audit</h2>
+          <div id="auditor-body"></div>
+        </section>
+      </div>
+
+      <!-- Section view: the scenarios the registry files under the active
+           section render here; nothing is hand-authored in this file. -->
+      <div class="reference-view" id="view-section" hidden>
+        <header class="reference-view-head" id="section-view-head"></header>
+        <div id="scenarios"></div>
+      </div>
     </main>
   </body>
 </html>

@@ -3,8 +3,8 @@
 title: "Core Source"
 description: "Domain-neutral framework primitives and shared base behavior"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-05"
-version: "1.1"
+date: "2026-08-25"
+version: "1.2"
 status: "Active"
 tags:
   - type: directory-readme
@@ -40,18 +40,23 @@ core/
 | File | Description | Status |
 |------|-------------|--------|
 | [base.css](base.css) | Layered base rules and core defaults | Active |
-| [components.css](components.css) | Button, panel, input, meter, and zero-raster spike styles | Active |
+| [components.css](components.css) | Button, panel, input, the meter family, and zero-raster spike styles | Active |
 
 ---
 
 ## 3. Registered core primitives
 
 `components.css` publishes `.gc-panel`, `.gc-button`, `.gc-input`, and `.gc-meter`
-plus the `.gc-spike` zero-raster specimen. They are registered scenarios in the
-conformance harness (`harness/registry/scenarios.js`), so they carry declared
-layer membership, required tokens, theme and viewport coverage, scripted
-interactions, and named capture checkpoints. The reference application and the
-Playwright runner render and drive them from that single declaration.
+plus the `.gc-spike` zero-raster specimen. `.gc-meter` is a family: `data-shape`
+(`continuous`, `segmented`, `pips`) and `data-orientation` (`horizontal`,
+`vertical`) on the element, an optional `.gc-meter__trail` secondary band
+expressing recent loss, and unit counts carried by the token-valued
+`--gc-meter-count` channel rather than markup. Quantized geometry is pure CSS,
+so segmented and pip fills always land on whole units. They are registered
+scenarios in the conformance harness (`harness/registry/scenarios.js`), so they
+carry declared layer membership, required tokens, theme and viewport coverage,
+scripted interactions, and named capture checkpoints. The reference application
+and the Playwright runner render and drive them from that single declaration.
 
 Per `AGENTS.md`, a component without a registered scenario is incomplete
 regardless of whether it renders. These primitives were provisional and

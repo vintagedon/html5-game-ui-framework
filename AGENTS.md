@@ -3,8 +3,8 @@
 title: "Agent Instructions"
 description: "Repository identity, architectural constraints, documentation conventions, and spec execution pattern for html5-game-ui-framework"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-02"
-version: "1.2"
+date: "2026-09-14"
+version: "1.5"
 status: "Active"
 tags:
   - type: reference
@@ -13,6 +13,7 @@ tags:
 related_documents:
   - "[Project Charter](docs/project-charter.md)"
   - "[README](README.md)"
+  - "[Post-Amendment Review 2026-09-07](docs/post-amendment-review-2026-09-07.md)"
   - "[Tagging Strategy](docs/documentation-standards/tagging-strategy.md)"
 ---
 -->
@@ -46,10 +47,12 @@ The charter is authoritative. Where the one-pager and the charter disagree, the 
 
 These are non-negotiable. Each exists because violating it breaks something an agent cannot see from inside a single task.
 
-- **Never regenerate golden images.** Golden approval is an operator action, with the same posture as pushes and merges. An agent that breaks a golden and regenerates it has deleted a failing test, and a regenerated capture looks like work product rather than like a deletion. When a golden fails, stop and surface the diff.
+- **Baselines record automatically; agents never rewrite them.** A capture case with no recorded baseline records one automatically. An agent never modifies or deletes a baseline that exists: a capture that disagrees with its baseline is a failure to surface, never a file to refresh, because a regenerated capture looks like work product rather than like a deletion. Accepting a changed render is an operator action performed by deleting the baseline PNG and its manifest entry, which appears in the diff as a deletion. When a comparison fails, stop and surface the diff.
+- **Only canonical capture may establish a baseline, and run output never resolves onto a curated location.** Establishing is the sole approved-tree write any run performs, and only the fixed, unfiltered `npm run capture` path may finalize it, after the complete Playwright child and post-run metrics succeed. Direct, file-filtered, and `--grep` runs never establish. Everything else a run writes, candidates and reports alike, goes to a destination the caller cannot alias onto a curated tree: approved baselines, sealed evidence under `work-logs/evidence/`, or any other tracked, operator-owned location. Promotion into a curated tree happens only through explicit finalization, never as a side effect of a comparison or a report. An agent that finds a way to write into a curated tree from a routine run has found a defect to surface, not a path to use. The full mechanism is in [harness/goldens/README.md](harness/goldens/README.md). **This constraint is declared ahead of its enforcement:** the compare path does not yet satisfy it, tracked as PA-001 in the [post-amendment review](docs/post-amendment-review-2026-09-07.md). Repairing it by rejecting symlinks alone is insufficient and has been reproduced as such.
 - **No raster assets in the framework or its themes.** Texture, ornament, and frames are produced with CSS and inline SVG. The framework raster count is a published metric and its correct value is zero.
 - **No module may depend on another module.** Modules compose core primitives. A primitive that two modules both need is promoted to core, never shared sideways.
 - **Frozen token names are API.** Renaming a semantic token is a major version. Values stay tunable until v1.0; the vocabulary does not. No hue-named tokens (`pink`), no domain-named tokens (`mana`, `hp`, `xp`).
+- **Game UI has one 1080p, 16:9 layout.** Follow [charter section 4.1.1](docs/project-charter.md#411-game-display-contract) for supported presentation targets and browser-window fitting. This contract is adopted ahead of runtime enforcement; read the [display contract review and migration handoff](docs/display-contract-review-2026-09-14.md) before stage or viewport work.
 - **Harvest requirements and technique, never source.** Reference packs under `reference-files-*` may be read to learn what a component must do and how an effect is achieved. Their rule blocks, markup, and files are never copied into this repository. Their licences prohibit redistribution as a component library, and this repository is exactly that. A pack with no local licence file records that no terms were in the archive, not that it is restricted; because nothing from a pack is redistributed, a missing terms file never gates derived-technique work. A pack whose terms forbid derived products is the one exception and is studied for nothing.
 - **A component without a registered scenario is incomplete.** Scenario registration ships in the same change as the component, not afterward.
 

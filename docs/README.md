@@ -3,8 +3,8 @@
 title: "Documentation"
 description: "Project documentation, standards, and reference materials"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-05"
-version: "1.5"
+date: "2026-09-14"
+version: "1.9"
 status: "Active"
 tags:
   - type: directory-readme
@@ -19,9 +19,13 @@ related_documents:
 
 Project documentation. The project charter holds frozen scope, architecture,
 and acceptance criteria. The token and cascade references describe the frozen
-foundations contract. The foundations review records the approved Phase 1
-decisions, and the harness review holds the current operator decision surface.
-The `documentation-standards/` subdirectory governs repository documentation.
+foundations contract. The foundations and harness reviews record their approved
+decisions. The status-family review records all seven dispositions that close
+ladder rung 1, and the post-amendment review carries the five inherited
+defects that independent verification of the rung 1 amendment surfaced. The
+`documentation-standards/` subdirectory governs repository documentation.
+The display contract review records the 1080p-based 16:9 decision, its
+implementation handoff, and the current PR review state.
 
 ---
 
@@ -44,13 +48,16 @@ docs/
 │   ├── script-header-powershell.md
 │   └── README.md
 ├── cascade-and-overrides.md         # Layer precedence and consumer override contract
+├── display-contract-review-2026-09-14.md # Display decision, current review, migration handoff
 ├── foundations-review-2026-08-02.md  # Closed Phase 1 decisions
-├── harness-review-2026-08-05.md     # H-001 through H-006 decisions
+├── harness-review-2026-08-05.md     # Recorded H-001 through H-006 decisions
+├── post-amendment-review-2026-09-07.md # Five inherited defects surfaced post-A2
 ├── project-charter.md              # Frozen scope, architecture, acceptance criteria
 ├── reference-corpus/               # UI pack catalog and capability map (public-derived)
 │   ├── ui-pack-inventory.json
 │   ├── ui-pack-capability-map.md
 │   └── README.md
+├── status-family-review-2026-08-18.md # Reviewed rung 1: meter family, navigation, baselines
 ├── token-reference.md              # Frozen semantic vocabulary and tier boundaries
 └── README.md                       # This file
 ```
@@ -63,8 +70,11 @@ docs/
 |------|-------------|--------|
 | [cascade-and-overrides.md](cascade-and-overrides.md) | Cascade order, zero-specificity defaults, and important-layer reversal | Active |
 | [foundations-review-2026-08-02.md](foundations-review-2026-08-02.md) | Closed approval questions for Phase 1 foundations and the spike | Approved |
-| [harness-review-2026-08-05.md](harness-review-2026-08-05.md) | Evidence and yes-or-no questions for the harness operator review | Under Review |
+| [harness-review-2026-08-05.md](harness-review-2026-08-05.md) | Recorded operator decisions for the Phase 2 harness | Active |
+| [post-amendment-review-2026-09-07.md](post-amendment-review-2026-09-07.md) | Five inherited defects (PA-001 to PA-005) surfaced by independent verification of the rung 1 amendment | Open |
+| [display-contract-review-2026-09-14.md](display-contract-review-2026-09-14.md) | Adopted display contract, implementation gaps, and pending PR work | Active |
 | [project-charter.md](project-charter.md) | Frozen scope, architecture, roadmap, and acceptance criteria | Active |
+| [status-family-review-2026-08-18.md](status-family-review-2026-08-18.md) | Reviewed ladder rung 1 with seven recorded dispositions | Active |
 | [token-reference.md](token-reference.md) | Three-tier contract and frozen semantic vocabulary | Active |
 
 ---

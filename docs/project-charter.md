@@ -4,12 +4,12 @@ schema: fixed-address-doc-v1
 document_type: project-charter
 status: Active
 owner: "VintageDon"
-updated: 2026-08-02
+updated: 2026-09-15
 title: "html5-game-ui-framework Project Charter"
 description: "Frozen scope, architecture, and acceptance criteria for a renderer-agnostic browser game UI framework"
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-07-25"
-version: "1.5"
+version: "1.7"
 tags:
   - type: charter
   - domain: foundations
@@ -47,7 +47,7 @@ The framework itself is never deployed. Its reference application is served as a
 - A reference application driven by a machine-readable scenario registry
 - A Playwright scenario runner with golden image comparison against approved captures
 - A computed metrics block rendered from the repository rather than hand-entered
-- The canvas host contract: DOM chrome composed over a canvas playfield
+- The game stage contract: one 1920x1080 logical layout, uniformly scaled to the three supported 16:9 presentation targets (section 4.1.1), with DOM chrome composed over a renderer-owned playfield
 - Rogue Cellar Starter as the first integration target, held locally and never published
 
 **In scope (v2/future):**
@@ -63,6 +63,7 @@ The framework itself is never deployed. Its reference application is served as a
 - Commercial distribution of any kind, including itch.io listings, marketplace bundles, and paid licensing
 - `file://` operation. Games built on this framework ship over https, so the framework does not carry the constraints `file://` support imposes on Playwright configuration, bundle targets, and font delivery.
 - Cross-browser pixel goldens. Font rasterization makes cross-platform pixel equality an expensive false target.
+- Separate game layouts for mobile, portrait, ultrawide, 720p, or other resolutions and aspect ratios. Non-matching browser windows fit the same logical stage as defined in section 4.1.1.
 - Redistribution of any harvested reference pack, in whole or in minimally modified form
 
 **Critical constraint: agents never regenerate golden images.** Golden approval is an operator action carrying the same posture as pushes and merges. An agent that breaks a golden and regenerates it has deleted a failing test, and a regenerated capture looks like work product rather than like a deletion.
@@ -96,6 +97,7 @@ A demonstrated methodology: specification-driven agent execution against a confo
 - Component rules are wrapped in `:where()` so consumer overrides need no specificity escalation
 - Four themes render the same markup with no change to stylesheet topology
 - Interactive state derives from base tokens via `color-mix()` rather than being enumerated per theme
+- Game UI uses the fixed logical stage and supported presentation targets in section 4.1.1; typography, spacing, and component geometry scale together without resolution-dependent reflow
 
 **Harness:**
 
@@ -116,7 +118,9 @@ A demonstrated methodology: specification-driven agent execution against a confo
 **Consumer integration:**
 
 - Rogue Cellar Starter runs with `src/app.js` and `styles.css` replaced by framework composition, with `simulation.js`, `renderer.js`, and `input.js` unmodified
-- The canvas host sizes the playfield correctly at multiple aspect ratios and viewport widths
+- The game stage presents the same layout at 1920x1080, 2560x1440, and 3840x2160, at scale factors 1, 4/3, and 2 respectively
+- At those targets, visible content and controls fit their stage regions, enabled controls receive real pointer and keyboard input, and scaling preserves geometry; a clipped base layout fails even when its scaling is uniform
+- Non-matching browser windows preserve the complete 16:9 stage through uniform fit and centered letterboxing; they do not introduce another game layout
 - Its integration is registered as scenarios with a fixed seed and scripted input
 
 ---
@@ -132,7 +136,8 @@ DOM and CSS, ESM JavaScript, inline SVG for iconography and generated texture. N
 | Decision | Value | Reason |
 |----------|-------|--------|
 | Token prefix | `--gc-` | Continuous with the predecessor, so harvested rules port without renaming. Short enough to read inline. |
-| Browser floor | Chrome and Edge 111, Safari 16.4, Firefox 128 | The binding features are `color-mix()` (Chrome 111), `@property` (Safari 16.4, Firefox 128), and `oklch()`. `@layer`, `:where()`, container queries, `backdrop-filter`, and SVG filters all clear that floor. No fallbacks are written for anything below it. |
+| Game display | One 1920x1080 logical stage; supported presentation targets 1920x1080, 2560x1440, and 3840x2160, all 16:9. See section 4.1.1. | Author and validate one layout; uniform scaling preserves the composition across the supported set. |
+| Browser floor | Chrome and Edge 125, Safari 16.4, Firefox 128 | The binding features are `color-mix()` (Chrome 111), `round()` (Chrome and Edge 125), `@property` (Safari 16.4, Firefox 128), and `oklch()`. `@layer`, `:where()`, container queries, `backdrop-filter`, and SVG filters all clear that floor. No fallbacks are written for anything below it. The harness floor manifest and check under `harness/floor/` verify the manifest agrees with this row and that each declared feature form appears as a substring in published source with requirements the floor clears; argument-form assumptions such as same-type `round()` arguments are operator-reviewed declarations, not machine-verified. |
 | Colour mixing space | OKLCH | Lightness is perceptually uniform, so one state-derivation recipe behaves the same against a near-black arcade base and a warm parchment fantasy base. sRGB mixing desaturates through grey and would need per-theme correction, which is exactly what `color-mix()` exists to avoid. |
 | Theme selector | `<html data-gc-theme="modern">` | Matches the token prefix. One attribute, no reload, no stylesheet swap. |
 | Icon geometry | Two families. **Chrome and input prompts** (Core): 24 by 24 viewBox, stroke-based, 2-unit stroke, round caps and joins, `stroke="currentColor"`, no fill except explicit optical corrections, 2-unit safe area. **Content** (shipped with the module that needs it): canonical 32 by 32 viewBox, filled silhouette, up to three local slots (`base`, `accent`, `rim`) bound to semantic or component tokens at the use site, no literal colours, geometry unchanged across themes. | Chrome icons sit inside buttons beside text, so inheriting text colour is correct and a second tone at 24 pixels reads as mud. Content icons carry per-theme recolouring through their three slots. No icon fonts, which are monochrome-only and cannot do either. |
@@ -144,6 +149,28 @@ Exact values (spacing, colour, shadow, motion timing) remain tunable. The decisi
 Themes are self-hosted; web fonts, when used, are self-hosted OFL or Apache faces counted in the byte budget rather than loaded from a CDN.
 
 Development follows a spec-driven pattern. Specs are authored against this charter, executed by coding agents on branches, and reviewed and merged by the operator. Agents do not push. The reference application is the conformance surface: a spec's output is checked against it rather than against reviewer memory.
+
+### 4.1.1 Game Display Contract
+
+**Operator decision, 2026-09-14.** Design game UI at **1920x1080 logical CSS pixels**, with a fixed **16:9** aspect ratio. This replaces the earlier consumer criterion requiring multiple aspect ratios. A 1440p mockup must be normalized to the 1080p coordinate system before implementation; it does not define a second layout.
+
+| Supported content viewport | Uniform scale |
+|----------------------------|---------------|
+| 1920x1080 (1080p) | 1 |
+| 2560x1440 (1440p) | 4/3 |
+| 3840x2160 (2160p) | 2 |
+
+The dimensions describe the available browser content area in CSS pixels, not the monitor's advertised resolution. Device pixel ratio affects renderer backing-store sharpness, not the logical UI dimensions or the choice of layout. Consumer renderers retain ownership of their drawing resolution.
+
+For an available host of width `W` and height `H`, use `s = min(W / 1920, H / 1080)`. Center the displayed `1920s` by `1080s` stage in the host; unused space forms letterbox or pillarbox bars. Intermediate sizes and smaller windows use the same fit operation, including fractional downscaling, without adding supported layout targets. Never stretch the axes independently or crop the stage to fill a window. Scale is continuous, not snapped to three values; the three resolutions are the required acceptance targets. The logical stage stays fixed even when its displayed size is smaller than 1080p.
+
+All game chrome, text, controls, and overlays share that coordinate system. Width-, height-, and orientation-based layout breakpoints do not rearrange the game. Internal percentages resolve against stage regions; raw viewport units such as `vw` and `vh` must not drive stage-internal geometry or typography. The outer fit host may measure the browser window. Consumer composition determines the internal playfield, rail, and panel split within the stage; this contract does not impose a universal 78/22 split or a 16:9 aspect ratio on each internal panel.
+
+Content must fit its authored 1080p region, with intentional internal scrolling where a surface needs it. Uniform scaling cannot repair overflow already present at the base size. DOM input must remain aligned with displayed controls; canvas or engine input adapters account for the stage offset and scale in their own integration boundary.
+
+The reference application's navigation, documentation, and metrics are ordinary browser tooling. Game specimens and consumer compositions use the stage contract; the surrounding documentation may remain scrollable. Game conformance covers the three presentation targets. A bounded host-fit check may verify centering and letterboxing without creating a portrait, mobile, or sub-1080p layout matrix.
+
+**Implementation status:** the requirement is adopted ahead of runtime enforcement. The current source has no shared stage host, and the registry still records legacy 1280x800 and 480x900 specimens. The [display contract review](display-contract-review-2026-09-14.md) identifies the implementation and baseline transition. Existing consumer pins remain in force; active games adopt through their own migration units or later backport decisions.
 
 ### 4.2 Architecture
 
@@ -204,6 +231,7 @@ The reference application renders all four layers from the scenario registry. La
 - Core primitives and modules built only as that integration forces them
 - Each registered as a tested scenario as it lands
 - Canvas host contract formalized against a real playfield
+- Shared 1080p stage fit implemented and verified before new game compositions depend on it, with the legacy capture matrix transitioned through the baseline approval process
 
 **Phase 4: Breadth**
 
@@ -255,7 +283,7 @@ Theme and component additions carry their scenario registration in the same chan
 |-------|-------|
 | Author | VintageDon |
 | Created | 2026-07-25 |
-| Version | 1.5 |
+| Version | 1.6 |
 | Status | Active |
 | Repository | https://github.com/vintagedon/html5-game-ui-framework |
 
@@ -269,6 +297,10 @@ Theme and component additions carry their scenario registration in the same chan
 | `gameui-browser-gaming-framework` charter and README | Predecessor scope and shipped component inventory |
 
 ### Lineage
+
+On 2026-09-15, charter v1.7 raises the Chrome and Edge browser floor from 111 to 125, naming CSS `round()` as binding alongside `color-mix()`, `@property`, and `oklch()`; discrete meter quantization requires it, and no fallback is written below the floor. Safari 16.4 and Firefox 128 are unchanged; the `round()` expressions in published source use same-type percentage arguments, which Safari clears at 15.4, so mixed-type argument forms remain out of use and would be an operator decision if introduced. The declared floor and published source are now compared automatically by the floor manifest and check under `harness/floor/`.
+
+On 2026-09-14, charter v1.6 records the operator's 1080p-based 16:9 display decision and limits supported presentation targets to 1080p, 1440p, and 2160p. Section 4.1.1 supersedes the previous multiple-aspect-ratio consumer criterion. Runtime enforcement remains follow-up work; this amendment does not change the browser-floor decision or authorize baseline replacement.
 
 The project began as an itch.io commercial exercise and was reframed twice. The first reframe dropped commercial distribution, which removed the provenance and sellable-standard arguments for a ground-up rebuild and left only the predecessor's genuine technical debt. The second reframe dropped `file://` operation once Azure Static Web Apps became the deployment target, which removed a Playwright configuration, a classic bundle target, and a font delivery constraint that had each been built on top of the original storefront requirement.
 

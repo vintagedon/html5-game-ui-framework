@@ -3,8 +3,8 @@
 title: "Harness Unit Tests"
 description: "Node unit tests for pure conformance-harness logic"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-08-05"
-version: "1.5"
+date: "2026-09-01"
+version: "2.5"
 status: "Active"
 tags:
   - type: directory-readme
@@ -31,7 +31,7 @@ tests/
 ├── amendment4-evidence.test.js  # Historical screenshot discrimination
 ├── auditor.test.js              # Dependency rule and hard-gate behavior
 ├── color.test.js                # Published contrast fixtures and color resolution
-├── compare.test.js              # Approval-manifest and PNG comparison state machine
+├── compare.test.js              # Baseline comparison and transaction state machine
 ├── membership-freshness.test.js # Current-run membership guard
 ├── membership.test.js           # Rendered identity and coverage accounting
 ├── reference-corpus.test.js     # UI pack catalog schema and map derivation
@@ -52,7 +52,7 @@ tests/
 | [amendment4-evidence.test.js](amendment4-evidence.test.js) | PNG hash and pixel-difference evidence checks | Active |
 | [auditor.test.js](auditor.test.js) | Module dependency detection and hard-gate conversion | Active |
 | [color.test.js](color.test.js) | WCAG contrast and CSS color-resolution unit tests | Active |
-| [compare.test.js](compare.test.js) | Approval-manifest and PNG comparator unit tests | Active |
+| [compare.test.js](compare.test.js) | Baseline integrity, bounded-pipe authority, lexical/resolved output containment, explicit and fallback output-link refusal, reporter-extension refusal, scratch-only filtered-run refusal, atomic PNG and manifest recovery, SIGKILL stale-link cleanup, candidate symlink safety, and orphan recovery | Active |
 | [membership-freshness.test.js](membership-freshness.test.js) | Current Playwright-run membership guard | Active |
 | [membership.test.js](membership.test.js) | Rendered token identity, outline, coverage, and contextual-exemption tests | Active |
 | [reference-corpus.test.js](reference-corpus.test.js) | UI pack catalog schema, redaction, derivation bond, and fixture guards | Active |

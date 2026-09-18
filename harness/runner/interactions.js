@@ -23,6 +23,13 @@ export function applyMeterValue(meter, value) {
     throw new Error("meter state requires a fill and visible display");
   }
   const normalized = String(value);
+  const trail = meter.querySelector(".gc-meter__trail");
+  if (trail) {
+    const previous = meter.getAttribute("aria-valuenow");
+    if (previous != null && previous !== "") {
+      trail.style.setProperty("--gc-meter-trail-value", `${previous}%`);
+    }
+  }
   fill.style.setProperty("--gc-meter-value", `${normalized}%`);
   display.textContent = `${normalized}%`;
   meter.setAttribute("aria-valuenow", normalized);
