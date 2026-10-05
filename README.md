@@ -3,8 +3,8 @@
 title: "html5-game-ui-framework"
 description: "A renderer-agnostic browser game UI framework whose reference application is also its conformance surface"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-09-14"
-version: "0.7"
+date: "2026-10-04"
+version: "0.8"
 status: "Active"
 tags:
   - type: project-root
@@ -78,8 +78,8 @@ with its baseline fails and surfaces its diff.
 
 | Area | Status | Description |
 |------|--------|-------------|
-| Charter | ✅ Complete | v1.6 records the operator's 1080p-based 16:9 display contract |
-| Game display | ⬜ Implementation pending | One 1920x1080 layout, uniformly scaled to 1080p, 1440p, and 2160p; [contract and migration review](docs/display-contract-review-2026-09-14.md) |
+| Charter | ✅ Complete | v1.8 records WP as the next migration and owner of the game-local stage-fit proof under the 1080p display contract |
+| Game display | ⬜ Implementation pending | WP proves the game-local 1920x1080 stage fit; shared framework adoption follows a separate backport review. [Display contract](docs/project-charter.md#411-game-display-contract) |
 | Repository hydration | ✅ Complete | Public baseline initialized on `main` |
 | Foundations | ✅ Complete | The 83-token semantic vocabulary, cascade contract, state recipes, and four themes are approved |
 | Zero-raster spike | ✅ Complete | Four dark-fantasy techniques render with zero framework raster files; the position holds |
@@ -87,9 +87,10 @@ with its baseline fails and surfaces its diff.
 | Harness | ✅ Complete | Recorded-baseline regression suite over every case; decisions recorded in the harness review |
 | Core primitives | ✅ Complete | Rung 1 meter and status family reviewed with all seven dispositions recorded |
 | Rung 1 amendment | ✅ Complete | All seven dispositions implemented and independently verified; five inherited defects surfaced and recorded in the [post-amendment review](docs/post-amendment-review-2026-09-07.md) |
-| PR #3 review | ⏳ Open | Five PA dispositions remain pending; the September 8 Kilo review adds nine reported items. [Current review context](docs/display-contract-review-2026-09-14.md) |
+| PR #3 | ✅ Merged | [Meter-family PR #3](https://github.com/vintagedon/html5-game-ui-framework/pull/3) merged at `a678a2b` on September 18. The [September review context](docs/display-contract-review-2026-09-14.md) remains a historical record |
 | Modules | ⬜ Planned | Composed from core; no module-to-module dependency |
-| First consumer | ⬜ Planned | Rogue Cellar integration, UI layer only |
+| WP migration | ⬜ Next | WP PR #6 is merged; Milestone 05 consumes Core primitives and builds WP-local compositions on a reviewed pin held through its presentation follow-up. [Coordination contract](docs/project-charter.md#43-roadmap) |
+| Canvas validation | ⬜ Planned | Rogue Cellar integration, UI layer only; validates the renderer boundary a DOM game cannot prove |
 | Published demo | ⬜ Planned | One original game, after the framework is proven |
 
 ---
