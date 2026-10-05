@@ -4,12 +4,12 @@ schema: fixed-address-doc-v1
 document_type: project-charter
 status: Active
 owner: "VintageDon"
-updated: 2026-09-15
+updated: 2026-10-04
 title: "html5-game-ui-framework Project Charter"
 description: "Frozen scope, architecture, and acceptance criteria for a renderer-agnostic browser game UI framework"
 author: "VintageDon (https://github.com/vintagedon/)"
 date: "2026-07-25"
-version: "1.7"
+version: "1.8"
 tags:
   - type: charter
   - domain: foundations
@@ -48,13 +48,13 @@ The framework itself is never deployed. Its reference application is served as a
 - A Playwright scenario runner with golden image comparison against approved captures
 - A computed metrics block rendered from the repository rather than hand-entered
 - The game stage contract: one 1920x1080 logical layout, uniformly scaled to the three supported 16:9 presentation targets (section 4.1.1), with DOM chrome composed over a renderer-owned playfield
-- Rogue Cellar Starter as the first integration target, held locally and never published
+- Rogue Cellar Starter as the Canvas-integration validation target, held locally and never published
 
 **In scope (v2/future):**
 
 - Additional consumers beyond the first
 - One published demo game, an original built against the proven framework
-- A dialogue and visual-novel module, deferred until Within Parameters completes its current delivery sequence
+- A dialogue and visual-novel module (CAP-015), deferred until Within Parameters' presentation work, Milestone 05 and its follow-up unit, is accepted
 - A tier scale beyond the status family, evidenced by three independent card and inventory sources
 
 **Out of scope:**
@@ -225,19 +225,23 @@ The reference application renders all four layers from the scenario registry. La
 - Golden capture and comparison workflow
 - Computed metrics block
 
-**Phase 3: First consumer**
+**Phase 3: Rogue Cellar Canvas-integration validation**
 
 - Rogue Cellar integration, replacing its UI layer only
 - Core primitives and modules built only as that integration forces them
 - Each registered as a tested scenario as it lands
 - Canvas host contract formalized against a real playfield
-- Shared 1080p stage fit implemented and verified before new game compositions depend on it, with the legacy capture matrix transitioned through the baseline approval process
+- Within Parameters proves the section 4.1.1 stage-fit contract in its game-local implementation. The framework builds no competing implementation while WP proves it; shared-stage adoption follows a separate backport review after that implementation is accepted. The legacy framework capture matrix still transitions through its own baseline approval process
 
 **Phase 4: Breadth**
 
 - Additional consumers
-- Within Parameters migration, after its current delivery sequence completes
+- Within Parameters is the next migration, cleared by [WP PR #6](https://github.com/vintagedon/within-parameters-visual-novel/pull/6) (`ff9f442`) and executed by Milestone 05 (`spec/2026-09-28-wp-spec-01-framework-migration-and-stage-composition.md`)
 - One original published demo game
+
+WP migration proceeds independently of Rogue Cellar's Canvas-validation phase and does not wait for a shared framework stage host. WP consumes Core primitives and authors game-local settings, modal, card, and dialogue compositions; these claim no framework candidate and do not start CAP-015. Vector Vortex's consumer status and candidate ownership remain unchanged. Rogue Cellar retains the Canvas-integration proof that a DOM game cannot supply.
+
+At Milestone 05 startup, WP adopts a reviewed framework `main` pin containing `a678a2b`, with `src/` identical to that commit. It holds this pin through Milestone 05 and its presentation follow-up unless the operator authorizes a new reviewed pin. CAP-015 remains deferred until both presentation units are accepted.
 
 ---
 
@@ -268,9 +272,9 @@ Theme and component additions carry their scenario registration in the same chan
 | Dependency | Relationship | Type |
 |-----------|-------------|------|
 | `gameui-browser-gaming-framework` | Predecessor; harvest source for components, gallery, and Playwright baseline. Preserved at `/opt/agents/repos-archive/gameui-browser-gaming-framework/`, not merged. | Upstream |
-| `within-parameters-visual-novel` | Live consumer of the predecessor. Pinned to its vendored copy until its current delivery sequence completes. | Peer |
+| `within-parameters-visual-novel` | Live consumer of the predecessor and next migration through Milestone 05 after WP PR #6. Proves a game-local stage fit and consumes Core primitives with WP-local compositions. Adopts the reviewed main pin defined in section 4.3 and holds it through the presentation follow-up unless the operator authorizes a new reviewed pin. | Peer |
 | Reference packs (Template Foundry and others) | Requirements and technique reference. Gitignored, never redistributed. | External data |
-| Rogue Cellar Starter | First integration target. Held locally, never published. | External data |
+| Rogue Cellar Starter | Canvas-integration validation target. Held locally, never published. | External data |
 | ROT.js | Bundled by Rogue Cellar under BSD-3-Clause. Notice travels with any deploy. | Upstream |
 | ML01 nginx preview | Serves the reference application at `gameui.donfather.site`. The framework's only deploy. | Infrastructure |
 | `project-template-repository` | Scaffolding source for documentation standards and agent conventions. | Upstream |
@@ -283,7 +287,7 @@ Theme and component additions carry their scenario registration in the same chan
 |-------|-------|
 | Author | VintageDon |
 | Created | 2026-07-25 |
-| Version | 1.6 |
+| Version | 1.8 |
 | Status | Active |
 | Repository | https://github.com/vintagedon/html5-game-ui-framework |
 
@@ -297,6 +301,8 @@ Theme and component additions carry their scenario registration in the same chan
 | `gameui-browser-gaming-framework` charter and README | Predecessor scope and shipped component inventory |
 
 ### Lineage
+
+On 2026-10-04, charter v1.8 records the operator's September 28 coordination decision, confirmed October 4 after WP PR #6 merged: WP is the next migration and owns the game-local stage-fit proof; shared adoption awaits a separate backport review. Rogue Cellar retains Canvas validation, Vector Vortex retains its consumer status and candidate ownership, and CAP-015 waits for acceptance of WP Milestone 05 and its presentation follow-up. This revision changes scheduling and responsibility, preserves section 4.1.1's display contract, and updates both charter version fields together.
 
 On 2026-09-15, charter v1.7 raises the Chrome and Edge browser floor from 111 to 125, naming CSS `round()` as binding alongside `color-mix()`, `@property`, and `oklch()`; discrete meter quantization requires it, and no fallback is written below the floor. Safari 16.4 and Firefox 128 are unchanged; the `round()` expressions in published source use same-type percentage arguments, which Safari clears at 15.4, so mixed-type argument forms remain out of use and would be an operator decision if introduced. The declared floor and published source are now compared automatically by the floor manifest and check under `harness/floor/`.
 

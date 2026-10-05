@@ -3,8 +3,8 @@
 title: "UI Pack Capability Map"
 description: "Ranked operator review surface derived from the UI reference corpus catalog"
 author: "VintageDon (https://github.com/vintagedon/)"
-date: "2026-09-14"
-version: "1.2"
+date: "2026-10-04"
+version: "1.3"
 status: "Active"
 tags:
   - type: report
@@ -17,7 +17,7 @@ related_documents:
 ---
 -->
 
-<!-- catalog-digest: sha256:e88a590049b39f1f2c6c57163dbd635087ecfc9af6f9a2258e3123caae5313bc -->
+<!-- catalog-digest: sha256:2ecb0ebd2a0f9a445bbe81d74a41828d0502019255e455fde2a800c7d24d6aa2 -->
 <!-- derivation: every table row and count below traces to ui-pack-inventory.json; the test suite fails this document when the catalog changes without regeneration -->
 
 # UI Pack Capability Map
@@ -233,15 +233,17 @@ Labs study technique and vocabulary without claiming runtime module ownership.
 | GC-003 | Alchemy Deck Run | candidate | moderate | Card draw and play loop with animated card transitions on DOM or Canvas | Card frames with rarity tiers, hand fan, deck viewer, and reward selection | `card-system-pixel`, `gilded-grove-alchemy-card-pack`, `ui-rpg-cards` | Two specs: core card play, then deck UI polish | The tier vocabulary must freeze first, and card animation belongs to the consumer renderer |
 | GC-004 | Neon Idle Arcade | candidate | low | Tick-driven economy simulation with prestige reset | Meters, sliders, upgrade lists, skill tree, notifications, and settings | `achievement-toast-notification-system-html5`, `neon-ui-mega-bundle`, `progression-system-complete`, `runic-fantasy-ui-tabs`, `skill-progression-system-complete`, `tiny-save-settings-menu-starter` | Two specs | Progression rules dominate; much of the UI repeats already-proven primitives, so framework novelty is lowest |
 | GC-005 | High-Score Arcade | candidate | low | Fixed-screen deterministic arcade loop with score state | Title and pause shell, settings, name entry, high-score table, and toasts | `achievement-toast-notification-system-html5`, `neon-ui-mega-bundle`, `tiny-save-settings-menu-starter`, `tiny-ui-sfx-pack`, `ui-feedback-sfx-pack-v2` | One to two specs | Little new UI beyond what Vector Vortex already exercises |
-| GC-006 | Within Parameters migration | candidate | moderate | Existing visual novel engine; migration onto framework modules only | Dialogue panel, choices, dossier, route tracker, and save slots | `moonlit-pact-vn-gui-kit-renpy`, `tiny-save-settings-menu-starter` | Deferred by charter until the current delivery sequence completes | Charter-frozen sequencing; the dialogue module must not start early |
+| GC-006 | Within Parameters migration | candidate | moderate | Existing visual novel engine; consume framework Core primitives and author WP-local compositions | Dialogue panel, choices, dossier, route tracker, and save slots | `moonlit-pact-vn-gui-kit-renpy`, `tiny-save-settings-menu-starter` | Next migration after WP PR #6 (ff9f442), through Milestone 05 (spec/2026-09-28-wp-spec-01-framework-migration-and-stage-composition.md) | WP-local compositions claim no framework candidate; hold the reviewed main pin through Milestone 05 and its presentation follow-up unless the operator authorizes a new reviewed pin; CAP-015 stays deferred until both presentation units are accepted |
 
 **Vector Vortex's current role.** Vector Vortex is in flight (Specs 02 and 03 in the central queue). It consumes the current published GameUI foundations and Core primitives by vendoring, produces game-local wireframe shell and feedback candidates under `vv-` ownership, and hands those candidates to a later, separately approved backport spec. It does not repin mid-spec, and no framework module may claim ownership of a surface Vector Vortex is actively proving: notification, settings, tab, and feedback candidates wait for its backport reconciliation unless the operator overrides in UIREF-005.
 
 ## 7. Module Ladder (Agreed)
 
-All future game surfaces follow the [1080p-based 16:9 display contract](../project-charter.md#411-game-display-contract), adopted on 2026-09-14. The shared stage host and capture migration remain pending; see the [implementation handoff](../display-contract-review-2026-09-14.md). This foundation constraint does not reorder the ladder or repin active games.
+All future game surfaces follow the [1080p-based 16:9 display contract](../project-charter.md#411-game-display-contract), adopted on 2026-09-14. The shared framework stage host and capture migration remain pending; the [September display handoff](../display-contract-review-2026-09-14.md) records the original transition. Under the September 28 coordination decision recorded in charter v1.8, WP is the next migration after WP PR #6 (`ff9f442`) and owns the game-local stage-fit proof in Milestone 05. The framework builds no competing implementation while WP proves it. Shared-stage adoption follows a separate backport review after WP's implementation is accepted; Rogue Cellar retains Canvas-integration validation. WP migration does not wait for either Rogue Cellar or a shared framework host.
 
 The earlier proposed next queue is replaced by the agreed module ladder, recorded here from operator decision. The ladder is the standing build order for the framework's module work; it still authorizes nothing by itself, and each rung is a separately dispatched spec. No ladder item is added, removed, or reordered except by operator decision.
+
+WP consumes Core primitives and authors WP-local settings, modal, card, and dialogue compositions without claiming framework candidates. CAP-015 remains `defer` until WP Milestone 05 and its presentation follow-up are accepted; game-local dialogue does not start that module. Vector Vortex's consumer status and candidate ownership are unchanged. At Milestone 05 startup, WP adopts a reviewed framework `main` pin containing `a678a2b` with identical `src/`, and holds it through the follow-up unless the operator authorizes a new reviewed pin. This coordination decision does not reorder the ladder or repin Vector Vortex.
 
 | Order | Rung | Shape | Basis |
 |---|---|---|---|

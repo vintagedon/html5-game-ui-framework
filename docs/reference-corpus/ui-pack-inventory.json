@@ -2924,7 +2924,7 @@
       "bestGameConsumers": [
         "GC-006"
       ],
-      "missingEvidence": "Charter defers the dialogue module until Within Parameters completes its delivery sequence; this is sequencing, not evidence."
+      "missingEvidence": "Framework dialogue and visual-novel module deferred until WP presentation work (Milestone 05 and its follow-up unit) is accepted; WP-local dialogue composition does not start CAP-015."
     },
     {
       "id": "CAP-016",
@@ -3517,14 +3517,14 @@
       "name": "Within Parameters migration",
       "status": "candidate",
       "complexity": "moderate",
-      "engineCapability": "Existing visual novel engine; migration onto framework modules only",
+      "engineCapability": "Existing visual novel engine; consume framework Core primitives and author WP-local compositions",
       "gameuiPressure": "Dialogue panel, choices, dossier, route tracker, and save slots",
       "supportingPackIds": [
         "moonlit-pact-vn-gui-kit-renpy",
         "tiny-save-settings-menu-starter"
       ],
-      "expectedSpecs": "Deferred by charter until the current delivery sequence completes",
-      "risk": "Charter-frozen sequencing; the dialogue module must not start early"
+      "expectedSpecs": "Next migration after WP PR #6 (ff9f442), through Milestone 05 (spec/2026-09-28-wp-spec-01-framework-migration-and-stage-composition.md)",
+      "risk": "WP-local compositions claim no framework candidate; hold the reviewed main pin through Milestone 05 and its presentation follow-up unless the operator authorizes a new reviewed pin; CAP-015 stays deferred until both presentation units are accepted"
     }
   ]
 }
