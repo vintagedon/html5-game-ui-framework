@@ -203,4 +203,4 @@ Third-party reference material held locally under `reference-files-*` is license
 
 ---
 
-Last Updated: September 14, 2026 | Status: Rung 1 Review Open; Display Contract Adopted
+Last Updated: October 4, 2026 | Status: PR #3 Merged; WP Migration Next; Display Contract Adopted
